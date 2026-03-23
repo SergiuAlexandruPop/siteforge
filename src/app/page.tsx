@@ -1,5 +1,4 @@
 import { getClientConfig } from '@/lib/client-config'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function HomePage() {
   const config = getClientConfig()
@@ -9,22 +8,24 @@ export default function HomePage() {
     .map(([name]) => name)
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">SiteForge is running</CardTitle>
-          <CardDescription>Phase 1A scaffold is working correctly.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Active Client</p>
-            <p className="text-lg font-semibold">{config.displayName}</p>
-            <p className="text-sm text-muted-foreground">{config.domain}</p>
-          </div>
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            {config.displayName}
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            {config.seo.siteDescription}
+          </p>
+        </div>
 
-          <div>
+        <div className="rounded-lg border border-border bg-card p-6">
+          <p className="text-sm font-medium text-muted-foreground">SiteForge Status</p>
+          <p className="mt-1 text-sm text-green-600">Phase 1C scaffold is working correctly.</p>
+
+          <div className="mt-4">
             <p className="text-sm font-medium text-muted-foreground">Enabled Features</p>
-            <div className="mt-1 flex flex-wrap gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               {enabledFeatures.map((feature) => (
                 <span
                   key={feature}
@@ -36,23 +37,11 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Navigation</p>
-            <ul className="mt-1 space-y-1">
-              {config.navigation.map((item) => (
-                <li key={item.href} className="text-sm">
-                  <span className="text-foreground">{item.label}</span>
-                  <span className="text-muted-foreground"> &mdash; {item.href}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <p className="text-xs text-muted-foreground">
-            Next step: Phase 1C &mdash; Layout Shell (Header, Footer, MobileMenu)
+          <p className="mt-4 text-xs text-muted-foreground">
+            Next step: Phase 2A — Content rendering from markdown files
           </p>
-        </CardContent>
-      </Card>
-    </main>
+        </div>
+      </div>
+    </div>
   )
 }

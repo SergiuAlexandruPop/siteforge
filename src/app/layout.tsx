@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
 import { getClientConfig } from '@/lib/client-config'
+import { LayoutShell } from '@/components/layout/LayoutShell'
 import { DevBanner } from '@/components/dev/DevBanner'
 import './globals.css'
 
@@ -59,7 +60,9 @@ export default function RootLayout({
   return (
     <html lang={config.defaultLanguage} suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+        <LayoutShell config={config}>
+          {children}
+        </LayoutShell>
         {isDev && (
           <DevBanner
             clientName={config.name}
