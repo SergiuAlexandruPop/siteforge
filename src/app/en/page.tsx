@@ -1,24 +1,27 @@
 import { getClientConfig } from '@/lib/client-config'
 import { getHomePage } from '@/lib/content'
-import { notFound } from 'next/navigation'
+import { NotAvailable } from '@/components/i18n/NotAvailable'
 import type { Metadata } from 'next'
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = getClientConfig()
-  if (!config.features.i18n) return {}
+  const page = await getHomePage('en')
 
   return {
+    title: page?.frontmatter.title ?? config.seo.siteName,
+    description: page?.frontmatter.description ?? config.seo.siteDescription,
     alternates: {
-      languages: { en: '/en' },
+      languages: { ro: '/' },
     },
   }
 }
 
-export default async function HomePage() {
-  const config = getClientConfig()
-  const page = await getHomePage(config.defaultLanguage)
+export default async function EnglishHomePage() {
+  const page = await getHomePage('en')
 
-  if (!page) notFound()
+  if (!page) {
+    return <NotAvailable romanianHref="/" />
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">

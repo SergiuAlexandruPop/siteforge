@@ -1,7 +1,7 @@
 import { getClientConfig } from '@/lib/client-config'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
 import { ContactForm } from '@/components/contact/ContactForm'
-import { notFound } from 'next/navigation'
+import { NotAvailable } from '@/components/i18n/NotAvailable'
 import type { Metadata } from 'next'
 
 interface PageProps {
@@ -9,16 +9,20 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
+  // Generate params for all Romanian slugs — English pages that don't exist
+  // will show the NotAvailable placeholder instead of 404
   const config = getClientConfig()
-  const slugs = getPageSlugs(config.defaultLanguage)
+  const roSlugs = getPageSlugs('ro')
+  const enSlugs = getPageSlugs('en')
 
-  return slugs.map((slug) => ({ slug }))
+  // Union of both so we cover all possible slugs
+  const allSlugs = [...new Set([...roSlugs, ...enSlugs])]
+  return allSlugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const config = getClientConfig()
-  const page = await getPageBySlug(slug, config.defaultLanguage)
+  const page = await getPageBySlug(slug, 'en')
 
   if (!page) return {}
 
@@ -29,20 +33,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: page.frontmatter.title,
       description: page.frontmatter.description,
     },
-    ...(config.features.i18n && {
-      alternates: {
-        languages: { en: `/en/${slug}` },
-      },
-    }),
+    alternates: {
+      languages: { ro: `/${slug}` },
+    },
   }
 }
 
-export default async function DynamicPage({ params }: PageProps) {
+export default async function EnglishDynamicPage({ params }: PageProps) {
   const { slug } = await params
   const config = getClientConfig()
-  const page = await getPageBySlug(slug, config.defaultLanguage)
+  const page = await getPageBySlug(slug, 'en')
 
-  if (!page) notFound()
+  if (!page) {
+    return <NotAvailable romanianHref={`/${slug}`} />
+  }
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">

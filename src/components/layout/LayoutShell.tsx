@@ -1,6 +1,7 @@
 import type { ClientConfig } from '@/types/config'
 import { Header } from './Header'
 import { Footer } from './Footer'
+import { LanguageToggle } from '@/components/i18n/LanguageToggle'
 
 interface LayoutShellProps {
   config: ClientConfig
@@ -14,6 +15,7 @@ export function LayoutShell({ config, children }: LayoutShellProps) {
         displayName={config.displayName}
         navigation={config.navigation}
         currentLanguage={config.defaultLanguage}
+        languageToggle={config.features.i18n ? <LanguageToggle /> : undefined}
       />
 
       <main className="flex-1">
