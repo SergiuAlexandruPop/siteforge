@@ -1,5 +1,6 @@
 import { getClientConfig } from '@/lib/client-config'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
+import { ContactForm } from '@/components/contact/ContactForm'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -56,6 +57,12 @@ export default async function DynamicPage({ params }: PageProps) {
           className="prose prose-slate max-w-none dark:prose-invert"
           dangerouslySetInnerHTML={{ __html: page.contentHtml }}
         />
+
+        {slug === 'contact' && config.features.contactForm && (
+          <div className="mt-8 max-w-lg">
+            <ContactForm />
+          </div>
+        )}
       </div>
     </div>
   )
