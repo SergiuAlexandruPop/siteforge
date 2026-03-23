@@ -22,8 +22,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) return {}
 
   return {
-    title: `${page.frontmatter.title} — ${config.seo.siteName}`,
+    title: page.frontmatter.title,
     description: page.frontmatter.description,
+    openGraph: {
+      title: page.frontmatter.title,
+      description: page.frontmatter.description,
+    },
   }
 }
 

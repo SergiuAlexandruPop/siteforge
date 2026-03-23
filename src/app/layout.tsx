@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 
 import { getClientConfig } from '@/lib/client-config'
 import { LayoutShell } from '@/components/layout/LayoutShell'
+import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
 import './globals.css'
 
@@ -13,10 +14,27 @@ const inter = Inter({
 
 export function generateMetadata(): Metadata {
   const config = getClientConfig()
+  const baseUrl = config.domain === 'localhost'
+    ? 'http://localhost:3000'
+    : `https://${config.domain}`
 
   return {
-    title: config.seo.siteName,
+    title: {
+      default: config.seo.siteName,
+      template: `%s — ${config.seo.siteName}`,
+    },
     description: config.seo.siteDescription,
+    metadataBase: new URL(baseUrl),
+    openGraph: {
+      type: 'website',
+      siteName: config.seo.siteName,
+      locale: config.defaultLanguage === 'ro' ? 'ro_RO' : 'en_US',
+      images: [{ url: config.seo.ogImage, width: 1200, height: 630 }],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
   }
 }
 
@@ -60,6 +78,7 @@ export default function RootLayout({
   return (
     <html lang={config.defaultLanguage} suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <JsonLd config={config} />
         <LayoutShell config={config}>
           {children}
         </LayoutShell>
