@@ -41,7 +41,9 @@ function getContentDir(): string {
  * Converts a markdown string to HTML.
  */
 async function markdownToHtml(markdown: string): Promise<string> {
-  const result = await remark().use(html).process(markdown)
+  const result = await remark()
+    .use(html, { allowDangerousHtml: true })
+    .process(markdown)
   return result.toString()
 }
 

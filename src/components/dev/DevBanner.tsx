@@ -16,15 +16,46 @@ interface DevBannerProps {
   envVars: EnvVarStatus[]
 }
 
+/**
+ * Maps env vars to their controlling feature flag.
+ * If the feature is off, the env var is irrelevant (not a real "missing").
+ */
+const ENV_FEATURE_MAP: Record<string, keyof ClientFeatures | null> = {
+  ACTIVE_CLIENT: null, // always required
+  R2_ACCOUNT_ID: 'blog',
+  R2_ACCESS_KEY_ID: 'blog',
+  R2_SECRET_ACCESS_KEY: 'blog',
+  R2_BUCKET_NAME: 'blog',
+  R2_PUBLIC_URL: 'blog',
+  RESEND_API_KEY: 'contactForm',
+  RESEND_FROM_EMAIL: 'contactForm',
+  RESEND_TO_EMAIL: 'contactForm',
+  GITHUB_TOKEN: 'blog',
+  GITHUB_REPO: 'blog',
+  ADMIN_PASSWORD: 'blog',
+  ADMIN_SESSION_SECRET: 'blog',
+  NEXT_PUBLIC_SMARTSUPP_ID: 'smartsupp',
+  NEXT_PUBLIC_GA4_ID: null, // always optional, no feature flag gate
+}
+
+function isRelevant(envName: string, features: ClientFeatures): boolean {
+  const feature = ENV_FEATURE_MAP[envName]
+  if (feature === null || feature === undefined) return true
+  return features[feature]
+}
+
 export function DevBanner({ clientName, displayName, features, envVars }: DevBannerProps) {
   const [dismissed, setDismissed] = useState(false)
   const [expanded, setExpanded] = useState(false)
 
   if (dismissed) return null
 
-  const missingRequired = envVars.filter((v) => v.required && !v.set)
-  const missingOptional = envVars.filter((v) => !v.required && !v.set)
-  const allSet = envVars.filter((v) => v.set)
+  // Filter to only relevant env vars based on active features
+  const relevantVars = envVars.filter((v) => isRelevant(v.name, features))
+
+  const missingRequired = relevantVars.filter((v) => v.required && !v.set)
+  const missingOptional = relevantVars.filter((v) => !v.required && !v.set)
+  const allSet = relevantVars.filter((v) => v.set)
 
   const statusColor =
     missingRequired.length > 0
@@ -101,7 +132,9 @@ export function DevBanner({ clientName, displayName, features, envVars }: DevBan
 
           {/* Environment */}
           <div className="px-3 py-2">
-            <div className="mb-1 text-slate-400">Environment</div>
+            <div className="mb-1 text-slate-400">
+              Environment ({relevantVars.length} relevant)
+            </div>
 
             {missingRequired.length > 0 && (
               <div className="mb-1">
@@ -122,7 +155,7 @@ export function DevBanner({ clientName, displayName, features, envVars }: DevBan
             )}
 
             <div className="text-green-400">
-              {allSet.length}/{envVars.length} vars configured
+              {allSet.length}/{relevantVars.length} vars configured
             </div>
           </div>
         </div>

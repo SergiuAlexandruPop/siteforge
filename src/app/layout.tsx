@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { getClientConfig } from '@/lib/client-config'
+import { getClientConfig, getClientTheme } from '@/lib/client-config'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
+import { ThemeProvider } from '@/components/theme/ThemeProvider'
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
+import { Smartsupp } from '@/components/integrations/Smartsupp'
+import { generateThemeCss } from '@/lib/theme-css'
 import './globals.css'
 
 const inter = Inter({
@@ -67,28 +71,85 @@ function getEnvStatus() {
   ]
 }
 
+// ---------------------------------------------------------------------------
+// Inline script to prevent FOUC (Flash of Unstyled Content) for dark mode.
+// Runs before React hydrates — reads localStorage and applies .dark class
+// immediately so the user never sees a white flash.
+// ---------------------------------------------------------------------------
+const themeInitScript = `
+(function(){
+  try {
+    var stored = localStorage.getItem('siteforge-theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (stored === 'dark' || (!stored && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch(e) {}
+})();
+`
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   const config = getClientConfig()
+  const theme = getClientTheme()
+  const themeCss = generateThemeCss(theme)
   const isDev = process.env.NODE_ENV === 'development'
+  const darkModeEnabled = config.features.darkMode
+  const ga4Id = process.env.NEXT_PUBLIC_GA4_ID ?? ''
+  const smartsuppId = process.env.NEXT_PUBLIC_SMARTSUPP_ID ?? ''
+
+  const appContent = (
+    <>
+      <JsonLd config={config} />
+      <LayoutShell config={config}>
+        {children}
+      </LayoutShell>
+
+      {/* Analytics — only loads when GA4 ID is set */}
+      {ga4Id && <GoogleAnalytics gaId={ga4Id} />}
+
+      {/* Smartsupp — only loads when feature is on AND ID is set */}
+      {config.features.smartsupp && smartsuppId && (
+        <Smartsupp smartsuppId={smartsuppId} />
+      )}
+
+      {/* Dev overlay — only in development */}
+      {isDev && (
+        <DevBanner
+          clientName={config.name}
+          displayName={config.displayName}
+          features={config.features}
+          envVars={getEnvStatus()}
+        />
+      )}
+    </>
+  )
 
   return (
     <html lang={config.defaultLanguage} suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <JsonLd config={config} />
-        <LayoutShell config={config}>
-          {children}
-        </LayoutShell>
-        {isDev && (
-          <DevBanner
-            clientName={config.name}
-            displayName={config.displayName}
-            features={config.features}
-            envVars={getEnvStatus()}
-          />
+      <head>
+        {/* Client theme colors — overrides shadcn defaults with client's brand */}
+        <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+        {/* Client fonts — loaded from Google Fonts */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          :root {
+            --font-heading: '${theme.fonts.heading}', sans-serif;
+            --font-body: '${theme.fonts.body}', sans-serif;
+            --font-blog: '${theme.fonts.blog}', serif;
+          }
+        `}} />
+        {darkModeEnabled && (
+          <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        )}
+      </head>
+      <body className={`${inter.variable} font-sans antialiased transition-colors duration-200`}>
+        {darkModeEnabled ? (
+          <ThemeProvider>{appContent}</ThemeProvider>
+        ) : (
+          appContent
         )}
       </body>
     </html>

@@ -56,7 +56,7 @@ export function BlogPost({ post }: BlogPostProps) {
       {/* Content — Medium-style typography */}
       <div
         className="prose prose-slate max-w-none dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-p:leading-[1.8] prose-p:text-foreground/90 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-blockquote:border-primary/50 prose-blockquote:text-muted-foreground"
-        style={{ fontFamily: 'Georgia, serif' }}
+        style={{ fontFamily: 'var(--font-blog)' }}
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
 

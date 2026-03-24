@@ -1,9 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+
+// Lazy-load Novel editor to avoid SSR issues and reduce initial bundle
+const NovelEditor = lazy(() =>
+  import('@/components/blog/NovelEditor').then((mod) => ({ default: mod.NovelEditor }))
+)
 
 interface PostMeta {
   title: string
@@ -112,43 +117,43 @@ export default function EditorPage() {
   const [loading, setLoading] = useState(!isNew)
   const [error, setError] = useState('')
   const [autoSlug, setAutoSlug] = useState(true)
+  const [editorReady, setEditorReady] = useState(false)
+  const [useMarkdown, setUseMarkdown] = useState(false)
 
   // Load existing post
   useEffect(() => {
-    if (isNew || !existingFilename) return
+    if (isNew || !existingFilename) {
+      setEditorReady(true)
+      return
+    }
 
     async function loadPost() {
       try {
-        const blogDir = language === 'en' ? 'blog-en' : 'blog'
-        const clientName = document.cookie
-          .split('; ')
-          .find((c) => c.startsWith('ACTIVE_CLIENT='))?.split('=')[1] ?? 'portfolio'
-
         // Fetch post list to get sha
         const response = await fetch(`/api/blog?language=${language}`)
         const data = await response.json()
 
         if (!response.ok) {
-          setError('Failed to load post.')
+          setError('Nu s-a putut încărca postarea.')
           setLoading(false)
+          setEditorReady(true)
           return
         }
 
         const post = data.posts.find((p: { filename: string }) => p.filename === existingFilename)
         if (!post) {
-          setError('Post not found.')
+          setError('Postarea nu a fost găsită.')
           setLoading(false)
+          setEditorReady(true)
           return
         }
 
-        // Now fetch the actual file content via a dedicated endpoint
-        // For simplicity, we'll re-read from GitHub through our API
+        // Fetch the actual file content
         const fileResponse = await fetch(
           `/api/blog/file?path=${encodeURIComponent(post.filePath)}`
         )
 
         if (!fileResponse.ok) {
-          // Fallback: use the list data we already have
           setSha(post.sha)
           setMeta((prev) => ({
             ...prev,
@@ -159,6 +164,7 @@ export default function EditorPage() {
           }))
           setAutoSlug(false)
           setLoading(false)
+          setEditorReady(true)
           return
         }
 
@@ -180,9 +186,10 @@ export default function EditorPage() {
         setSha(fileData.sha)
         setAutoSlug(false)
       } catch {
-        setError('Failed to load post.')
+        setError('Nu s-a putut încărca postarea.')
       } finally {
         setLoading(false)
+        setEditorReady(true)
       }
     }
 
@@ -192,7 +199,6 @@ export default function EditorPage() {
   function updateMeta(field: keyof PostMeta, value: string | boolean | number) {
     setMeta((prev) => {
       const updated = { ...prev, [field]: value }
-      // Auto-generate slug from title
       if (field === 'title' && autoSlug) {
         updated.slug = generateSlug(value as string)
       }
@@ -362,16 +368,42 @@ export default function EditorPage() {
           />
         </div>
 
-        {/* Content editor — plain textarea for now, Novel integration in next step */}
+        {/* Editor toggle + content area */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium">Conținut (Markdown)</label>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={20}
-            className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono"
-            placeholder="Scrie conținutul postării în format markdown..."
-          />
+          <div className="mb-1.5 flex items-center justify-between">
+            <label className="block text-sm font-medium">Conținut</label>
+            <button
+              type="button"
+              onClick={() => setUseMarkdown(!useMarkdown)}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {useMarkdown ? '← Editor vizual' : 'Editare Markdown →'}
+            </button>
+          </div>
+
+          {useMarkdown ? (
+            /* Markdown textarea fallback */
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={20}
+              className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring font-mono"
+              placeholder="Scrie conținutul postării în format markdown..."
+            />
+          ) : (
+            /* Novel WYSIWYG editor */
+            editorReady && (
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[400px] items-center justify-center rounded-md border border-input">
+                    <p className="text-sm text-muted-foreground">Se încarcă editorul...</p>
+                  </div>
+                }
+              >
+                <NovelEditor initialContent={body} onChange={setBody} />
+              </Suspense>
+            )
+          )}
         </div>
       </div>
     </div>

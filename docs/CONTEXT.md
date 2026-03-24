@@ -8,14 +8,14 @@
 
 ## Last Updated
 **Date:** 2026-03-24
-**Updated By:** Claude — Phase 3B complete
+**Updated By:** Claude — Phase 3C + Theme wiring complete
 
 ---
 
 ## Current Phase
-**Phase 3B — Blog Admin CMS (Complete)**
+**Phases 1-4 Complete + Phase 3C Complete + Theme wiring done**
 
-See `docs/ROADMAP.md` for full phase details.
+Ready for Phase 5: Portfolio Design & Content.
 
 ---
 
@@ -26,77 +26,64 @@ See `docs/ROADMAP.md` for full phase details.
 **Phase 1A+1B: Project Skeleton & Dev Tooling**
 - Next.js 15 with TypeScript strict mode, Turbopack for dev
 - Tailwind CSS v3 + shadcn/ui (Button, Input, Card)
-- `clients/_template/` and `clients/portfolio/` with full config
-- `src/types/config.ts` — ClientConfig and ClientTheme interfaces
-- `src/lib/client-config.ts` — loads active client from env (explicit import registry)
-- `scripts/dev.ts` — CLI copies env + starts Turbopack dev server
-- `src/components/dev/DevBanner.tsx` — floating dev overlay
+- Client config system with template and portfolio
+- CLI dev scripts, DevBanner overlay
 
 **Phase 1C: Layout Shell**
-- `src/components/layout/Header.tsx` — sticky responsive nav, mobile hamburger, slots for toggles
-- `src/components/layout/MobileMenu.tsx` — slide-in mobile menu with backdrop, ESC close, body scroll lock
-- `src/components/layout/Footer.tsx` — contact info, copyright, "Built with SiteForge"
-- `src/components/layout/LayoutShell.tsx` — composes Header + main + Footer
+- Sticky header, mobile menu, footer, LayoutShell composition
 
-**Phase 2A: Content Rendering**
-- `src/lib/content.ts` — reads .md files, parses frontmatter (gray-matter), converts to HTML (remark)
-- `src/app/page.tsx` — homepage from index.md
-- `src/app/[slug]/page.tsx` — dynamic pages from markdown with generateStaticParams
-
-**Phase 2B: SEO**
-- Layout metadata with OG tags, title template (`%s — Site Name`)
-- `src/components/seo/JsonLd.tsx` — Organization + WebSite structured data
-- `src/app/sitemap.ts` — auto-generated from pages + blog posts (both languages)
-- `src/app/robots.ts` — allows all, disallows /admin/ and /api/
-
-**Phase 2C: Contact Form**
-- `src/components/contact/ContactForm.tsx` — client-side validation, loading/success/error states
-- `src/app/api/contact/route.ts` — server validation + Resend integration
-- `src/lib/resend.ts` — Resend API utility
-- Form renders on `/contact` page when `features.contactForm` is true
-
-**Phase 2D: i18n**
-- `src/app/en/page.tsx` and `src/app/en/[slug]/page.tsx` — English routes
-- `src/components/i18n/LanguageToggle.tsx` — RO/EN toggle in header (only when features.i18n true)
-- `src/components/i18n/NotAvailable.tsx` — placeholder when English content missing
-- hreflang alternate tags on all pages
+**Phase 2A-2D: Core Modules**
+- Markdown content rendering (gray-matter + remark-html with allowDangerousHtml)
+- SEO (metadata API, JSON-LD, sitemap, robots.txt)
+- Contact form (client validation + Resend server-side)
+- i18n (Romanian default, /en/ prefix, language toggle, NotAvailable placeholder)
 
 **Phase 3A: Blog Frontend**
-- `src/types/blog.ts` — BlogMeta, BlogPost interfaces
-- `src/lib/content.ts` — added getAllBlogPosts, getBlogBySlug, getBlogSlugs, parseBlogMeta
-- `src/components/blog/BlogCard.tsx` — card with image, title, excerpt, date, tags, reading time
-- `src/components/blog/BlogList.tsx` — responsive grid (1/2/3 cols)
-- `src/components/blog/BlogPost.tsx` — Medium-style renderer (680px max, serif font, author bar)
-- `src/app/blog/page.tsx` and `src/app/blog/[slug]/page.tsx` — Romanian blog routes
-- `src/app/en/blog/page.tsx` and `src/app/en/blog/[slug]/page.tsx` — English blog routes
-- BlogPosting JSON-LD on individual posts
-- Blog posts added to sitemap
+- Blog listing, individual posts (Medium-style), BlogPosting JSON-LD
+- Romanian + English blog routes
 
-**Phase 3B: Blog Admin CMS**
-- `src/lib/auth.ts` — JWT session with jose, password verification from env
-- `src/middleware.ts` — protects /admin/* routes (except login page)
-- `src/app/admin/page.tsx` — login page (Romanian labels)
-- `src/app/admin/dashboard/page.tsx` — post list with RO/EN toggle, edit/delete (Romanian labels)
-- `src/app/admin/editor/[slug]/page.tsx` — metadata fields + markdown textarea editor (Romanian labels)
-- `src/lib/github.ts` — GitHub API utilities (read, create, update, delete files)
-- `src/app/api/auth/route.ts` — login endpoint
-- `src/app/api/blog/route.ts` — CRUD (list, create/update, delete) via GitHub API
-- `src/app/api/blog/file/route.ts` — read single file for editing
-- All admin UI labels are in Romanian
+**Phase 3B: Blog Admin CMS + Novel Editor**
+- JWT auth (jose), middleware-protected /admin routes
+- Dashboard with RO/EN toggle, CRUD via GitHub API
+- Novel 0.5 WYSIWYG editor with full toolbar (H2/H3/H4, B/I/U/S, code, lists, blockquote, code block, HR, link, image)
+- Toggle between visual editor and raw markdown
+- Bubble menu on text selection
+
+**Phase 3C: Image Upload Pipeline**
+- `src/lib/r2.ts` — Cloudflare R2 upload/delete via AWS S3 SDK
+- `src/lib/image-optimize.ts` — Sharp resize (max 1200px), WebP conversion, EXIF stripping
+- `src/app/api/upload/route.ts` — authenticated upload endpoint
+- Three upload methods: toolbar button (file picker), drag-and-drop, paste
+- Custom Tiptap image extension with `data-size` (small/medium/full) and `data-align` (left/center/right)
+- Floating image toolbar appears on image click with size + alignment controls
+- Image CSS works in both editor and public blog (uses data attributes)
+- `allowDangerousHtml: true` in remark-html to preserve img data attributes in public blog
+
+**Phase 4A-4D: Optional Modules**
+- Dark mode (ThemeProvider, ThemeToggle, anti-FOUC script, feature-flag gated)
+- Smartsupp chat widget (feature-flag + env gated)
+- Google Analytics GA4 (env gated, next/script afterInteractive)
+- DevBanner with smart env filtering by feature flags
+
+**Theme System**
+- `src/lib/theme-css.ts` — converts client theme.ts hex colors → HSL CSS variables
+- Layout injects `<style>` tag overriding shadcn defaults with client's brand colors
+- Font CSS variables (--font-heading, --font-body, --font-blog) from theme.ts
+- BlogPost uses --font-blog variable instead of hardcoded Georgia
 
 ### What Is In Progress
-- Nothing. Awaiting next phase.
+- Nothing. Ready for Phase 5.
 
 ### Known Issues
-- CMS saves to GitHub, but in dev mode you must `git pull` to see new posts locally (expected — in production, Vercel rebuilds automatically)
-- Novel WYSIWYG editor not yet integrated — currently using plain markdown textarea. Non-technical clients will need the visual editor.
-- `blog-en/` directory may not exist on GitHub until first English post is created — the API handles this gracefully (returns empty list)
+- CMS saves to GitHub; in dev mode you must `git pull` to see new posts locally
+- `blog-en/` directory may not exist until first English post is created
+- Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
+- Google Fonts not loaded via `<link>` tag yet — currently only CSS variables set. Works when fonts match system/Inter (loaded via next/font). Other fonts need a Google Fonts `<link>` in head.
 
 ### Tech Debt
-- Client config loader uses explicit imports per client (src/lib/client-config.ts). Phase 6 CLI will automate registration.
-- Theme tokens from client theme.ts not yet wired into CSS variables dynamically. Uses shadcn defaults in globals.css.
-- Admin editor uses plain textarea instead of Novel WYSIWYG editor — planned upgrade.
-- No image upload pipeline yet (Phase 3C).
+- Client config loader uses explicit imports per client. Phase 6 CLI will automate.
+- Google Fonts loading should dynamically add `<link>` for non-Inter fonts.
+- Novel editor image drag-drop shows no loading indicator during upload.
 
 ---
 
@@ -104,34 +91,17 @@ See `docs/ROADMAP.md` for full phase details.
 
 | # | Decision | Rationale | Date |
 |---|----------|-----------|------|
-| 1 | Next.js App Router (not Pages Router) | Modern standard, RSC support, better file-based routing | Planning |
-| 2 | Mono-repo with client config folders (not separate repos) | 5-7 clients makes this maintainable; one fix applies to all | Planning |
-| 3 | Tailwind CSS + shadcn/ui (not other component libraries) | Tailwind is AI-friendly; shadcn is copy-paste, no dependency | Planning |
-| 4 | Cloudflare R2 for images (not Supabase Storage) | 10GB free, 500 buckets, no per-project limit | Planning |
-| 5 | Resend for email (not EmailJS/Formspree) | 100 emails/day free, server-side, React Email templates | Planning |
-| 6 | Novel editor for CMS (not Tiptap raw/custom) | Medium-style UX out of box, built on Tiptap + Tailwind | Planning |
-| 7 | Markdown files in repo for blog (not database) | Zero cost, version-controlled, works without Supabase | Planning |
-| 8 | Custom micro-CMS (not third-party headless CMS) | Fewer dependencies, full control, simpler architecture | Planning |
-| 9 | GitHub API for CMS file operations | No database needed for blog CRUD; files commit to repo | Planning |
-| 10 | Supabase optional per client (not required) | Most clients won't need a database; add only when needed | Planning |
-| 11 | Romanian default language, English under /en/ | Simple routing, no middleware locale detection | Planning |
-| 12 | Separate blog posts per language (Medium model) | Simpler than translation linking, cleaner for SEO | Planning |
-| 13 | Password auth via env var for admin (not OAuth) | Simplest possible auth for blog CMS; no database needed | Planning |
-| 14 | Single main branch for all content | Content branch adds complexity without enough benefit for 5-7 clients | Planning |
-| 15 | GA4 + Google Search Console for analytics | Both free, industry standard, sufficient for all clients | Planning |
-| 16 | Dev mode floating banner for config warnings | Prevents config mistakes, shows active client and status | Planning |
-| 17 | CLI scripts for client switching in dev | yarn dev:{client-name} swaps env and starts server | Planning |
-| 18 | Sharp for image optimization before R2 upload | Resize, WebP conversion, EXIF stripping on server | Planning |
-| 19 | Two-tier architecture (starter kit + separate repos for full apps) | Health SaaS and complex apps don't belong in this repo | Planning |
-| 20 | Turso as backup DB if Supabase free tier exhausted | 500 free databases, SQLite, generous limits | Planning |
-| 21 | Yarn as package manager (not npm) | User preference | Phase 1A |
-| 22 | Next.js 15 with Turbopack for dev (not Vite) | Keeps SSG, API routes, SEO; Turbopack gives near-Vite dev speed | Phase 1A |
-| 23 | Tailwind v3 (not v4) | shadcn/ui compatibility, tailwind.config.ts pattern | Phase 1A |
-| 24 | Explicit client imports in client-config.ts (not dynamic) | Turbopack/webpack reliability; dynamic imports of config files are fragile | Phase 1A |
-| 25 | Simple /en/ nested routes (not [lang] route group) | Quick implementation, works now, minor lang attribute compromise | Phase 2D |
-| 26 | Plain textarea for CMS editor initially (not Novel) | Pragmatic — full CRUD works, Novel upgrade is a separate step | Phase 3B |
-| 27 | Admin UI labels always in Romanian (not internationalized) | Admin is internal tool for Romanian clients | Phase 3B |
-| 28 | jose for JWT sessions (not next-auth) | Lightweight, no database, simple password auth | Phase 3B |
+| 1-28 | (See previous entries) | | Planning-Phase 3B |
+| 29 | Anti-FOUC inline script for dark mode | Zero dependency, works with feature flags | Phase 4A |
+| 30 | next/script afterInteractive for GA4 | Next.js recommended, better loading | Phase 4C |
+| 31 | Smart DevBanner env filtering by feature flags | Reduces noise, only relevant warnings | Phase 4D |
+| 32 | Novel editor with markdown fallback toggle | Power users get raw markdown, clients get WYSIWYG | Novel |
+| 33 | Lazy-load Novel editor (React.lazy + Suspense) | Avoids SSR issues, reduces initial bundle | Novel |
+| 34 | Novel MarkdownExtension for markdown↔editor | Native markdown round-trip, saves as .md | Novel |
+| 35 | Custom uploadAndInsert instead of Novel's createImageUpload | Novel's version requires UploadImagesPlugin; ours is simpler | Phase 3C |
+| 36 | Predefined image sizes + alignment (not free-form resize) | Simpler, works with markdown, clients understand small/medium/full | Phase 3C |
+| 37 | data-size/data-align attributes on images | Survives markdown round-trip as HTML, CSS handles display | Phase 3C |
+| 38 | Theme CSS variables generated from theme.ts at build time | Each client gets their brand colors without touching globals.css | Theme |
 
 ---
 
@@ -139,7 +109,7 @@ See `docs/ROADMAP.md` for full phase details.
 
 | Client | Folder Name | Domain | Status | Features Enabled |
 |--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 3B complete | blog, i18n, darkMode, contactForm |
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phases 1-4 complete | blog, i18n, darkMode, contactForm |
 | Doctor | `doctor-maria` | TBD | Not started | TBD |
 | Electrician | `electrician-ion` | TBD | Not started | TBD |
 
@@ -150,26 +120,22 @@ See `docs/ROADMAP.md` for full phase details.
 | Package | Version | Purpose |
 |---------|---------|---------|
 | next | ^15.1.0 | Framework |
-| react | ^19.0.0 | UI library |
-| react-dom | ^19.0.0 | React DOM renderer |
-| class-variance-authority | ^0.7.1 | Component variant utility (shadcn) |
-| @radix-ui/react-slot | ^1.1.1 | Slot primitive (shadcn Button) |
-| clsx | ^2.1.1 | Class name utility |
-| tailwind-merge | ^2.6.0 | Tailwind class deduplication |
-| gray-matter | ^4.0.3 | Markdown frontmatter parser |
-| remark | ^15.0.1 | Markdown processor |
-| remark-html | ^16.0.1 | Markdown to HTML |
+| react / react-dom | ^19.0.0 | UI library |
+| class-variance-authority | ^0.7.1 | Component variants (shadcn) |
+| @radix-ui/react-slot | ^1.1.1 | Slot primitive (shadcn) |
+| clsx + tailwind-merge | ^2.1.1 / ^2.6.0 | Class utilities |
+| gray-matter | ^4.0.3 | Markdown frontmatter |
+| remark + remark-html | ^15.0.1 / ^16.0.1 | Markdown to HTML |
 | resend | ^4.1.0 | Email API |
-| novel | ^0.5.0 | WYSIWYG editor (installed, not yet integrated) |
-| jose | ^5.9.0 | JWT signing/verification |
-| typescript | ^5.7.0 | Type checker |
-| tailwindcss | ^3.4.17 | CSS framework |
-| postcss | ^8.4.49 | CSS processing |
-| autoprefixer | ^10.4.20 | CSS vendor prefixes |
-| tailwindcss-animate | ^1.0.7 | Animation utilities (shadcn) |
-| @tailwindcss/typography | ^0.5.15 | Prose styling for blog |
-| tsx | ^4.19.0 | TypeScript script runner (CLI) |
-| cross-env | ^7.0.3 | Cross-platform env var setting |
+| novel | ^0.5.0 | WYSIWYG editor |
+| jose | ^5.9.0 | JWT sessions |
+| @aws-sdk/client-s3 | latest | R2 upload (S3-compatible) |
+| sharp | latest | Image optimization |
+| tailwindcss + postcss + autoprefixer | ^3.4.17 | CSS |
+| tailwindcss-animate | ^1.0.7 | Animations (shadcn) |
+| @tailwindcss/typography | ^0.5.15 | Prose styling |
+| tsx | ^4.19.0 | Script runner |
+| cross-env | ^7.0.3 | Cross-platform env |
 
 ---
 
@@ -177,9 +143,9 @@ See `docs/ROADMAP.md` for full phase details.
 
 | Service | Account Created | Configured | Notes |
 |---------|----------------|------------|-------|
-| GitHub | Yes | Yes | Repo created, token configured for CMS |
+| GitHub | Yes | Yes | Repo + token for CMS |
+| Cloudflare R2 | Yes | Yes | Bucket created, keys in env |
 | Vercel | TBD | No | Need account + project per client |
-| Cloudflare R2 | TBD | No | Need account + bucket per client |
 | Resend | TBD | No | Need account + API key |
 | Google Analytics | TBD | No | Need GA4 property per client |
 | Google Search Console | TBD | No | Need verification per domain |
@@ -189,14 +155,15 @@ See `docs/ROADMAP.md` for full phase details.
 
 ## Next Steps
 
-**Next chat should:** Choose between:
-1. **Phase 3C: Image Upload Pipeline** — Sharp optimization → R2 upload for blog images
-2. **Phase 4: Optional Modules** — Dark mode, Smartsupp, Analytics, DevBanner polish
-3. **Novel editor integration** — Replace markdown textarea with WYSIWYG editor for non-technical users
+**Next chat should:** Begin Phase 5 — Portfolio Design & Content.
 
-Phase 3C requires a Cloudflare R2 account + bucket. Phase 4 has no external dependencies. Novel integration is a focused upgrade.
-
-**Recommended order:** Phase 4 first (no external deps, quick wins), then Novel editor, then Phase 3C (when R2 is set up).
+Phase 5 involves:
+1. Design portfolio homepage layout (hero, projects, about snippet, blog preview)
+2. Design projects page, about page, contact page
+3. Write content in Romanian
+4. Implement portfolio-specific components
+5. Finalize theme with actual brand colors/fonts
+6. Deploy to Vercel with custom domain
 
 ---
 
@@ -204,7 +171,7 @@ Phase 3C requires a Cloudflare R2 account + bucket. Phase 4 has no external depe
 
 - The user has NO backend/database/DevOps experience. Explain everything step by step.
 - The user develops on Windows 11 with WebStorm.
-- The user uses Claude Desktop with MCP for development (filesystem tools available).
+- The user uses Claude Desktop with MCP for development.
 - The user prefers Yarn over npm.
 - Admin UI labels should always be in Romanian.
 - Always plan before coding. Always work in small phases.

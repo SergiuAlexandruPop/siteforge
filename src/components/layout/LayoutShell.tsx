@@ -2,6 +2,7 @@ import type { ClientConfig } from '@/types/config'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { LanguageToggle } from '@/components/i18n/LanguageToggle'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 interface LayoutShellProps {
   config: ClientConfig
@@ -16,6 +17,7 @@ export function LayoutShell({ config, children }: LayoutShellProps) {
         navigation={config.navigation}
         currentLanguage={config.defaultLanguage}
         languageToggle={config.features.i18n ? <LanguageToggle /> : undefined}
+        themeToggle={config.features.darkMode ? <ThemeToggle /> : undefined}
       />
 
       <main className="flex-1">

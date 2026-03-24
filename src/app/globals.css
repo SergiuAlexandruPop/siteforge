@@ -58,3 +58,100 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Novel Editor — Tiptap placeholder and editor styles
+   --------------------------------------------------------------------------- */
+
+.novel-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  height: 0;
+}
+
+.novel-editor .tiptap:focus {
+  outline: none;
+}
+
+/* Task list styling in editor */
+.novel-editor .tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+}
+
+.novel-editor .tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.novel-editor .tiptap ul[data-type="taskList"] li > label {
+  margin-top: 0.25rem;
+}
+
+/* ---------------------------------------------------------------------------
+   SiteForge Image — size & alignment system
+   Works in both the Novel editor and public blog post renderer.
+   Uses data attributes (data-size, data-align) set by the custom extension.
+   Aspect ratio is ALWAYS preserved (height: auto).
+   --------------------------------------------------------------------------- */
+
+/* Base: all sf-image images */
+img.sf-image,
+.prose img[data-size] {
+  height: auto;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+/* --- Sizes --- */
+
+/* Small: max 400px, good for inline illustrations */
+img[data-size="small"] {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Medium: max 680px, matches blog content width — the default */
+img[data-size="medium"] {
+  max-width: 680px;
+  width: 100%;
+}
+
+/* Full: spans the entire container width */
+img[data-size="full"] {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* --- Alignment --- */
+
+/* Center: block with auto margins (default) */
+img[data-align="center"] {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Left: float left with right margin */
+img[data-align="left"] {
+  display: block;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Right: float right with left margin */
+img[data-align="right"] {
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* --- Editor-specific: selected image highlight --- */
+.novel-editor .tiptap img.ProseMirror-selectednode {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}

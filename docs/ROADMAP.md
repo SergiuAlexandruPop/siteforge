@@ -102,8 +102,8 @@
 ---
 
 ## Phase 3: Blog System
-**Status: IN PROGRESS (3A + 3B complete, 3C pending)**
-**Chats estimated: 2-3 | Chats used: 1**
+**Status: COMPLETE**
+**Chats estimated: 2-3 | Chats used: 3**
 
 ### 3A: Blog Frontend (Public)
 - [x] Create `src/app/blog/page.tsx` — blog listing
@@ -134,47 +134,52 @@
 - [x] Verify: full CRUD flow — create, edit, delete posts via CMS
 
 ### 3C: Image Upload Pipeline
-- [ ] Create `src/lib/r2.ts` — R2 upload/delete utilities (S3-compatible SDK)
-- [ ] Create `src/lib/image-optimize.ts` — Sharp resize + WebP conversion + EXIF strip
-- [ ] Create `src/app/api/upload/route.ts` — authenticated upload endpoint
-- [ ] Wire editor image upload to → optimize → R2 → return URL
-- [ ] Add file type validation (jpg, jpeg, png, gif, webp only)
-- [ ] Add file size limit (5MB max)
-- [ ] Verify: drag image into editor → appears in post → persists after save
+- [x] Create `src/lib/r2.ts` — R2 upload/delete utilities (S3-compatible SDK)
+- [x] Create `src/lib/image-optimize.ts` — Sharp resize + WebP conversion + EXIF strip
+- [x] Create `src/app/api/upload/route.ts` — authenticated upload endpoint
+- [x] Wire editor image upload to → optimize → R2 → return URL (toolbar button, drag-drop, paste)
+- [x] Add file type validation (jpg, jpeg, png, gif, webp only)
+- [x] Add file size limit (5MB max)
+- [x] Custom image extension with data-size (small/medium/full) and data-align (left/center/right)
+- [x] Floating image toolbar — appears on image click with size + alignment controls
+- [x] Image CSS works in both editor and public blog
+- [x] Verify: upload image → resize/align → save → displays correctly on public blog
 
-**Milestone: Blog frontend + CMS complete. Image pipeline pending (needs R2 setup).**
+**Milestone: Complete blog with CMS + image pipeline. ✅**
 
 ---
 
 ## Phase 4: Optional Modules & Polish
-**Status: NOT STARTED**
-**Chats estimated: 2-3**
+**Status: COMPLETE**
+**Chats estimated: 2-3 | Chats used: 1**
 
 ### 4A: Dark Mode
-- [ ] Create `src/components/theme/ThemeProvider.tsx` — system detection + localStorage persistence
-- [ ] Create `src/components/theme/ThemeToggle.tsx` — sun/moon toggle
-- [ ] Integrate with client theme.ts dark color overrides
-- [ ] Only render toggle if `features.darkMode === true`
-- [ ] Verify: toggle works, persists, respects system preference, smooth transition
+- [x] Create `src/components/theme/ThemeProvider.tsx` — system detection + localStorage persistence
+- [x] Create `src/components/theme/ThemeToggle.tsx` — sun/moon toggle
+- [x] Integrate with client theme.ts dark color overrides (via globals.css .dark class)
+- [x] Only render toggle if `features.darkMode === true`
+- [x] Anti-FOUC inline script in layout.tsx head
+- [x] Verify: toggle works, persists, respects system preference, smooth transition
 
 ### 4B: Smartsupp Integration
-- [ ] Create `src/components/integrations/Smartsupp.tsx` — script loader
-- [ ] Only load if `features.smartsupp === true` and NEXT_PUBLIC_SMARTSUPP_ID is set
-- [ ] Verify: widget appears on page, doesn't load when disabled
+- [x] Create `src/components/integrations/Smartsupp.tsx` — script loader
+- [x] Only load if `features.smartsupp === true` and NEXT_PUBLIC_SMARTSUPP_ID is set
+- [x] Verify: widget appears on page, doesn't load when disabled
 
 ### 4C: Analytics
-- [ ] Create `src/components/analytics/GoogleAnalytics.tsx` — GA4 script loader
-- [ ] Only load if NEXT_PUBLIC_GA4_ID is set
-- [ ] Add to root layout
-- [ ] Verify: events show in GA4 real-time dashboard
+- [x] Create `src/components/analytics/GoogleAnalytics.tsx` — GA4 script loader
+- [x] Only load if NEXT_PUBLIC_GA4_ID is set
+- [x] Add to root layout
+- [x] Verify: events show in GA4 real-time dashboard
 
 ### 4D: Dev Banner Polish
-- [ ] Comprehensive config checks (all env vars, all services)
-- [ ] Color-coded status (red/yellow/green)
-- [ ] Only renders in development mode
-- [ ] Click to dismiss (persists for session)
+- [x] Comprehensive config checks (all env vars, all services)
+- [x] Color-coded status (red/yellow/green)
+- [x] Only renders in development mode
+- [x] Click to dismiss (persists for session)
+- [x] Smart env var filtering — only warns about missing vars for enabled features
 
-**Milestone: All optional modules working. Feature flags control everything.**
+**Milestone: All optional modules working. Feature flags control everything. ✅**
 
 ---
 
