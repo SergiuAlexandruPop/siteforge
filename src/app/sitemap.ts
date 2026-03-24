@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { getClientConfig } from '@/lib/client-config'
-import { getPageSlugs } from '@/lib/content'
+import { getPageSlugs, getBlogSlugs } from '@/lib/content'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const config = getClientConfig()
@@ -53,7 +53,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Future: Blog posts will be added here in Phase 3
+  // Blog posts (Romanian)
+  if (config.features.blog) {
+    const blogSlugs = getBlogSlugs('ro')
+    for (const slug of blogSlugs) {
+      entries.push({
+        url: `${baseUrl}/blog/${slug}`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      })
+    }
+
+    // Blog listing page
+    entries.push({
+      url: `${baseUrl}/blog`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    })
+
+    // English blog posts (if i18n enabled)
+    if (config.features.i18n) {
+      const enBlogSlugs = getBlogSlugs('en')
+      for (const slug of enBlogSlugs) {
+        entries.push({
+          url: `${baseUrl}/en/blog/${slug}`,
+          lastModified: now,
+          changeFrequency: 'weekly',
+          priority: 0.6,
+        })
+      }
+
+      entries.push({
+        url: `${baseUrl}/en/blog`,
+        lastModified: now,
+        changeFrequency: 'weekly',
+        priority: 0.7,
+      })
+    }
+  }
 
   return entries
 }

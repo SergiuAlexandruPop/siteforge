@@ -3,6 +3,7 @@ import path from 'node:path'
 import matter from 'gray-matter'
 import { remark } from 'remark'
 import html from 'remark-html'
+import type { BlogMeta, BlogPost } from '@/types/blog'
 
 // ---------------------------------------------------------------------------
 // Content Library
@@ -85,6 +86,120 @@ export async function getPageBySlug(
     contentHtml,
   }
 }
+
+// ---------------------------------------------------------------------------
+// Blog Content
+// ---------------------------------------------------------------------------
+
+/**
+ * Get all published blog posts, sorted by date descending.
+ */
+export async function getAllBlogPosts(
+  language: 'ro' | 'en' = 'ro'
+): Promise<BlogPost[]> {
+  const folder = language === 'en' ? 'blog-en' : 'blog'
+  const blogDir = path.join(getContentDir(), folder)
+
+  if (!fs.existsSync(blogDir)) return []
+
+  const files = fs
+    .readdirSync(blogDir)
+    .filter((file) => file.endsWith('.md'))
+
+  const posts: BlogPost[] = []
+
+  for (const file of files) {
+    const filePath = path.join(blogDir, file)
+    const fileContents = fs.readFileSync(filePath, 'utf-8')
+    const { data, content } = matter(fileContents)
+
+    const meta = parseBlogMeta(data, file)
+    if (!meta.published) continue
+
+    const contentHtml = await markdownToHtml(content)
+    posts.push({ meta, contentHtml })
+  }
+
+  // Sort by date descending (newest first)
+  posts.sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime())
+
+  return posts
+}
+
+/**
+ * Get a single blog post by slug. Returns null if not found or not published.
+ */
+export async function getBlogBySlug(
+  slug: string,
+  language: 'ro' | 'en' = 'ro'
+): Promise<BlogPost | null> {
+  const folder = language === 'en' ? 'blog-en' : 'blog'
+  const blogDir = path.join(getContentDir(), folder)
+
+  if (!fs.existsSync(blogDir)) return null
+
+  const files = fs.readdirSync(blogDir).filter((f) => f.endsWith('.md'))
+
+  for (const file of files) {
+    const filePath = path.join(blogDir, file)
+    const fileContents = fs.readFileSync(filePath, 'utf-8')
+    const { data, content } = matter(fileContents)
+
+    const meta = parseBlogMeta(data, file)
+    if (meta.slug !== slug) continue
+    if (!meta.published) return null
+
+    const contentHtml = await markdownToHtml(content)
+    return { meta, contentHtml }
+  }
+
+  return null
+}
+
+/**
+ * Get all published blog post slugs (for generateStaticParams).
+ */
+export function getBlogSlugs(language: 'ro' | 'en' = 'ro'): string[] {
+  const folder = language === 'en' ? 'blog-en' : 'blog'
+  const blogDir = path.join(getContentDir(), folder)
+
+  if (!fs.existsSync(blogDir)) return []
+
+  const files = fs.readdirSync(blogDir).filter((f) => f.endsWith('.md'))
+  const slugs: string[] = []
+
+  for (const file of files) {
+    const filePath = path.join(blogDir, file)
+    const fileContents = fs.readFileSync(filePath, 'utf-8')
+    const { data } = matter(fileContents)
+
+    if (data.published === false) continue
+    slugs.push(data.slug ?? file.replace(/\.md$/, ''))
+  }
+
+  return slugs
+}
+
+/**
+ * Parse frontmatter data into a typed BlogMeta with safe defaults.
+ */
+function parseBlogMeta(data: Record<string, unknown>, filename: string): BlogMeta {
+  return {
+    title: (data.title as string) ?? 'Untitled',
+    slug: (data.slug as string) ?? filename.replace(/\.md$/, ''),
+    date: (data.date as string) ?? new Date().toISOString().slice(0, 10),
+    author: (data.author as string) ?? 'Unknown',
+    excerpt: (data.excerpt as string) ?? '',
+    featuredImage: (data.featuredImage as string) ?? '',
+    published: data.published !== false,
+    readingTime: (data.readingTime as number) ?? 3,
+    tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Page Content
+// ---------------------------------------------------------------------------
 
 /**
  * Get the homepage content (index.md).
