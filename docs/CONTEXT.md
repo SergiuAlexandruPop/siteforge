@@ -8,12 +8,12 @@
 
 ## Last Updated
 **Date:** 2026-03-25
-**Updated By:** Claude — Full checkpoint after Phase 6
+**Updated By:** Claude — Phase 7.5 Chat 1: Foundation Layer (implementation)
 
 ---
 
 ## Current Phase
-**Phases 1-6 Complete. Ready for Phase 5C (deploy) or Phase 7 (second client).**
+**Phases 1-6 Complete. Phase 7.5 Chat 1 — Foundation Layer (COMPLETE). Chat 2 next.**
 
 ---
 
@@ -44,20 +44,9 @@
 - Romanian + English blog routes with BlogPosting JSON-LD
 - Blog admin CMS: JWT auth (jose), middleware-protected /admin routes
 - Dashboard with RO/EN toggle, CRUD via GitHub API (`src/lib/github.ts`)
-- Novel 0.5 WYSIWYG editor with full toolbar:
-  - Headings (H2/H3/H4), Bold, Italic, Underline, Strikethrough, Inline code
-  - Bullet list, Ordered list, Blockquote, Code block, Horizontal rule
-  - Link (URL prompt), Image upload (file picker)
-  - Bubble menu on text selection
-  - Toggle between visual editor and raw markdown mode
-- Image upload pipeline:
-  - `src/lib/r2.ts` — Cloudflare R2 via AWS S3 SDK
-  - `src/lib/image-optimize.ts` — Sharp resize (max 1200px), WebP, EXIF strip
-  - `src/app/api/upload/route.ts` — authenticated endpoint
-  - Upload via: toolbar button, drag-and-drop, paste
-  - Custom Tiptap image extension with `data-size` (small/medium/full) and `data-align` (left/center/right)
-  - Floating image toolbar on click with size + alignment controls
-  - CSS works in both editor and public blog
+- Novel 0.5 WYSIWYG editor with full toolbar
+- Image upload pipeline: Sharp optimization → Cloudflare R2
+- Custom Tiptap image extension with data-size/data-align + floating toolbar
 
 **Phase 4: Optional Modules (COMPLETE)**
 - Dark mode: ThemeProvider, ThemeToggle, anti-FOUC inline script, feature-flag gated
@@ -66,53 +55,64 @@
 - DevBanner: smart env filtering by active feature flags, color-coded status
 
 **Phase 5A: Homepage Sections (COMPLETE)**
-- 6 modular section components in `src/components/sections/`:
-  - `Hero.tsx` — headline, subtitle, CTAs, background image, children slot
-  - `Features.tsx` — card grid (2/3/4 cols)
-  - `AboutSnippet.tsx` — text + image side-by-side, reversible
-  - `Showcase.tsx` — image cards with tags and links
-  - `BlogPreview.tsx` — async server component, latest N posts
-  - `CtaBanner.tsx` — full-width banner, muted/primary variants
-- All sections: responsive, dark mode, className override, zero animations (future-ready)
-- Portfolio homepage composed from sections in page.tsx
+- 6 modular section components in `src/components/sections/`
+- Hero, Features, AboutSnippet, Showcase, BlogPreview, CtaBanner
+- All sections: responsive, dark mode, className override, zero animations
 
 **Phase 6: Client Setup Automation (COMPLETE)**
-- `scripts/new-client.ts` — interactive CLI (Romanian prompts):
-  - Asks: name, domain, email, phone, features, brand color
-  - Creates: client folder, config.ts, theme.ts, content, env file
-  - Registers: client-config.ts imports + package.json scripts
-- `scripts/toggle-feature.ts` — enable/disable features for existing clients:
-  - Shows current feature status per client
-  - Checks which env vars are needed and if they're set
-  - Step-by-step instructions for obtaining missing values
-  - Auto-creates directories, adds blog config/nav when enabling blog
-- `docs/CLIENT_SETUP_CHECKLIST.md` — operational quick-reference per feature
+- `scripts/new-client.ts` — interactive CLI
+- `scripts/toggle-feature.ts` — enable/disable features per client
+- `docs/CLIENT_SETUP_CHECKLIST.md` — operational quick-reference
 
-**Theme System**
-- `src/lib/theme-css.ts` — hex → HSL CSS variable generator
-- Layout injects client theme colors as `<style>` tag (overrides shadcn defaults)
-- Font CSS variables (--font-heading, --font-body, --font-blog) from theme.ts
-- BlogPost uses --font-blog variable
+**Phase 7.5 Chat 1: Foundation Layer (COMPLETE)**
+- `lenis` installed — smooth scrolling library (MIT, ~5KB)
+- `src/types/animations.ts` — shared prop interfaces (ScrollRevealProps, RotatingTextProps, MarqueeProps, CountUpProps, SmoothScrollProps)
+- `src/hooks/useReducedMotion.ts` — prefers-reduced-motion detection hook
+- `src/hooks/useScrollReveal.ts` — IntersectionObserver-based visibility hook
+- `src/hooks/useScrollVideo.ts` — stub for future scroll-linked video
+- `src/components/animations/` — 5 shared primitives + barrel export:
+  - `SmoothScroll.tsx` — Lenis wrapper with dynamic import, auto-disables on reduced motion
+  - `ScrollReveal.tsx` — scroll-triggered fade/slide reveal (up/down/left/right)
+  - `RotatingText.tsx` — cycling text with fade transition, aria-live for a11y
+  - `Marquee.tsx` — infinite horizontal scroll strip, pause on hover
+  - `CountUp.tsx` — animated number counter using requestAnimationFrame
+- `src/lib/client-layout.ts` — per-client layout registry (falls back to LayoutShell)
+- `src/lib/client-homepage.ts` — per-client homepage registry (falls back to DefaultHomePage)
+- `src/components/sections/DefaultHomePage.tsx` — extracted current homepage as fallback
+- `src/app/layout.tsx` modified — uses `getClientLayout()` instead of hardcoded LayoutShell
+- `src/app/page.tsx` modified — uses `getClientHomePage()` instead of inline sections
+- `src/app/globals.css` — added `@keyframes marquee` for Marquee component
+- **Zero visual regression confirmed — site looks identical after all changes**
 
 ### What Is In Progress
-- Nothing. At a clean checkpoint.
+
+**Phase 7.5: Portfolio Animation Redesign (Chat 1 COMPLETE, Chat 2 next)**
+
+**⚠️ Before working on ANY portfolio animation/layout task, Claude MUST read: `clients/portfolio/DESIGN.md`**
+
+**Remaining chats:**
+- Chat 2: Portfolio layout + header (SmoothScroll, transparent header, premium dark palette)
+- Chat 3: Animated hero + marquee (RotatingText, gradient bg, parallax, tech logos)
+- Chat 4: Tabbed services + project showcase (TabbedServices, ProjectShowcase)
+- Chat 5: Polish + documentation (a11y audit, performance, docs update)
 
 ### Known Issues
 - CMS saves to GitHub; in dev mode you must `git pull` to see new posts locally
 - `blog-en/` directory may not exist on GitHub until first English post is created
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
-- Google Fonts not loaded via `<link>` tag — only CSS variables set. Non-Inter fonts need a `<link>` added to head.
+- Google Fonts not loaded via `<link>` tag — only CSS variables set
 
 ### Tech Debt
 - Google Fonts loading should dynamically add `<link>` for non-Inter fonts
 - Novel editor image upload shows no loading indicator during upload
-- Homepage sections have zero animations (intentional — user will add later)
 - Phase 5B (portfolio content polish, more pages) not done
 - Phase 5C (Vercel deployment) not done
 
 ---
 
 ## Decision Log
+
+All architecture and business decisions. Claude should reference this before suggesting alternatives.
 
 | # | Decision | Rationale | Date |
 |---|----------|-----------|------|
@@ -157,6 +157,20 @@
 | 39 | Section-based homepage | Modular, replaceable, no heavy config schema | Phase 5A |
 | 40 | No animation libraries yet | User will explore modern designs later | Phase 5A |
 | 41 | toggle-feature CLI | Easy feature management for existing clients | Phase 6 |
+| 42 | Per-client layout via registry | Clients can have fundamentally different shells | Phase 7.5 |
+| 43 | Per-client homepage via registry | Each client controls their section composition | Phase 7.5 |
+| 44 | DefaultHomePage extracted from page.tsx | Current homepage becomes fallback, not hardcoded | Phase 7.5 |
+| 45 | Custom animations over GSAP | GSAP prohibits commercial use on free tier | Phase 7.5 |
+| 46 | Lenis (MIT) as only animation dep | Smooth scrolling too complex to DIY; 5KB, MIT | Phase 7.5 |
+| 47 | IntersectionObserver for scroll reveals | Native API, zero deps, 97%+ support | Phase 7.5 |
+| 48 | prefers-reduced-motion from day one | Accessibility is not a bolt-on | Phase 7.5 |
+| 49 | Portfolio components in src/components/portfolio/ | Co-location by domain; client folder = config/content only | Phase 7.5 |
+| 50 | Inline SVGs for tech logos | Zero requests, full control, no icon library | Phase 7.5 |
+| 51 | projects.ts in clients/portfolio/data/ | TypeScript > markdown for structured data | Phase 7.5 |
+| 52 | DESIGN.md in client folder | Client-specific design spec, self-contained | Phase 7.5 |
+| 53 | ScrollVideoHero as separate future component | SRP — does not bloat AnimatedHero | Phase 7.5 |
+| 54 | CSS-only dark mode premium effects | dark: prefix + CSS vars, no runtime branching | Phase 7.5 |
+| 55 | Deeper dark palette (gray-950 base) | More contrast, more dramatic, rocket.new feel | Phase 7.5 |
 
 ---
 
@@ -164,7 +178,8 @@
 
 | Client | Folder Name | Domain | Status | Features Enabled |
 |--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phases 1-6 complete | blog, i18n, darkMode, contactForm |
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 Chat 1 complete | blog, i18n, darkMode, contactForm |
+| ElectroWill | `electrowill-solutions` | TBD | Scaffolded | TBD |
 | Doctor | `doctor-maria` | TBD | Not started | TBD |
 | Electrician | `electrician-ion` | TBD | Not started | TBD |
 
@@ -186,11 +201,13 @@
 | jose | ^5.9.0 | JWT sessions |
 | @aws-sdk/client-s3 | ^3.1015.0 | R2 upload (S3-compatible) |
 | sharp | ^0.34.5 | Image optimization |
+| tailwind-merge | ^2.6.0 | Class merging |
 | tailwindcss + postcss + autoprefixer | ^3.4.17 | CSS |
 | tailwindcss-animate | ^1.0.7 | Animations (shadcn) |
 | @tailwindcss/typography | ^0.5.15 | Prose styling |
 | tsx | ^4.19.0 | Script runner |
 | cross-env | ^7.0.3 | Cross-platform env |
+| lenis | latest | Smooth scrolling (MIT, ~5KB) |
 
 ---
 
@@ -229,16 +246,27 @@
 | `docs/DEV_NOTES.md` | Gotchas, debugging, environment tips |
 | `docs/NEW_CLIENT_GUIDE.md` | Detailed step-by-step client setup |
 | `docs/CLIENT_SETUP_CHECKLIST.md` | Quick-reference operational checklist |
+| `clients/portfolio/DESIGN.md` | **Portfolio design & animation architecture** |
 
 ---
 
 ## Next Steps
 
-Choose from:
-1. **Phase 5C** — Deploy portfolio to Vercel with custom domain
-2. **Phase 7** — Create second client to validate architecture
-3. **Modern design exploration** — Add animations (GSAP/Framer Motion), scroll effects, page transitions
-4. **Google Fonts loading fix** — Dynamic `<link>` tag for non-Inter fonts
+**Immediate next chat:** Phase 7.5 Chat 2 — Portfolio Layout + Header.
+
+**Before starting, Claude must:**
+1. Read this file (CONTEXT.md) for project state
+2. Read `clients/portfolio/DESIGN.md` for the full animation architecture spec
+3. Focus on Chat 2 scope in DESIGN.md Section 10
+
+**What Chat 2 produces:**
+- `src/components/portfolio/PortfolioHeader.tsx` — transparent → blur-on-scroll header
+- `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with gradient
+- `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + PortfolioHeader + PortfolioFooter
+- Portfolio layout registered in `src/lib/client-layout.ts`
+- Portfolio `theme.ts` updated with deeper dark palette (gray-950 base)
+- Glow CSS variables added to `globals.css`
+- **Verify: smooth scrolling, transparent header, premium dark mode**
 
 ---
 
@@ -253,4 +281,6 @@ Choose from:
 - Always suggest better alternatives. Never implement blindly.
 - Check this file first for current state before doing anything.
 - Use `__dirname` not `import.meta.dirname` in scripts (tsx runs as CJS on Windows).
-- The user wants to explore modern web design later (GSAP, scroll animations, etc.) — current sections are intentionally animation-free and modular for easy replacement.
+- **For portfolio work: always read `clients/portfolio/DESIGN.md` first.**
+- **Zero commercial-license dependencies.** Only MIT/Apache/BSD. No GSAP, no paid plugins.
+- **Explicit import registries** (not dynamic imports) for Turbopack reliability.

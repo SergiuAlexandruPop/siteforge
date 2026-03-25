@@ -155,3 +155,16 @@ img[data-align="right"] {
   outline-offset: 2px;
   border-radius: 0.5rem;
 }
+
+/* ---------------------------------------------------------------------------
+   Animation Keyframes — Used by src/components/animations/ primitives.
+   --------------------------------------------------------------------------- */
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
 import { getClientConfig, getClientTheme } from '@/lib/client-config'
-import { LayoutShell } from '@/components/layout/LayoutShell'
+import { getClientLayout } from '@/lib/client-layout'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
@@ -101,12 +101,15 @@ export default function RootLayout({
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID ?? ''
   const smartsuppId = process.env.NEXT_PUBLIC_SMARTSUPP_ID ?? ''
 
+  // --- Registry: resolve layout for this client ---
+  const ClientLayout = getClientLayout(config.name)
+
   const appContent = (
     <>
       <JsonLd config={config} />
-      <LayoutShell config={config}>
+      <ClientLayout config={config}>
         {children}
-      </LayoutShell>
+      </ClientLayout>
 
       {/* Analytics — only loads when GA4 ID is set */}
       {ga4Id && <GoogleAnalytics gaId={ga4Id} />}

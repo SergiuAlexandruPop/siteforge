@@ -239,6 +239,67 @@
 
 ---
 
+## Phase 7.5: Portfolio Animation Redesign
+**Status: IN PROGRESS (Chat 1 complete)**
+**Chats estimated: 5 | Chats used: 1**
+**Design spec: `clients/portfolio/DESIGN.md`**
+
+### Chat 1: Foundation Layer (COMPLETE)
+- [x] Install `lenis` (MIT, ~5KB smooth scrolling)
+- [x] Create `src/types/animations.ts` — shared animation prop interfaces
+- [x] Create `src/hooks/useReducedMotion.ts` — prefers-reduced-motion hook
+- [x] Create `src/hooks/useScrollReveal.ts` — IntersectionObserver hook
+- [x] Create `src/hooks/useScrollVideo.ts` — stub for future scroll-linked video
+- [x] Create `src/components/animations/SmoothScroll.tsx` — Lenis wrapper
+- [x] Create `src/components/animations/ScrollReveal.tsx` — scroll-triggered reveal
+- [x] Create `src/components/animations/RotatingText.tsx` — cycling text
+- [x] Create `src/components/animations/Marquee.tsx` — infinite scroll strip
+- [x] Create `src/components/animations/CountUp.tsx` — animated counter
+- [x] Create `src/components/animations/index.ts` — barrel export
+- [x] Create `src/lib/client-layout.ts` — per-client layout registry
+- [x] Create `src/lib/client-homepage.ts` — per-client homepage registry
+- [x] Extract `src/components/sections/DefaultHomePage.tsx` from page.tsx
+- [x] Modify `layout.tsx` to use getClientLayout()
+- [x] Modify `page.tsx` to use getClientHomePage()
+- [x] Add `@keyframes marquee` to globals.css
+- [x] Verify: zero visual regression — site looks identical
+
+### Chat 2: Portfolio Layout + Header
+- [ ] Create `src/components/portfolio/PortfolioHeader.tsx` — transparent → blur-on-scroll
+- [ ] Create `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with gradient
+- [ ] Create `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + header + footer
+- [ ] Register portfolio layout in `src/lib/client-layout.ts`
+- [ ] Update portfolio `theme.ts` with deeper dark palette (gray-950 base)
+- [ ] Add glow CSS variables to globals.css
+- [ ] Verify: smooth scrolling, transparent header, premium dark mode
+
+### Chat 3: Animated Hero + Marquee
+- [ ] Create `src/components/portfolio/icons.tsx` — inline SVG tech logos
+- [ ] Create `src/components/portfolio/TechMarquee.tsx`
+- [ ] Create `src/components/portfolio/AnimatedHero.tsx`
+- [ ] Create `src/components/portfolio/HomePage.tsx`
+- [ ] Register portfolio homepage in `src/lib/client-homepage.ts`
+- [ ] Verify: animated hero with rotating text, parallax, marquee, dark mode glow
+
+### Chat 4: Tabbed Services + Project Showcase
+- [ ] Create `src/components/portfolio/TabbedServices.tsx`
+- [ ] Create `src/components/portfolio/ProjectShowcase.tsx`
+- [ ] Populate `clients/portfolio/data/projects.ts`
+- [ ] Complete HomePage.tsx composition with all sections
+- [ ] Add ScrollReveal wrapping to all sections
+- [ ] Verify: full homepage, all sections, animations, responsive, dark mode
+
+### Chat 5: Polish + Documentation
+- [ ] prefers-reduced-motion audit across all components
+- [ ] Dark mode glow refinement
+- [ ] Mobile responsiveness sweep (375px, 768px, 1024px, 1280px)
+- [ ] Lighthouse performance audit
+- [ ] Update CONTEXT.md, ARCHITECTURE.md, DEV_NOTES.md, DESIGN.md
+
+**Milestone: Portfolio homepage with premium animations, per-client architecture proven.**
+
+---
+
 ## Phase 7: Second Client (Template Validation)
 **Status: NOT STARTED**
 **Chats estimated: 2-3**
