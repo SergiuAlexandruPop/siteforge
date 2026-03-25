@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import { DefaultHomePage } from '@/components/sections/DefaultHomePage'
+import { PortfolioHomePage } from '@/components/portfolio/HomePage'
 
 // ---------------------------------------------------------------------------
 // Client Homepage Registry
@@ -19,10 +20,9 @@ import { DefaultHomePage } from '@/components/sections/DefaultHomePage'
 type HomePageComponent = ComponentType
 
 // --- Custom homepage imports go here ---
-// import { PortfolioHomePage } from '@/components/portfolio/HomePage'
 
 const homepages: Record<string, HomePageComponent> = {
-  // 'portfolio': PortfolioHomePage,  // Chat 3 will uncomment this
+  'portfolio': PortfolioHomePage,
 }
 
 /**

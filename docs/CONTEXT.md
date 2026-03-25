@@ -8,12 +8,12 @@
 
 ## Last Updated
 **Date:** 2026-03-25
-**Updated By:** Claude — Phase 7.5 Chat 1: Foundation Layer (implementation)
+**Updated By:** Claude — Phase 7.5 Chat 4: TabbedServices + ProjectShowcase (implementation)
 
 ---
 
 ## Current Phase
-**Phases 1-6 Complete. Phase 7.5 Chat 1 — Foundation Layer (COMPLETE). Chat 2 next.**
+**Phases 1-6 Complete. Phase 7.5 Chat 4 — TabbedServices + ProjectShowcase (COMPLETE). Chat 5 next.**
 
 ---
 
@@ -66,34 +66,47 @@
 
 **Phase 7.5 Chat 1: Foundation Layer (COMPLETE)**
 - `lenis` installed — smooth scrolling library (MIT, ~5KB)
-- `src/types/animations.ts` — shared prop interfaces (ScrollRevealProps, RotatingTextProps, MarqueeProps, CountUpProps, SmoothScrollProps)
-- `src/hooks/useReducedMotion.ts` — prefers-reduced-motion detection hook
-- `src/hooks/useScrollReveal.ts` — IntersectionObserver-based visibility hook
-- `src/hooks/useScrollVideo.ts` — stub for future scroll-linked video
-- `src/components/animations/` — 5 shared primitives + barrel export:
-  - `SmoothScroll.tsx` — Lenis wrapper with dynamic import, auto-disables on reduced motion
-  - `ScrollReveal.tsx` — scroll-triggered fade/slide reveal (up/down/left/right)
-  - `RotatingText.tsx` — cycling text with fade transition, aria-live for a11y
-  - `Marquee.tsx` — infinite horizontal scroll strip, pause on hover
-  - `CountUp.tsx` — animated number counter using requestAnimationFrame
-- `src/lib/client-layout.ts` — per-client layout registry (falls back to LayoutShell)
-- `src/lib/client-homepage.ts` — per-client homepage registry (falls back to DefaultHomePage)
-- `src/components/sections/DefaultHomePage.tsx` — extracted current homepage as fallback
-- `src/app/layout.tsx` modified — uses `getClientLayout()` instead of hardcoded LayoutShell
-- `src/app/page.tsx` modified — uses `getClientHomePage()` instead of inline sections
-- `src/app/globals.css` — added `@keyframes marquee` for Marquee component
-- **Zero visual regression confirmed — site looks identical after all changes**
+- `src/types/animations.ts` — shared prop interfaces
+- `src/hooks/` — useReducedMotion, useScrollReveal, useScrollVideo (stub)
+- `src/components/animations/` — SmoothScroll, ScrollReveal, RotatingText, Marquee, CountUp + barrel
+- `src/lib/client-layout.ts` + `src/lib/client-homepage.ts` — per-client registries
+- `src/components/sections/DefaultHomePage.tsx` — extracted fallback homepage
+- layout.tsx + page.tsx modified to use registries
+- `@keyframes marquee` added to globals.css
+
+**Phase 7.5 Chat 2: Portfolio Layout + Header (COMPLETE)**
+- `src/components/portfolio/PortfolioHeader.tsx` — transparent → frosted glass on scroll (fixed position, scroll listener, 50px threshold, 0.3s transition)
+- `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with dark mode gradient top edge (hidden dark:block blue gradient line)
+- `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + PortfolioHeader + main (pt-16 offset) + PortfolioFooter
+- `src/components/portfolio/index.ts` — barrel export
+- Portfolio layout registered in `src/lib/client-layout.ts`
+- Glow CSS variables added to globals.css: `--glow-primary`, `--glow-muted`
+- **Dark palette kept as original slate-blue** (user preferred #0f172a over gray-950 #030712, Decision #55 overridden)
+- Smooth scrolling via Lenis active for portfolio
+- MobileMenu reused via composition from layout/
+
+**Phase 7.5 Chat 3: Animated Hero + Marquee (COMPLETE)**
+- `src/components/portfolio/icons.tsx` — 8 inline SVG tech logos (React, Next.js, TypeScript, Tailwind, Node.js, Supabase, PostgreSQL, Git). Brand colors, aria-hidden, viewBox scaling.
+- `src/components/portfolio/TechMarquee.tsx` — Wraps shared Marquee with tech icons in labeled pills. 35s cycle, pauseOnHover, border-y separator, dark mode styling.
+- `src/components/portfolio/AnimatedHero.tsx` — Client component. Static headline + RotatingText (3s interval, 0.5s transition, text-primary). Two CTAs — primary gets dark glow via `--glow-primary`, intensifies on hover. Dark mode radial gradient overlay (`hidden dark:block`). TechMarquee at bottom.
+- `src/components/portfolio/index.ts` — Updated barrel with AnimatedHero, TechMarquee, PortfolioHomePage.
+- `src/lib/client-homepage.ts` — Portfolio homepage registered. `getClientHomePage('portfolio')` → `PortfolioHomePage`.
+- **AnimatedHero accepts `rotatingWords` as prop (Decision #56) — content is per-client, not hardcoded.**
+
+**Phase 7.5 Chat 4: TabbedServices + ProjectShowcase (COMPLETE)**
+- `clients/portfolio/data/projects.ts` — 4 featured projects with typed `Project` interface (slug, title, description, techStack, image, href, featured). Decision #51.
+- `src/components/portfolio/TabbedServices.tsx` — Client component. Desktop (md+): horizontal tab bar with active indicator glow in dark mode, numbered feature list content panel. Mobile (< md): accordion with expand/collapse, chevron animation. 4 service categories in Romanian. Both layouts rendered in DOM, toggled via Tailwind `hidden md:block` / `md:hidden`.
+- `src/components/portfolio/ProjectShowcase.tsx` — Client component. Filters featured projects, 2-column grid (desktop) / single-column (mobile). Cards: image placeholder, title with hover color, description (line-clamp-2), tech stack tags. Dark mode: hover glow `--glow-primary`, image overlay gradient.
+- `src/components/portfolio/HomePage.tsx` — Complete composition: AnimatedHero (no ScrollReveal) → ScrollReveal > TabbedServices → ScrollReveal > ProjectShowcase → ScrollReveal > BlogPreview (blog gated) → ScrollReveal > CtaBanner. Alternating bg treatment.
+- `src/components/portfolio/index.ts` — Updated barrel with TabbedServices, ProjectShowcase.
 
 ### What Is In Progress
 
-**Phase 7.5: Portfolio Animation Redesign (Chat 1 COMPLETE, Chat 2 next)**
+**Phase 7.5: Portfolio Animation Redesign (Chats 1-4 COMPLETE, Chat 5 next)**
 
 **⚠️ Before working on ANY portfolio animation/layout task, Claude MUST read: `clients/portfolio/DESIGN.md`**
 
 **Remaining chats:**
-- Chat 2: Portfolio layout + header (SmoothScroll, transparent header, premium dark palette)
-- Chat 3: Animated hero + marquee (RotatingText, gradient bg, parallax, tech logos)
-- Chat 4: Tabbed services + project showcase (TabbedServices, ProjectShowcase)
 - Chat 5: Polish + documentation (a11y audit, performance, docs update)
 
 ### Known Issues
@@ -101,12 +114,15 @@
 - `blog-en/` directory may not exist on GitHub until first English post is created
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
 - Google Fonts not loaded via `<link>` tag — only CSS variables set
+- Next.js dark mode class on SVGs: `className="dark:fill-white"` on Next.js logo circle may not work inside inline SVG (CSS selectors depend on how the SVG is rendered). If Next.js icon looks wrong in dark mode, replace with a simpler monochrome version.
+- Project images are placeholders (colored divs) — need real screenshots before deployment
 
 ### Tech Debt
 - Google Fonts loading should dynamically add `<link>` for non-Inter fonts
 - Novel editor image upload shows no loading indicator during upload
 - Phase 5B (portfolio content polish, more pages) not done
 - Phase 5C (Vercel deployment) not done
+- Project screenshots needed in `clients/portfolio/public/projects/`
 
 ---
 
@@ -170,7 +186,9 @@ All architecture and business decisions. Claude should reference this before sug
 | 52 | DESIGN.md in client folder | Client-specific design spec, self-contained | Phase 7.5 |
 | 53 | ScrollVideoHero as separate future component | SRP — does not bloat AnimatedHero | Phase 7.5 |
 | 54 | CSS-only dark mode premium effects | dark: prefix + CSS vars, no runtime branching | Phase 7.5 |
-| 55 | Deeper dark palette (gray-950 base) | More contrast, more dramatic, rocket.new feel | Phase 7.5 |
+| 55 | Keep original slate-blue dark palette | User prefers warm slate-blue (#0f172a) over cold gray-950 (#030712) | Phase 7.5 C2 |
+| 56 | AnimatedHero accepts rotatingWords as prop | Content is per-client, not hardcoded in component | Phase 7.5 C3 |
+| 57 | Dual-render tabs/accordion for mobile | Both layouts in DOM, toggled via Tailwind. No resize listener, no hydration mismatch | Phase 7.5 C4 |
 
 ---
 
@@ -178,7 +196,7 @@ All architecture and business decisions. Claude should reference this before sug
 
 | Client | Folder Name | Domain | Status | Features Enabled |
 |--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 Chat 1 complete | blog, i18n, darkMode, contactForm |
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 Chat 4 complete | blog, i18n, darkMode, contactForm |
 | ElectroWill | `electrowill-solutions` | TBD | Scaffolded | TBD |
 | Doctor | `doctor-maria` | TBD | Not started | TBD |
 | Electrician | `electrician-ion` | TBD | Not started | TBD |
@@ -252,21 +270,19 @@ All architecture and business decisions. Claude should reference this before sug
 
 ## Next Steps
 
-**Immediate next chat:** Phase 7.5 Chat 2 — Portfolio Layout + Header.
+**Immediate next chat:** Phase 7.5 Chat 5 — Polish + Documentation.
 
 **Before starting, Claude must:**
 1. Read this file (CONTEXT.md) for project state
 2. Read `clients/portfolio/DESIGN.md` for the full animation architecture spec
-3. Focus on Chat 2 scope in DESIGN.md Section 10
+3. Focus on Chat 5 scope in DESIGN.md Section 10
 
-**What Chat 2 produces:**
-- `src/components/portfolio/PortfolioHeader.tsx` — transparent → blur-on-scroll header
-- `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with gradient
-- `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + PortfolioHeader + PortfolioFooter
-- Portfolio layout registered in `src/lib/client-layout.ts`
-- Portfolio `theme.ts` updated with deeper dark palette (gray-950 base)
-- Glow CSS variables added to `globals.css`
-- **Verify: smooth scrolling, transparent header, premium dark mode**
+**What Chat 5 produces:**
+- prefers-reduced-motion audit across all animation components
+- Dark mode glow refinement (visual QA pass)
+- Mobile responsiveness sweep (375px, 768px, 1024px, 1280px)
+- Lighthouse performance audit and fixes
+- Update CONTEXT.md, ARCHITECTURE.md, DEV_NOTES.md, DESIGN.md
 
 ---
 
@@ -284,3 +300,4 @@ All architecture and business decisions. Claude should reference this before sug
 - **For portfolio work: always read `clients/portfolio/DESIGN.md` first.**
 - **Zero commercial-license dependencies.** Only MIT/Apache/BSD. No GSAP, no paid plugins.
 - **Explicit import registries** (not dynamic imports) for Turbopack reliability.
+- **User prefers original slate-blue dark palette** over deeper gray-950. Do not change dark colors.

@@ -240,8 +240,8 @@
 ---
 
 ## Phase 7.5: Portfolio Animation Redesign
-**Status: IN PROGRESS (Chat 1 complete)**
-**Chats estimated: 5 | Chats used: 1**
+**Status: IN PROGRESS (Chats 1-4 complete)**
+**Chats estimated: 5 | Chats used: 4**
 **Design spec: `clients/portfolio/DESIGN.md`**
 
 ### Chat 1: Foundation Layer (COMPLETE)
@@ -264,30 +264,31 @@
 - [x] Add `@keyframes marquee` to globals.css
 - [x] Verify: zero visual regression — site looks identical
 
-### Chat 2: Portfolio Layout + Header
-- [ ] Create `src/components/portfolio/PortfolioHeader.tsx` — transparent → blur-on-scroll
-- [ ] Create `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with gradient
-- [ ] Create `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + header + footer
-- [ ] Register portfolio layout in `src/lib/client-layout.ts`
-- [ ] Update portfolio `theme.ts` with deeper dark palette (gray-950 base)
-- [ ] Add glow CSS variables to globals.css
-- [ ] Verify: smooth scrolling, transparent header, premium dark mode
+### Chat 2: Portfolio Layout + Header (COMPLETE)
+- [x] Create `src/components/portfolio/PortfolioHeader.tsx` — transparent → blur-on-scroll
+- [x] Create `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with gradient
+- [x] Create `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + header + footer
+- [x] Create `src/components/portfolio/index.ts` — barrel export
+- [x] Register portfolio layout in `src/lib/client-layout.ts`
+- [x] Add glow CSS variables to globals.css (--glow-primary, --glow-muted)
+- [x] Dark palette: kept original slate-blue (user preference over gray-950)
+- [x] Verify: smooth scrolling, transparent header, dark mode footer glow
 
-### Chat 3: Animated Hero + Marquee
-- [ ] Create `src/components/portfolio/icons.tsx` — inline SVG tech logos
-- [ ] Create `src/components/portfolio/TechMarquee.tsx`
-- [ ] Create `src/components/portfolio/AnimatedHero.tsx`
-- [ ] Create `src/components/portfolio/HomePage.tsx`
-- [ ] Register portfolio homepage in `src/lib/client-homepage.ts`
-- [ ] Verify: animated hero with rotating text, parallax, marquee, dark mode glow
+### Chat 3: Animated Hero + Marquee (COMPLETE)
+- [x] Create `src/components/portfolio/icons.tsx` — inline SVG tech logos (8 icons)
+- [x] Create `src/components/portfolio/TechMarquee.tsx`
+- [x] Create `src/components/portfolio/AnimatedHero.tsx` — rotatingWords as prop (Decision #56)
+- [x] Create `src/components/portfolio/HomePage.tsx`
+- [x] Register portfolio homepage in `src/lib/client-homepage.ts`
+- [x] Verify: animated hero with rotating text, marquee, dark mode glow, responsive
 
-### Chat 4: Tabbed Services + Project Showcase
-- [ ] Create `src/components/portfolio/TabbedServices.tsx`
-- [ ] Create `src/components/portfolio/ProjectShowcase.tsx`
-- [ ] Populate `clients/portfolio/data/projects.ts`
-- [ ] Complete HomePage.tsx composition with all sections
-- [ ] Add ScrollReveal wrapping to all sections
-- [ ] Verify: full homepage, all sections, animations, responsive, dark mode
+### Chat 4: Tabbed Services + Project Showcase (COMPLETE)
+- [x] Create `src/components/portfolio/TabbedServices.tsx` — desktop tabs + mobile accordion
+- [x] Create `src/components/portfolio/ProjectShowcase.tsx` — 2-col grid, hover glow, tech tags
+- [x] Populate `clients/portfolio/data/projects.ts` — 4 featured projects, typed interface
+- [x] Complete HomePage.tsx composition with all 5 sections
+- [x] Add ScrollReveal wrapping to all below-hero sections
+- [x] Verify: full homepage, all sections, animations, responsive, dark mode
 
 ### Chat 5: Polish + Documentation
 - [ ] prefers-reduced-motion audit across all components
