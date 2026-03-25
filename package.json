@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "new-client": "tsx scripts/new-client.ts",
     "dev:portfolio": "tsx scripts/dev.ts portfolio",
     "dev:doctor-maria": "tsx scripts/dev.ts doctor-maria",
     "dev:electrician-ion": "tsx scripts/dev.ts electrician-ion",
