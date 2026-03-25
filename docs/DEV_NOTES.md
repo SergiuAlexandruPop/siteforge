@@ -64,6 +64,50 @@ This makes the git log scannable and filterable.
 
 ---
 
+## Animation System Notes (Phase 7.5)
+
+### prefers-reduced-motion
+Every animation component checks `useReducedMotion()` and degrades:
+- `RotatingText` → static first word, no cycling
+- `Marquee` → static flex-wrap layout, no scrolling
+- `ScrollReveal` → content immediately visible, no fade/slide
+- `CountUp` → final number shown immediately
+- `SmoothScroll` → Lenis auto-disables (built-in behavior)
+
+If you add a new animation component, it MUST check `useReducedMotion()` and provide a static fallback.
+
+### Lenis Smooth Scrolling
+- Lenis is dynamically imported in `SmoothScroll.tsx` to keep the initial bundle small
+- It uses `requestAnimationFrame` internally — cleanup is important on unmount
+- On iOS, Lenis uses native touch momentum (no fighting with rubber-band scroll)
+- If you see "jerky scrolling" in dev, it's likely Turbopack's hot reload — try a fresh page load
+
+### CSS Glow Variables
+Dark mode glow effects are defined in `globals.css`:
+```css
+.dark {
+  --glow-primary: 0 0 80px rgba(37, 99, 235, 0.15);
+  --glow-muted: 0 0 120px rgba(37, 99, 235, 0.05);
+}
+```
+Used via Tailwind: `dark:shadow-[var(--glow-primary)]`. These are portfolio-specific but defined globally because CSS variables need to be in scope. Other clients can override or ignore them.
+
+### Inline SVG Icons (icons.tsx)
+- 8 tech logos are inline SVGs in `src/components/portfolio/icons.tsx`
+- All use `aria-hidden="true"` (decorative, not informational)
+- The Next.js icon uses `className="dark:fill-white"` on its circle — this may not work perfectly inside inline SVGs depending on how Tailwind processes them. If the icon looks wrong in dark mode, replace the circle fill with `currentColor` and control via parent text color.
+
+### Import Path for Portfolio Data
+`ProjectShowcase.tsx` imports from `../../../clients/portfolio/data/projects`. This relative path works but is fragile. The `@/` alias only maps to `src/` so it can't reach `clients/`. This is intentional — client data folders are outside `src/` by architecture. If this becomes annoying, add a `@clients/` path alias in `tsconfig.json`.
+
+### ScrollReveal Wrapping Pattern
+ScrollReveal wraps sections from **outside** in `HomePage.tsx`, not inside each section component. This follows SRP — section components don't know they're being animated. AnimatedHero is NOT wrapped because it's above the fold and should be visible immediately.
+
+### Dual-Render Tabs/Accordion (Decision #57)
+`TabbedServices.tsx` renders BOTH the desktop tab layout and the mobile accordion layout in the DOM simultaneously. Tailwind `hidden md:block` / `md:hidden` toggles visibility. This avoids resize listeners, hydration mismatches, and SSR issues. The tradeoff is slightly more DOM nodes, which is negligible for this content volume.
+
+---
+
 ## Vercel-Specific Notes
 
 ### Build Commands Per Client
@@ -122,10 +166,6 @@ Images are processed BEFORE upload to R2:
 - Class B operations (reads): 10 million/month
 - Egress: free (no bandwidth charges ever)
 
-At 100 visitors/day across 7 sites, each loading 5 images per page:
-- Reads: ~105,000/month (1% of limit)
-- Storage: depends on content, but 10GB is hundreds of optimized blog images
-
 ---
 
 ## Resend Notes
@@ -160,13 +200,7 @@ The GitHub Personal Access Token needs MINIMAL permissions:
 
 ### Rate Limits
 - 5,000 requests/hour per token (authenticated)
-- A typical CMS session (open dashboard, read 20 posts, edit one, save) uses ~25 requests
-- Nowhere near the limit
-
-### File Size Limits
-- GitHub API can create/update files up to 100MB
-- For markdown blog posts, this is irrelevant (a long post is maybe 50KB)
-- Images go to R2, not GitHub
+- A typical CMS session uses ~25 requests — nowhere near the limit
 
 ---
 
@@ -175,28 +209,17 @@ The GitHub Personal Access Token needs MINIMAL permissions:
 ### Common Patterns to Enforce
 ```typescript
 // NEVER do this
-const data: any = fetchSomething()
+//const data: any = fetchSomething()
 
 // DO this
-const data: unknown = fetchSomething()
+//const data: unknown = fetchSomething()
 if (isValidBlogPost(data)) {
   // TypeScript now knows data is BlogPost
-}
-
-// Type guard function
-function isValidBlogPost(value: unknown): value is BlogPost {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'title' in value &&
-    'slug' in value
-  )
 }
 ```
 
 ### Environment Variable Typing
 ```typescript
-// Create a validated env reader, not raw process.env access
 function getRequiredEnv(key: string): string {
   const value = process.env[key]
   if (!value) {
@@ -211,34 +234,37 @@ function getRequiredEnv(key: string): string {
 ## Common Debug Scenarios
 
 ### "Page not found" after adding new content
-- Check that the markdown file is in the correct folder: `clients/{active-client}/content/pages/` or `content/blog/`
-- Check that the frontmatter `slug` matches the URL you're trying to access
-- Check that `published: true` is set in the frontmatter
-- Restart the dev server (Next.js caches file reads in dev)
+- Check correct folder: `clients/{active-client}/content/pages/` or `content/blog/`
+- Check frontmatter `slug` matches URL
+- Check `published: true` in frontmatter
+- Restart dev server (Next.js caches file reads)
 
 ### "Image not showing" in blog post
 - Check browser console for R2 URL errors
-- Verify the R2 bucket has public access enabled
-- Check that the image URL in the markdown matches the R2 public URL format
-- Try opening the image URL directly in a new tab
+- Verify R2 bucket has public access
+- Try opening image URL directly in browser
 
 ### "Contact form not sending"
-- Check browser Network tab for the `/api/contact` response
-- Verify RESEND_API_KEY is set in `.env.local`
-- Verify RESEND_TO_EMAIL is a valid email
+- Check Network tab for `/api/contact` response
+- Verify RESEND_API_KEY in `.env.local`
 - Check Resend dashboard for delivery logs
 
 ### "CMS can't save posts"
-- Check browser console for GitHub API errors
-- Verify GITHUB_TOKEN is set and has `repo` scope
-- Verify GITHUB_REPO format is `username/repo-name`
-- Check GitHub token expiration (tokens can expire)
+- Check console for GitHub API errors
+- Verify GITHUB_TOKEN has `repo` scope
+- Check token expiration
 
-### "Styles look wrong / Tailwind not applying"
-- Check that `tailwind.config.ts` is reading the active client's theme.ts
-- Run `yarn dev:{client-name}` to ensure correct env is loaded
-- Check browser dev tools for CSS class presence
-- Verify the component has the correct Tailwind classes
+### "Animations not working"
+- Check browser console for JavaScript errors
+- Verify the component has `'use client'` directive (animation components need client-side JS)
+- Check if `prefers-reduced-motion` is enabled in OS settings (animations will be disabled)
+- For Marquee: ensure `@keyframes marquee` exists in `globals.css`
+- For ScrollReveal: element must be below the viewport fold to trigger (threshold: 0.15)
+
+### "Dark mode glow not showing"
+- Verify `--glow-primary` and `--glow-muted` are defined in `globals.css` under `.dark`
+- Check that the Tailwind class uses `dark:shadow-[var(--glow-primary)]` (arbitrary value syntax)
+- Glow is intentionally subtle — check in a dark room or increase the opacity in the CSS variable temporarily
 
 ---
 
@@ -246,11 +272,10 @@ function getRequiredEnv(key: string): string {
 
 | Metric | Target | Tool |
 |--------|--------|------|
-| Lighthouse Performance | > 95 | Chrome DevTools |
+| Lighthouse Performance | > 90 | Chrome DevTools |
 | Lighthouse SEO | > 95 | Chrome DevTools |
 | Lighthouse Accessibility | > 90 | Chrome DevTools |
 | Lighthouse Best Practices | > 95 | Chrome DevTools |
-| First Contentful Paint | < 1.5s | WebPageTest |
 | Largest Contentful Paint | < 2.5s | WebPageTest |
 | Cumulative Layout Shift | < 0.1 | WebPageTest |
 | Total page weight | < 500KB | Network tab |

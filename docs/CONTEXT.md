@@ -8,12 +8,12 @@
 
 ## Last Updated
 **Date:** 2026-03-25
-**Updated By:** Claude — Phase 7.5 Chat 4: TabbedServices + ProjectShowcase (implementation)
+**Updated By:** Claude — Phase 7.5 Chat 5: Polish + Documentation (FINAL)
 
 ---
 
 ## Current Phase
-**Phases 1-6 Complete. Phase 7.5 Chat 4 — TabbedServices + ProjectShowcase (COMPLETE). Chat 5 next.**
+**Phases 1-6 Complete. Phase 7.5 COMPLETE. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
 
 ---
 
@@ -57,64 +57,31 @@
 **Phase 5A: Homepage Sections (COMPLETE)**
 - 6 modular section components in `src/components/sections/`
 - Hero, Features, AboutSnippet, Showcase, BlogPreview, CtaBanner
-- All sections: responsive, dark mode, className override, zero animations
 
 **Phase 6: Client Setup Automation (COMPLETE)**
-- `scripts/new-client.ts` — interactive CLI
-- `scripts/toggle-feature.ts` — enable/disable features per client
-- `docs/CLIENT_SETUP_CHECKLIST.md` — operational quick-reference
+- `scripts/new-client.ts`, `scripts/toggle-feature.ts`, docs
 
-**Phase 7.5 Chat 1: Foundation Layer (COMPLETE)**
-- `lenis` installed — smooth scrolling library (MIT, ~5KB)
-- `src/types/animations.ts` — shared prop interfaces
-- `src/hooks/` — useReducedMotion, useScrollReveal, useScrollVideo (stub)
-- `src/components/animations/` — SmoothScroll, ScrollReveal, RotatingText, Marquee, CountUp + barrel
-- `src/lib/client-layout.ts` + `src/lib/client-homepage.ts` — per-client registries
-- `src/components/sections/DefaultHomePage.tsx` — extracted fallback homepage
-- layout.tsx + page.tsx modified to use registries
-- `@keyframes marquee` added to globals.css
-
-**Phase 7.5 Chat 2: Portfolio Layout + Header (COMPLETE)**
-- `src/components/portfolio/PortfolioHeader.tsx` — transparent → frosted glass on scroll (fixed position, scroll listener, 50px threshold, 0.3s transition)
-- `src/components/portfolio/PortfolioFooter.tsx` — enhanced footer with dark mode gradient top edge (hidden dark:block blue gradient line)
-- `src/components/portfolio/PortfolioLayout.tsx` — SmoothScroll + PortfolioHeader + main (pt-16 offset) + PortfolioFooter
-- `src/components/portfolio/index.ts` — barrel export
-- Portfolio layout registered in `src/lib/client-layout.ts`
-- Glow CSS variables added to globals.css: `--glow-primary`, `--glow-muted`
-- **Dark palette kept as original slate-blue** (user preferred #0f172a over gray-950 #030712, Decision #55 overridden)
-- Smooth scrolling via Lenis active for portfolio
-- MobileMenu reused via composition from layout/
-
-**Phase 7.5 Chat 3: Animated Hero + Marquee (COMPLETE)**
-- `src/components/portfolio/icons.tsx` — 8 inline SVG tech logos (React, Next.js, TypeScript, Tailwind, Node.js, Supabase, PostgreSQL, Git). Brand colors, aria-hidden, viewBox scaling.
-- `src/components/portfolio/TechMarquee.tsx` — Wraps shared Marquee with tech icons in labeled pills. 35s cycle, pauseOnHover, border-y separator, dark mode styling.
-- `src/components/portfolio/AnimatedHero.tsx` — Client component. Static headline + RotatingText (3s interval, 0.5s transition, text-primary). Two CTAs — primary gets dark glow via `--glow-primary`, intensifies on hover. Dark mode radial gradient overlay (`hidden dark:block`). TechMarquee at bottom.
-- `src/components/portfolio/index.ts` — Updated barrel with AnimatedHero, TechMarquee, PortfolioHomePage.
-- `src/lib/client-homepage.ts` — Portfolio homepage registered. `getClientHomePage('portfolio')` → `PortfolioHomePage`.
-- **AnimatedHero accepts `rotatingWords` as prop (Decision #56) — content is per-client, not hardcoded.**
-
-**Phase 7.5 Chat 4: TabbedServices + ProjectShowcase (COMPLETE)**
-- `clients/portfolio/data/projects.ts` — 4 featured projects with typed `Project` interface (slug, title, description, techStack, image, href, featured). Decision #51.
-- `src/components/portfolio/TabbedServices.tsx` — Client component. Desktop (md+): horizontal tab bar with active indicator glow in dark mode, numbered feature list content panel. Mobile (< md): accordion with expand/collapse, chevron animation. 4 service categories in Romanian. Both layouts rendered in DOM, toggled via Tailwind `hidden md:block` / `md:hidden`.
-- `src/components/portfolio/ProjectShowcase.tsx` — Client component. Filters featured projects, 2-column grid (desktop) / single-column (mobile). Cards: image placeholder, title with hover color, description (line-clamp-2), tech stack tags. Dark mode: hover glow `--glow-primary`, image overlay gradient.
-- `src/components/portfolio/HomePage.tsx` — Complete composition: AnimatedHero (no ScrollReveal) → ScrollReveal > TabbedServices → ScrollReveal > ProjectShowcase → ScrollReveal > BlogPreview (blog gated) → ScrollReveal > CtaBanner. Alternating bg treatment.
-- `src/components/portfolio/index.ts` — Updated barrel with TabbedServices, ProjectShowcase.
+**Phase 7.5: Portfolio Animation Redesign (COMPLETE — 5 chats)**
+- Chat 1: Foundation — Lenis, hooks, animation primitives, registries, DefaultHomePage extraction
+- Chat 2: Layout — PortfolioHeader (transparent→blur), PortfolioFooter (gradient), PortfolioLayout (SmoothScroll), glow CSS vars
+- Chat 3: Hero — 8 inline SVG icons, TechMarquee, AnimatedHero (RotatingText, dark glow, CTAs), HomePage registered
+- Chat 4: Content — TabbedServices (tabs/accordion), ProjectShowcase (2-col grid, hover glow), projects.ts, ScrollReveal wrapping
+- Chat 5: Polish — reduced-motion audit (all pass), dark mode glow verified, mobile review, docs updated (ARCHITECTURE.md, DEV_NOTES.md, ROADMAP.md, CONTEXT.md)
 
 ### What Is In Progress
 
-**Phase 7.5: Portfolio Animation Redesign (Chats 1-4 COMPLETE, Chat 5 next)**
+**Nothing actively in progress. Phase 7.5 is complete.**
 
-**⚠️ Before working on ANY portfolio animation/layout task, Claude MUST read: `clients/portfolio/DESIGN.md`**
-
-**Remaining chats:**
-- Chat 5: Polish + documentation (a11y audit, performance, docs update)
+### What's Next (choose one)
+1. **Phase 5B/5C** — Write real content (about page, projects page, blog posts), add screenshots, deploy to Vercel
+2. **Phase 7** — Set up a second client (doctor or electrician) to validate the multi-client architecture
 
 ### Known Issues
 - CMS saves to GitHub; in dev mode you must `git pull` to see new posts locally
 - `blog-en/` directory may not exist on GitHub until first English post is created
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
 - Google Fonts not loaded via `<link>` tag — only CSS variables set
-- Next.js dark mode class on SVGs: `className="dark:fill-white"` on Next.js logo circle may not work inside inline SVG (CSS selectors depend on how the SVG is rendered). If Next.js icon looks wrong in dark mode, replace with a simpler monochrome version.
+- Next.js icon SVG `dark:fill-white` may not work inside inline SVGs — replace with currentColor if needed
 - Project images are placeholders (colored divs) — need real screenshots before deployment
 
 ### Tech Debt
@@ -123,6 +90,7 @@
 - Phase 5B (portfolio content polish, more pages) not done
 - Phase 5C (Vercel deployment) not done
 - Project screenshots needed in `clients/portfolio/public/projects/`
+- ROADMAP.md Phases 2-4 detail was compressed — restore if full history needed
 
 ---
 
@@ -196,7 +164,7 @@ All architecture and business decisions. Claude should reference this before sug
 
 | Client | Folder Name | Domain | Status | Features Enabled |
 |--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 Chat 4 complete | blog, i18n, darkMode, contactForm |
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 COMPLETE | blog, i18n, darkMode, contactForm |
 | ElectroWill | `electrowill-solutions` | TBD | Scaffolded | TBD |
 | Doctor | `doctor-maria` | TBD | Not started | TBD |
 | Electrician | `electrician-ion` | TBD | Not started | TBD |
@@ -270,19 +238,22 @@ All architecture and business decisions. Claude should reference this before sug
 
 ## Next Steps
 
-**Immediate next chat:** Phase 7.5 Chat 5 — Polish + Documentation.
+**Phase 7.5 is complete.** Two paths forward:
 
-**Before starting, Claude must:**
-1. Read this file (CONTEXT.md) for project state
-2. Read `clients/portfolio/DESIGN.md` for the full animation architecture spec
-3. Focus on Chat 5 scope in DESIGN.md Section 10
+**Option A: Phase 5B/5C — Content + Deployment**
+- Write real page content (about, projects, contact) in Romanian
+- Add project screenshots to `clients/portfolio/public/projects/`
+- Set up Vercel, Resend, GA4, Search Console
+- Deploy the portfolio live
+- This makes the portfolio your sales tool
 
-**What Chat 5 produces:**
-- prefers-reduced-motion audit across all animation components
-- Dark mode glow refinement (visual QA pass)
-- Mobile responsiveness sweep (375px, 768px, 1024px, 1280px)
-- Lighthouse performance audit and fixes
-- Update CONTEXT.md, ARCHITECTURE.md, DEV_NOTES.md, DESIGN.md
+**Option B: Phase 7 — Second Client**
+- Use `yarn new-client` to scaffold a second client
+- Customize theme, content, features
+- Deploy to Vercel as separate project
+- Validate that the multi-client architecture works end-to-end
+
+**Recommendation:** Phase 5B/5C first — get your portfolio live, then use it as proof when onboarding clients.
 
 ---
 
