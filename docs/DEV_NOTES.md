@@ -18,17 +18,22 @@
 ### Initial Setup Commands
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/siteforge.git
+git clone https://github.com/SergiuAlexandruPop/siteforge.git
 cd siteforge
 
 # Install dependencies
 yarn install
 
-# Copy the portfolio env file to active env
-cp env/.env.portfolio .env.local
-
-# Start dev server for your portfolio
+# Start dev server for your portfolio (auto-copies env file)
 yarn dev:portfolio
+```
+
+### CLI Tools
+```bash
+yarn new-client           # Scaffold a new client (interactive, Romanian)
+yarn toggle-feature       # Enable/disable features for existing client
+yarn dev:{client-name}    # Start dev server for a specific client
+yarn build:{client-name}  # Build a specific client for production
 ```
 
 ---

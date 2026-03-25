@@ -184,31 +184,32 @@
 ---
 
 ## Phase 5: Portfolio Site — Your First Client
-**Status: NOT STARTED**
-**Chats estimated: 3-5**
+**Status: IN PROGRESS (5A complete, 5B/5C pending)**
+**Chats estimated: 3-5 | Chats used: 1**
 
 ### 5A: Design & Content
-- [ ] Design portfolio homepage layout (hero, projects grid, about snippet, blog preview)
+- [x] Build modular homepage section system (6 components)
+- [x] Compose portfolio homepage from sections (Hero, Features, About, BlogPreview, CTA)
+- [x] Wire client theme.ts colors into CSS variables (dynamic per client)
+- [x] Font CSS variables (--font-heading, --font-body, --font-blog)
 - [ ] Design projects page (showcase cards with screenshots, tech stack, links)
 - [ ] Design about page (professional story, skills, reconversion narrative)
-- [ ] Design contact page
-- [ ] Write homepage content (Romanian)
+- [ ] Design contact page layout
+- [ ] Write final homepage content (Romanian)
 - [ ] Write about page content
 - [ ] Write first 2-3 blog posts
 
 ### 5B: Implementation
-- [ ] Implement portfolio-specific components (project cards, hero section)
-- [ ] Finalize theme.ts with your brand colors and fonts
+- [ ] Finalize theme.ts with actual brand colors and fonts
 - [ ] Add all page content as markdown files
 - [ ] Add project screenshots and images
 - [ ] Test all pages on mobile (375px), tablet (768px), desktop (1280px)
 
 ### 5C: Deployment
-- [ ] Create GitHub repository
-- [ ] Push code to GitHub
+- [x] GitHub repository created and configured
+- [x] Cloudflare R2 bucket created and configured
 - [ ] Create Vercel project (siteforge-portfolio)
 - [ ] Configure environment variables in Vercel
-- [ ] Create Cloudflare R2 bucket (portfolio-images)
 - [ ] Create Resend account + verify domain
 - [ ] Set up Google Analytics + Search Console
 - [ ] Connect custom domain
@@ -220,17 +221,21 @@
 ---
 
 ## Phase 6: Client Setup Automation
-**Status: NOT STARTED**
-**Chats estimated: 1-2**
+**Status: COMPLETE**
+**Chats estimated: 1-2 | Chats used: 1**
 
-- [ ] Create `scripts/new-client.ts` — interactive CLI that scaffolds a new client folder
-- [ ] CLI asks: client name, domain, which features to enable
-- [ ] CLI creates: config.ts, theme.ts, content/ with placeholder pages, env template
-- [ ] CLI adds yarn scripts for the new client
-- [ ] Update NEW_CLIENT_GUIDE.md with final verified steps
-- [ ] Test: run CLI, verify all files created correctly
+- [x] Create `scripts/new-client.ts` — interactive CLI (Romanian prompts)
+- [x] CLI asks: name, display name, domain, email, phone, features, brand color
+- [x] CLI creates: config.ts, theme.ts, content/ with placeholder pages, env file
+- [x] CLI adds yarn dev + build scripts to package.json
+- [x] CLI registers client in src/lib/client-config.ts (imports + maps)
+- [x] Create `scripts/toggle-feature.ts` — enable/disable features for existing clients
+- [x] toggle-feature checks env var requirements and shows how to get missing values
+- [x] toggle-feature auto-creates directories and adds blog config when enabling
+- [x] Create `docs/CLIENT_SETUP_CHECKLIST.md` — operational quick-reference
+- [x] Update NEW_CLIENT_GUIDE.md references to use CLI
 
-**Milestone: Adding a new client takes < 5 minutes of scaffolding.**
+**Milestone: Adding a new client takes < 5 minutes of scaffolding. ✅**
 
 ---
 
