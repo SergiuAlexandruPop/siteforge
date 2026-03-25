@@ -8,12 +8,15 @@
     "start": "next start",
     "lint": "next lint",
     "new-client": "tsx scripts/new-client.ts",
+    "toggle-feature": "tsx scripts/toggle-feature.ts",
     "dev:portfolio": "tsx scripts/dev.ts portfolio",
     "dev:doctor-maria": "tsx scripts/dev.ts doctor-maria",
     "dev:electrician-ion": "tsx scripts/dev.ts electrician-ion",
     "build:portfolio": "cross-env ACTIVE_CLIENT=portfolio next build",
     "build:doctor-maria": "cross-env ACTIVE_CLIENT=doctor-maria next build",
-    "build:electrician-ion": "cross-env ACTIVE_CLIENT=electrician-ion next build"
+    "build:electrician-ion": "cross-env ACTIVE_CLIENT=electrician-ion next build",
+    "dev:electrowill-solutions": "tsx scripts/dev.ts electrowill-solutions",
+    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions next build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1015.0",

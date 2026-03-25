@@ -4,6 +4,8 @@ import portfolioConfig from '../../clients/portfolio/config'
 import portfolioTheme from '../../clients/portfolio/theme'
 import templateConfig from '../../clients/_template/config'
 import templateTheme from '../../clients/_template/theme'
+import electrowillSolutionsConfig from '../../clients/electrowill-solutions/config'
+import electrowillSolutionsTheme from '../../clients/electrowill-solutions/theme'
 
 // ---------------------------------------------------------------------------
 // Client Registry
@@ -13,11 +15,13 @@ import templateTheme from '../../clients/_template/theme'
 // ---------------------------------------------------------------------------
 
 const configs: Record<string, ClientConfig> = {
+  'electrowill-solutions': electrowillSolutionsConfig,
   portfolio: portfolioConfig,
   _template: templateConfig,
 }
 
 const themes: Record<string, ClientTheme> = {
+  'electrowill-solutions': electrowillSolutionsTheme,
   portfolio: portfolioTheme,
   _template: templateTheme,
 }
