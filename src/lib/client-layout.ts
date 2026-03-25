@@ -1,6 +1,7 @@
 import type { ComponentType, ReactNode } from 'react'
 import type { ClientConfig } from '@/types/config'
 import { LayoutShell } from '@/components/layout/LayoutShell'
+import { PortfolioLayout } from '@/components/portfolio/PortfolioLayout'
 
 // ---------------------------------------------------------------------------
 // Client Layout Registry
@@ -23,11 +24,8 @@ interface LayoutComponentProps {
 
 type LayoutComponent = ComponentType<LayoutComponentProps>
 
-// --- Custom layout imports go here ---
-// import { PortfolioLayout } from '@/components/portfolio/PortfolioLayout'
-
 const layouts: Record<string, LayoutComponent> = {
-  // 'portfolio': PortfolioLayout,  // Chat 2 will uncomment this
+  portfolio: PortfolioLayout,
 }
 
 /**

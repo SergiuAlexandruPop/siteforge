@@ -60,6 +60,18 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Dark Mode — Glow effect variables for premium dark treatments.
+   Used by portfolio components: hero glow, CTA button glow, card hover glow.
+   Applied via: dark:shadow-[var(--glow-primary)] in Tailwind classes.
+   See DESIGN.md Section 3 — Dark Mode Glow Effects.
+   --------------------------------------------------------------------------- */
+
+.dark {
+  --glow-primary: 0 0 80px rgba(37, 99, 235, 0.15);
+  --glow-muted: 0 0 120px rgba(37, 99, 235, 0.05);
+}
+
+/* ---------------------------------------------------------------------------
    Novel Editor — Tiptap placeholder and editor styles
    --------------------------------------------------------------------------- */
 
