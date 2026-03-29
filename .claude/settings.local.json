@@ -4,7 +4,10 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(taskkill //F //PID 20048)",
       "Bash(netstat -ano)",
-      "Bash(taskkill //F //PID 50884)"
+      "Bash(taskkill //F //PID 50884)",
+      "Bash(npx next:*)",
+      "Bash(yarn add:*)",
+      "Bash(yarn build:*)"
     ]
   }
 }

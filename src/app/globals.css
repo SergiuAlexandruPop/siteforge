@@ -72,6 +72,25 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Blueprint — Rocket scroll animation color scheme.
+   Light mode: dark strokes on light blueprint paper.
+   Dark mode: bright blue strokes on deep background.
+   See RocketBlueprint component.
+   --------------------------------------------------------------------------- */
+
+:root {
+  --blueprint-stroke: hsl(210, 40%, 30%);
+  --blueprint-grid: hsl(210, 30%, 80%);
+  --blueprint-bg: hsl(210, 30%, 96%);
+}
+
+.dark {
+  --blueprint-stroke: hsl(210, 100%, 70%);
+  --blueprint-grid: hsl(210, 60%, 25%);
+  --blueprint-bg: hsl(220, 30%, 8%);
+}
+
+/* ---------------------------------------------------------------------------
    Novel Editor — Tiptap placeholder and editor styles
    --------------------------------------------------------------------------- */
 

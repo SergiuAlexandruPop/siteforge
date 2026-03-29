@@ -63,10 +63,7 @@ export function PortfolioHeader({
           : 'bg-transparent border-b border-transparent'
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-        {/* Empty spacer to keep nav right-aligned via justify-between */}
-        <div />
-
+      <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-center px-4 sm:px-6">
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
           {navigation.map((item) => {
@@ -94,7 +91,7 @@ export function PortfolioHeader({
         </nav>
 
         {/* Mobile: toggles + hamburger */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="absolute right-4 flex items-center gap-2 md:hidden">
           {languageToggle}
           {themeToggle}
 

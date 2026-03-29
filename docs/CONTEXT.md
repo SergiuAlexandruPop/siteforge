@@ -157,6 +157,7 @@ All architecture and business decisions. Claude should reference this before sug
 | 55 | Keep original slate-blue dark palette | User prefers warm slate-blue (#0f172a) over cold gray-950 (#030712) | Phase 7.5 C2 |
 | 56 | AnimatedHero accepts rotatingWords as prop | Content is per-client, not hardcoded in component | Phase 7.5 C3 |
 | 57 | Dual-render tabs/accordion for mobile | Both layouts in DOM, toggled via Tailwind. No resize listener, no hydration mismatch | Phase 7.5 C4 |
+| 58 | Motion (MIT, ~11KB) for scroll animation | useScroll/useTransform needed for continuous scroll→SVG mapping; too complex for pure rAF. Tree-shaken import from "motion/react" | Rocket Anim |
 
 ---
 
@@ -194,6 +195,7 @@ All architecture and business decisions. Claude should reference this before sug
 | tsx | ^4.19.0 | Script runner |
 | cross-env | ^7.0.3 | Cross-platform env |
 | lenis | latest | Smooth scrolling (MIT, ~5KB) |
+| motion | ^12.38.0 | Scroll-linked SVG animation (MIT, ~11KB tree-shaken) |
 
 ---
 

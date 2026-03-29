@@ -19,7 +19,7 @@ The portfolio is a premium, modern developer site inspired by:
 - **Light-first, premium dark** — default is light mode; dark mode gets special treatment (deeper palette, glow effects, radial gradients)
 - **Mobile-first** — all CSS starts from 375px and scales up via Tailwind `sm:`, `md:`, `lg:` breakpoints
 - **Accessible animations** — every animation respects `prefers-reduced-motion`, degrades to static content
-- **Zero commercial-license dependencies** — no GSAP, no Framer Motion. Browser-native APIs + Lenis (MIT, 5KB)
+- **Minimal dependencies** — no GSAP. Motion (MIT, ~11KB) for scroll-linked SVG animation. Lenis (MIT, 5KB) for smooth scroll
 - **Performance targets** — Lighthouse 90+ all categories, LCP < 2.5s, CLS < 0.1 even with animations
 
 ---
@@ -34,12 +34,13 @@ The portfolio is a premium, modern developer site inspired by:
 | CSS transitions + keyframes | All visual animations (fade, slide, rotate, marquee) | Browser native | 0KB |
 | `lenis` | Smooth scrolling wrapper | MIT | ~5KB |
 | `useState` + `setInterval` | Rotating text cycling | React built-in | 0KB |
+| `motion` (v12+) | Scroll-linked SVG animation (useScroll, useTransform) | MIT | ~11KB |
 
 ### What We Don't Use (and Why)
 | Technology | Reason Rejected |
 |-----------|----------------|
 | GSAP | Free tier prohibits commercial use. Portfolio sells freelance services = commercial. Business license $250/yr. |
-| Framer Motion | 32KB+ gzipped, we'd use ~5% of it. Overkill. Can't do scroll-scrub natively. |
+| Framer Motion (legacy) | Superseded by `motion` v12+ which tree-shakes to ~11KB. Now used for RocketBlueprint. |
 | AOS (Animate on Scroll) | jQuery-era thinking. IntersectionObserver does the same thing natively. |
 | Three.js / WebGL | Massive dependency for effects we don't need. Future consideration only. |
 
@@ -50,6 +51,7 @@ Every animation component checks `prefers-reduced-motion: reduce`. When active:
 - `Marquee` — stops scrolling, items display statically with flex-wrap
 - `CountUp` — shows final number immediately
 - `SmoothScroll` — Lenis disables itself (built-in behavior)
+- `RocketBlueprint` — shows fully assembled colored rocket, no scroll animation, no sticky
 - Parallax effects — disabled, elements at default position
 
 ---
