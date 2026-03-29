@@ -45,7 +45,7 @@ export async function BlogPreview({
             href={`${basePath}/blog`}
             className="hidden text-sm font-medium text-primary hover:text-primary/80 transition-colors sm:block"
           >
-            Toate articolele →
+            {language === 'en' ? 'All articles →' : 'Toate articolele →'}
           </a>
         </div>
 
@@ -61,7 +61,7 @@ export async function BlogPreview({
             href={`${basePath}/blog`}
             className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
-            Toate articolele →
+            {language === 'en' ? 'All articles →' : 'Toate articolele →'}
           </a>
         </div>
       </div>

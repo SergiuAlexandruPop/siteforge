@@ -1,6 +1,5 @@
 import { getClientConfig } from '@/lib/client-config'
 import { AnimatedHero } from './AnimatedHero'
-import { TabbedServices } from './TabbedServices'
 import { ProjectShowcase } from './ProjectShowcase'
 import { ScrollReveal } from '@/components/animations/ScrollReveal'
 import { BlogPreview } from '@/components/sections/BlogPreview'
@@ -9,56 +8,56 @@ import { CtaBanner } from '@/components/sections/CtaBanner'
 // ---------------------------------------------------------------------------
 // PortfolioHomePage — Homepage composition for the portfolio client.
 // ---------------------------------------------------------------------------
-// Server component (async) — can fetch blog posts for BlogPreview.
+// Inspired by rocket.new — clean hero with name + typewriter effect.
 //
-// Section order per DESIGN.md Section 7:
-//   1. AnimatedHero — no ScrollReveal (always visible, above fold)
-//   2. TabbedServices — wrapped in ScrollReveal
-//   3. ProjectShowcase — wrapped in ScrollReveal (staggered delay)
-//   4. BlogPreview — wrapped in ScrollReveal (gated by features.blog)
-//   5. CtaBanner — wrapped in ScrollReveal
+// Section order:
+//   1. AnimatedHero — rocket GIF, name, "Build production ready [typewriter]"
+//   2. ProjectShowcase — wrapped in ScrollReveal
+//   3. BlogPreview — wrapped in ScrollReveal (gated by features.blog)
+//   4. CtaBanner — wrapped in ScrollReveal
 //
-// DESIGN.md Section 6 data flow:
-//   ScrollReveal wraps each section from outside (SRP — sections don't
-//   know they're being animated). AnimatedHero is NOT wrapped because
-//   it's above the fold and should be visible immediately.
-//
-// Decision #56: rotatingWords passed as prop to AnimatedHero.
+// Supports i18n via `language` prop — all hardcoded strings are translated.
 // ---------------------------------------------------------------------------
 
-export async function PortfolioHomePage() {
+interface PortfolioHomePageProps {
+  language?: 'ro' | 'en'
+}
+
+export async function PortfolioHomePage({ language = 'ro' }: PortfolioHomePageProps) {
   const config = getClientConfig()
+  const isEn = language === 'en'
+  const prefix = isEn ? '/en' : ''
 
   return (
     <>
       <AnimatedHero
-        headline="Construiesc"
-        rotatingWords={[
-          'site-uri moderne',
-          'aplicații web',
-          'experiențe digitale',
-          'soluții performante',
-        ]}
-        subtitle="Full-stack developer cu pasiune pentru design, performanță și cod curat. Transform ideile în produse web rapide, optimizate SEO, cu focus pe experiența utilizatorului."
-        cta={{ label: 'Vezi proiecte', href: '/projects' }}
-        ctaSecondary={{ label: 'Contactează-mă', href: '/contact' }}
+        headline="Sergiu Pop"
+        staticPrefix={isEn ? 'Build production ready' : 'Construiesc'}
+        typewriterWords={
+          isEn
+            ? ['web app.', 'internal tool.', 'dashboard.', 'website.', 'landing page.']
+            : ['aplicații web.', 'unelte interne.', 'tablouri de bord.', 'site-uri.', 'pagini de prezentare.']
+        }
+        rocketImage="/rocket.gif"
+        cta={{ label: isEn ? 'View projects' : 'Vezi proiecte', href: `${prefix}/projects` }}
+        ctaSecondary={{ label: isEn ? 'Contact me' : 'Contactează-mă', href: `${prefix}/contact` }}
       />
 
-      <ScrollReveal direction="up" delay={0}>
-        <TabbedServices className="bg-muted/30 dark:bg-transparent" />
-      </ScrollReveal>
-
       <ScrollReveal direction="up" delay={0.1}>
-        <ProjectShowcase />
+        <ProjectShowcase language={language} />
       </ScrollReveal>
 
       {config.features.blog && (
         <ScrollReveal direction="up" delay={0.1}>
           <BlogPreview
-            title="Ultimele articole"
-            subtitle="Scriu despre tech, dezvoltare web și lecții din tranziția profesională."
+            title={isEn ? 'Latest articles' : 'Ultimele articole'}
+            subtitle={
+              isEn
+                ? 'Writing about tech, web development and lessons from career transition.'
+                : 'Scriu despre tech, dezvoltare web și lecții din tranziția profesională.'
+            }
             count={3}
-            language={config.defaultLanguage}
+            language={language}
             className="bg-muted/30 dark:bg-transparent"
           />
         </ScrollReveal>
@@ -66,9 +65,13 @@ export async function PortfolioHomePage() {
 
       <ScrollReveal direction="up" delay={0}>
         <CtaBanner
-          headline="Ai nevoie de un site profesional?"
-          description="Contactează-mă pentru o discuție gratuită despre proiectul tău."
-          cta={{ label: 'Contactează-mă', href: '/contact' }}
+          headline={isEn ? 'Need a professional website?' : 'Ai nevoie de un site profesional?'}
+          description={
+            isEn
+              ? 'Contact me for a free discussion about your project.'
+              : 'Contactează-mă pentru o discuție gratuită despre proiectul tău.'
+          }
+          cta={{ label: isEn ? 'Contact me' : 'Contactează-mă', href: `${prefix}/contact` }}
           variant="primary"
         />
       </ScrollReveal>

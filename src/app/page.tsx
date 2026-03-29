@@ -17,5 +17,5 @@ export default async function HomePage() {
   const config = getClientConfig()
   const ClientHomePage = getClientHomePage(config.name)
 
-  return <ClientHomePage />
+  return <ClientHomePage language="ro" />
 }

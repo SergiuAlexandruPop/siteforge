@@ -17,7 +17,8 @@ import { PortfolioHomePage } from '@/components/portfolio/HomePage'
 // ---------------------------------------------------------------------------
 
 // Async server components return Promise<JSX.Element>
-type HomePageComponent = ComponentType
+// Language prop enables i18n for custom homepages.
+type HomePageComponent = ComponentType<{ language?: 'ro' | 'en' }>
 
 // --- Custom homepage imports go here ---
 

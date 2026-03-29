@@ -1,13 +1,15 @@
 ---
 title: "Despre mine"
-description: "Povestea mea profesională și competențele tehnice."
+description: "Sergiu Pop — Software Developer."
 ---
 
-Sunt un dezvoltator full-stack aflat într-o continuă reconversie profesională. Cred în învățarea constantă și în puterea tehnologiei de a transforma afacerile mici.
+Sunt Sergiu Pop, software developer cu experiență în construirea de aplicații web moderne.
 
 ## Competențe
 
-- TypeScript, Vue 3, React, Next.js
+- TypeScript, React, Next.js
 - Tailwind CSS, shadcn/ui
 - Node.js, Supabase, Cloudflare R2
 - AI tools și automatizări
+
+*Pagina completă este în curs de actualizare.*

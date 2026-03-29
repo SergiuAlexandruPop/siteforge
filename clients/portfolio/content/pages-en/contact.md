@@ -1,9 +1,9 @@
 ---
 title: "Contact"
-description: "Contactează-mă pentru proiecte, colaborări sau întrebări."
+description: "Get in touch for projects, collaborations, or questions."
 ---
 
-Ai un proiect în minte? Trimite-mi un mesaj folosind formularul de mai jos sau contactează-mă direct.
+Have a project in mind? Send me a message using the form below or reach out directly.
 
 - **Email:** [sergiualexandrupop@gmail.com](mailto:sergiualexandrupop@gmail.com)
 - **LinkedIn:** [linkedin.com/in/sergiualexandrupop](https://www.linkedin.com/in/sergiualexandrupop/)

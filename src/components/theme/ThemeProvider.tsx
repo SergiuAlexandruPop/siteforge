@@ -14,16 +14,15 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 const STORAGE_KEY = 'siteforge-theme'
 
 function getInitialTheme(): Theme {
-  // Server render — default to light, the inline script in layout.tsx
-  // handles the real value before React hydrates.
-  if (typeof window === 'undefined') return 'light'
+  // Server render — default to dark (portfolio preference).
+  // The inline script in layout.tsx applies .dark before React hydrates.
+  if (typeof window === 'undefined') return 'dark'
 
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored === 'dark' || stored === 'light') return stored
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+  // No stored preference — default to dark
+  return 'dark'
 }
 
 function applyTheme(theme: Theme) {

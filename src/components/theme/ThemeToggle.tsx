@@ -1,10 +1,30 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useTheme } from './ThemeProvider'
+
+// ---------------------------------------------------------------------------
+// ThemeToggle — Dark/light mode toggle button.
+// ---------------------------------------------------------------------------
+// Uses a `mounted` guard to prevent hydration mismatch. On the server and
+// during the first client render we show a static placeholder (moon icon).
+// After hydration completes we swap to the real theme-aware icon.
+//
+// The anti-FOUC inline script in layout.tsx ensures the page is visually
+// correct even before React hydrates — so the brief placeholder is invisible.
+// ---------------------------------------------------------------------------
 
 export function ThemeToggle() {
   const { theme, toggle } = useTheme()
-  const isDark = theme === 'dark'
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Before hydration: render a static placeholder to match server HTML.
+  // Always render the sun icon (matches server default of 'dark' theme).
+  const isDark = mounted ? theme === 'dark' : true
 
   return (
     <button
@@ -14,7 +34,7 @@ export function ThemeToggle() {
       title={isDark ? 'Mod luminos' : 'Mod întunecat'}
     >
       {isDark ? (
-        /* Sun icon */
+        /* Sun icon — shown in dark mode */
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
@@ -37,7 +57,7 @@ export function ThemeToggle() {
           <path d="m19.07 4.93-1.41 1.41" />
         </svg>
       ) : (
-        /* Moon icon */
+        /* Moon icon — shown in light mode (and as server default) */
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"

@@ -24,45 +24,4 @@ export interface Project {
   featured: boolean
 }
 
-export const projects: Project[] = [
-  {
-    slug: 'siteforge',
-    title: 'SiteForge',
-    description:
-      'Starter kit mono-repo care alimentează multiple site-uri de business dintr-un singur codebase. CMS integrat, blog, dark mode, i18n.',
-    techStack: ['Next.js', 'TypeScript', 'Tailwind', 'Cloudflare R2'],
-    image: '/projects/siteforge.jpg',
-    href: '#',
-    featured: true,
-  },
-  {
-    slug: 'blog-cms',
-    title: 'Blog CMS',
-    description:
-      'Editor WYSIWYG în stil Medium cu upload de imagini, optimizare automată și publicare directă pe GitHub.',
-    techStack: ['Novel', 'Tiptap', 'Sharp', 'GitHub API'],
-    image: '/projects/blog-cms.jpg',
-    href: '#',
-    featured: true,
-  },
-  {
-    slug: 'portfolio-site',
-    title: 'Portfolio Personal',
-    description:
-      'Site-ul pe care îl vizitezi acum. Animații premium, dark mode cu glow effects, performanță Lighthouse 95+.',
-    techStack: ['Next.js', 'Lenis', 'Tailwind', 'Vercel'],
-    image: '/projects/portfolio.jpg',
-    href: '#',
-    featured: true,
-  },
-  {
-    slug: 'electrowill',
-    title: 'ElectroWill Solutions',
-    description:
-      'Site de prezentare pentru o firmă de instalații electrice. Formular de contact, SEO local, design responsive.',
-    techStack: ['Next.js', 'Resend', 'Tailwind'],
-    image: '/projects/electrowill.jpg',
-    href: '#',
-    featured: true,
-  },
-]
+export const projects: Project[] = []

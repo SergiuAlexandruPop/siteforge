@@ -1,9 +1,11 @@
 ---
-title: "Contact"
-description: "Contactează-mă pentru proiecte, colaborări sau întrebări."
+title: "CV"
+description: "CV-ul meu profesional — în curs de actualizare."
 ---
 
-Ai un proiect în minte? Trimite-mi un mesaj folosind formularul de mai jos sau contactează-mă direct.
+## CV-ul meu este în curs de actualizare.
+
+Între timp, mă poți contacta direct:
 
 - **Email:** [sergiualexandrupop@gmail.com](mailto:sergiualexandrupop@gmail.com)
 - **LinkedIn:** [linkedin.com/in/sergiualexandrupop](https://www.linkedin.com/in/sergiualexandrupop/)

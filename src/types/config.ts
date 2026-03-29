@@ -37,6 +37,11 @@ export interface ClientContact {
   email: string
   phone: string
   address?: string
+  socials?: {
+    linkedin?: string
+    github?: string
+    twitter?: string
+  }
 }
 
 export interface ClientBlogSettings {

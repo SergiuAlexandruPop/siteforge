@@ -5,7 +5,7 @@ date: "2025-07-01"
 author: "Alex"
 excerpt: "Prima postare pe blog. Despre ce voi scrie, motivația din spatele acestui proiect și planurile de viitor."
 featuredImage: ""
-published: true
+published: false
 readingTime: 3
 tags: ["general", "intro", "tech"]
 ---

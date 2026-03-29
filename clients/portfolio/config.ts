@@ -2,9 +2,9 @@ import type { ClientConfig } from '../../src/types/config'
 
 const config: ClientConfig = {
   name: 'portfolio',
-  displayName: 'Alex Dev',
+  displayName: 'Sergiu Pop',
   domain: 'localhost',
-  defaultLanguage: 'ro',
+  defaultLanguage: 'en',
 
   features: {
     i18n: true,
@@ -16,29 +16,34 @@ const config: ClientConfig = {
   },
 
   seo: {
-    siteName: 'Alex Dev — Full-Stack Developer',
-    siteDescription: 'Portfolio and blog about tech, AI, health, and professional growth.',
+    siteName: 'Sergiu Pop — Software Developer',
+    siteDescription: 'Portfolio și blog despre tech, sănătate și dezvoltare profesională.',
     ogImage: '/og-image.jpg',
   },
 
   contact: {
-    email: 'hello@alexdev.ro',
-    phone: '+40 700 000 000',
+    email: 'sergiualexandrupop@gmail.com',
+    phone: '',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/sergiualexandrupop/',
+      github: 'https://github.com/SergiuAlexandruPop',
+    },
   },
 
   navigation: [
     { label: 'Acasă', href: '/', labelEn: 'Home' },
     { label: 'Despre', href: '/about', labelEn: 'About' },
     { label: 'Proiecte', href: '/projects', labelEn: 'Projects' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Contact', href: '/contact' },
+    { label: 'Blog', href: '/blog', labelEn: 'Blog' },
+    { label: 'CV', href: '/resume', labelEn: 'Resume' },
+    { label: 'Contact', href: '/contact', labelEn: 'Contact' },
   ],
 
   blog: {
     postsPerPage: 10,
     showReadingTime: true,
     showAuthor: true,
-    authorName: 'Alex',
+    authorName: 'Sergiu',
     authorAvatar: '/avatar.jpg',
   },
 }

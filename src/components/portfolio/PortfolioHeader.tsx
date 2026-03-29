@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import type { NavigationItem } from '@/types/config'
 import { MobileMenu } from '@/components/layout/MobileMenu'
 
@@ -34,6 +35,11 @@ export function PortfolioHeader({
   languageToggle,
   themeToggle,
 }: PortfolioHeaderProps) {
+  const pathname = usePathname()
+  const detectedLanguage = pathname.startsWith('/en') ? 'en' : 'ro'
+  // Use detected language from URL instead of prop (which comes from config.defaultLanguage)
+  const lang = detectedLanguage as 'ro' | 'en'
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
@@ -58,21 +64,16 @@ export function PortfolioHeader({
       }`}
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-        {/* Logo / site name */}
-        <a
-          href="/"
-          className="text-lg font-semibold text-foreground hover:text-primary transition-colors"
-        >
-          {displayName}
-        </a>
+        {/* Empty spacer to keep nav right-aligned via justify-between */}
+        <div />
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
           {navigation.map((item) => {
             const label =
-              currentLanguage === 'en' && item.labelEn ? item.labelEn : item.label
+              lang === 'en' && item.labelEn ? item.labelEn : item.label
             const href =
-              currentLanguage === 'en'
+              lang === 'en'
                 ? `/en${item.href === '/' ? '' : item.href}`
                 : item.href
 
@@ -126,7 +127,7 @@ export function PortfolioHeader({
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         items={navigation}
-        currentLanguage={currentLanguage}
+        currentLanguage={lang}
       />
     </header>
   )
