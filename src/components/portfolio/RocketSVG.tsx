@@ -31,6 +31,7 @@ interface RocketSVGAnimatedProps {
   noseconePathLength: MotionValue<number>
   windowPathLength: MotionValue<number>
   fillOpacity: MotionValue<number>
+  noseconeStrokeFadeOut: MotionValue<number>
   exhaustOpacity: MotionValue<number>
   rocketY: MotionValue<number>
 }
@@ -91,8 +92,8 @@ function StaticRocket() {
       {/* Nosecone */}
       <path
         d="M200 80 L160 200 L240 200 Z"
-        fill="hsl(0, 75%, 55%)"
-        opacity={0.9}
+        fill="hsl(8, 90%, 58%)"
+        opacity={0.95}
       />
       {/* Left fin */}
       <path
@@ -143,6 +144,7 @@ function AnimatedRocket({
   noseconePathLength,
   windowPathLength,
   fillOpacity,
+  noseconeStrokeFadeOut,
   exhaustOpacity,
   rocketY,
 }: RocketSVGAnimatedProps) {
@@ -200,11 +202,11 @@ function AnimatedRocket({
           fill="hsl(210, 80%, 55%)"
           opacity={0.85}
         />
-        {/* Nosecone fill */}
+        {/* Nosecone fill — vibrant gradient-like red-orange */}
         <path
           d="M200 80 L160 200 L240 200 Z"
-          fill="hsl(0, 75%, 55%)"
-          opacity={0.85}
+          fill="hsl(8, 90%, 58%)"
+          opacity={0.95}
         />
         {/* Left fin fill */}
         <path
@@ -255,9 +257,9 @@ function AnimatedRocket({
       </motion.g>
 
       {/* ================================================================
-          Layer 4: Nosecone (stroke draw-on)
+          Layer 4: Nosecone (stroke draw-on, fades out when fills appear)
           ================================================================ */}
-      <motion.g style={{ y: rocketY }}>
+      <motion.g style={{ y: rocketY, opacity: noseconeStrokeFadeOut }}>
         <motion.path
           d="M200 80 L160 200 L240 200 Z"
           {...STROKE_STYLE}

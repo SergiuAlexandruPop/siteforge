@@ -56,8 +56,9 @@ export function RocketBlueprint({ language = 'ro' }: RocketBlueprintProps) {
   // Stage 4: Window draws (50% → 65%)
   const windowPathLength = useTransform(scrollYProgress, [0.50, 0.65], [0, 1])
 
-  // Stage 5: Color fills fade in (65% → 80%)
+  // Stage 5: Color fills fade in (65% → 80%), nosecone stroke fades out
   const fillOpacity = useTransform(scrollYProgress, [0.65, 0.80], [0, 1])
+  const noseconeStrokeFadeOut = useTransform(scrollYProgress, [0.65, 0.80], [1, 0])
 
   // Stage 6: Grid fades out (80% → 90%)
   const gridFadeOut = useTransform(scrollYProgress, [0.80, 0.90], [1, 0])
@@ -85,7 +86,7 @@ export function RocketBlueprint({ language = 'ro' }: RocketBlueprintProps) {
     <section
       ref={containerRef}
       className="relative"
-      style={{ height: '250vh' }}
+      style={{ height: '180vh' }}
       aria-label={isEn ? 'Rocket build animation' : 'Animație construire rachetă'}
     >
       {/* Sticky viewport — stays pinned while user scrolls through the runway */}
@@ -119,6 +120,7 @@ export function RocketBlueprint({ language = 'ro' }: RocketBlueprintProps) {
             noseconePathLength={noseconePathLength}
             windowPathLength={windowPathLength}
             fillOpacity={fillOpacity}
+            noseconeStrokeFadeOut={noseconeStrokeFadeOut}
             exhaustOpacity={exhaustOpacity}
             rocketY={rocketY}
           />
