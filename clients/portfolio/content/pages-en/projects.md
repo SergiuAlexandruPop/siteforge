@@ -1,10 +1,10 @@
 ---
 title: "Projects"
-description: "My project portfolio — being updated."
+description: "From internal business tools to multi-client web platforms — a selection of what I build."
 ---
 
-## Projects section is being updated.
+## Projects
 
-Coming back soon with a selection of recent projects.
+A selection of my recent work. Every project solves a real business problem.
 
-In the meantime, check out my activity on [GitHub](https://github.com/SergiuAlexandruPop).
+You can also check out my activity on [GitHub](https://github.com/SergiuAlexandruPop).

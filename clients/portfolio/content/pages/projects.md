@@ -1,10 +1,10 @@
 ---
 title: "Proiecte"
-description: "Portofoliul meu de proiecte — în curs de actualizare."
+description: "De la unelte interne pentru business la platforme web multi-client — o selecție din ce construiesc."
 ---
 
-## Secțiunea de proiecte este în curs de actualizare.
+## Proiecte
 
-Revin în curând cu o selecție de proiecte recente.
+O selecție din lucrările mele recente. Fiecare proiect rezolvă o problemă reală de business.
 
-Între timp, poți vedea activitatea mea pe [GitHub](https://github.com/PopSerghei).
+Poți vedea activitatea mea și pe [GitHub](https://github.com/PopSerghei).
