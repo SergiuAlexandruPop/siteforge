@@ -7,7 +7,8 @@
       "Bash(taskkill //F //PID 50884)",
       "Bash(npx next:*)",
       "Bash(yarn add:*)",
-      "Bash(yarn build:*)"
+      "Bash(yarn build:*)",
+      "Bash(npx cross-env:*)"
     ]
   }
 }

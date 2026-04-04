@@ -1,4 +1,5 @@
 import { getClientConfig } from '@/lib/client-config'
+import { getClientPage } from '@/lib/client-pages'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { NotAvailable } from '@/components/i18n/NotAvailable'
@@ -42,6 +43,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function EnglishDynamicPage({ params }: PageProps) {
   const { slug } = await params
   const config = getClientConfig()
+
+  const CustomPage = getClientPage(config.name, slug)
+  if (CustomPage) return <CustomPage language="en" />
+
   const page = await getPageBySlug(slug, 'en')
 
   if (!page) {

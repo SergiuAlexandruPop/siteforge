@@ -1,15 +1,6 @@
 ---
 title: "About Me"
-description: "Sergiu Pop — Software Developer."
+description: "Sergiu Pop — Software Developer passionate about building modern web applications."
 ---
 
-I'm Sergiu Pop, a software developer with experience building modern web applications.
-
-## Skills
-
-- TypeScript, React, Next.js
-- Tailwind CSS, shadcn/ui
-- Node.js, Supabase, Cloudflare R2
-- AI tools and automation
-
-*Full bio coming soon.*
+This page is rendered by the custom AboutPage component.

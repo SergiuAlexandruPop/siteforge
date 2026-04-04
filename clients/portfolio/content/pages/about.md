@@ -1,15 +1,6 @@
 ---
 title: "Despre mine"
-description: "Sergiu Pop — Software Developer."
+description: "Sergiu Pop — Software Developer cu pasiune pentru construirea de aplicații web moderne."
 ---
 
-Sunt Sergiu Pop, software developer cu experiență în construirea de aplicații web moderne.
-
-## Competențe
-
-- TypeScript, React, Next.js
-- Tailwind CSS, shadcn/ui
-- Node.js, Supabase, Cloudflare R2
-- AI tools și automatizări
-
-*Pagina completă este în curs de actualizare.*
+Pagina este redată de componenta custom AboutPage.

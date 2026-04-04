@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Newsreader } from 'next/font/google'
 
 import { getClientConfig, getClientTheme } from '@/lib/client-config'
 import { getClientLayout } from '@/lib/client-layout'
@@ -14,6 +14,12 @@ import './globals.css'
 const inter = Inter({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-inter',
+})
+
+const newsreader = Newsreader({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-editorial',
+  display: 'swap',
 })
 
 export function generateMetadata(): Metadata {
@@ -148,7 +154,7 @@ export default function RootLayout({
           <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         )}
       </head>
-      <body className={`${inter.variable} font-sans antialiased transition-colors duration-200`}>
+      <body className={`${inter.variable} ${newsreader.variable} font-sans antialiased transition-colors duration-200`}>
         {darkModeEnabled ? (
           <ThemeProvider>{appContent}</ThemeProvider>
         ) : (
