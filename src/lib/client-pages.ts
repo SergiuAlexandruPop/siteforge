@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 import { AboutPage } from '@/components/portfolio/AboutPage'
 import { ProjectsPage } from '@/components/portfolio/ProjectsPage'
+import { ResumePage } from '@/components/portfolio/ResumePage'
 
 // ---------------------------------------------------------------------------
 // Client Page Registry
@@ -22,6 +23,7 @@ const pages: Record<string, Record<string, PageComponent>> = {
   'portfolio': {
     'about': AboutPage,
     'projects': ProjectsPage,
+    'resume': ResumePage,
   },
 }
 

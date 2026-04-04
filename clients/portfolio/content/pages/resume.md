@@ -1,12 +1,6 @@
 ---
 title: "CV"
-description: "CV-ul meu profesional — în curs de actualizare."
+description: "CV-ul profesional al lui Sergiu Pop — Front-end Developer cu peste 5 ani de experiență."
 ---
 
-## CV-ul meu este în curs de actualizare.
-
-Între timp, mă poți contacta direct:
-
-- **Email:** [sergiualexandrupop@gmail.com](mailto:sergiualexandrupop@gmail.com)
-- **LinkedIn:** [linkedin.com/in/sergiualexandrupop](https://www.linkedin.com/in/sergiualexandrupop/)
-- **GitHub:** [github.com/SergiuAlexandruPop](https://github.com/SergiuAlexandruPop)
+Pagina este redată de componenta custom ResumePage.

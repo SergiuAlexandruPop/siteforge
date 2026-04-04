@@ -1,12 +1,6 @@
 ---
 title: "Resume"
-description: "My professional resume — being updated."
+description: "Sergiu Pop's professional resume — Front-end Developer with 5+ years of experience."
 ---
 
-## My resume is being updated.
-
-In the meantime, you can reach me directly:
-
-- **Email:** [sergiualexandrupop@gmail.com](mailto:sergiualexandrupop@gmail.com)
-- **LinkedIn:** [linkedin.com/in/sergiualexandrupop](https://www.linkedin.com/in/sergiualexandrupop/)
-- **GitHub:** [github.com/SergiuAlexandruPop](https://github.com/SergiuAlexandruPop)
+This page is rendered by the custom ResumePage component.
