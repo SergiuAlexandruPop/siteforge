@@ -5,21 +5,26 @@ import { ContactForm } from '@/components/contact/ContactForm'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
+// ---------------------------------------------------------------------------
+// Root-level [slug] routes are ALWAYS Romanian.
+// English routes are served by /en/[slug]/page.tsx.
+// This is the i18n routing convention (Decision #25).
+// ---------------------------------------------------------------------------
+const LANGUAGE = 'ro' as const
+
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  const config = getClientConfig()
-  const slugs = getPageSlugs(config.defaultLanguage)
-
+  const slugs = getPageSlugs(LANGUAGE)
   return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const config = getClientConfig()
-  const page = await getPageBySlug(slug, config.defaultLanguage)
+  const page = await getPageBySlug(slug, LANGUAGE)
 
   if (!page) return {}
 
@@ -43,9 +48,9 @@ export default async function DynamicPage({ params }: PageProps) {
   const config = getClientConfig()
 
   const CustomPage = getClientPage(config.name, slug)
-  if (CustomPage) return <CustomPage language={config.defaultLanguage} />
+  if (CustomPage) return <CustomPage language={LANGUAGE} />
 
-  const page = await getPageBySlug(slug, config.defaultLanguage)
+  const page = await getPageBySlug(slug, LANGUAGE)
 
   if (!page) notFound()
 
@@ -70,7 +75,7 @@ export default async function DynamicPage({ params }: PageProps) {
 
         {slug === 'contact' && config.features.contactForm && (
           <div className="mt-8 max-w-lg">
-            <ContactForm />
+            <ContactForm language={LANGUAGE} />
           </div>
         )}
       </div>
