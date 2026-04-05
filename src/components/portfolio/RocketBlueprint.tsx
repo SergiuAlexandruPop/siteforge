@@ -8,7 +8,7 @@ import { RocketSVG } from './RocketSVG'
 // ---------------------------------------------------------------------------
 // RocketBlueprint — Scroll-driven rocket blueprint animation.
 // ---------------------------------------------------------------------------
-// Replaces AnimationPlaceholder. As the user scrolls through ~250vh of
+// Replaces AnimationPlaceholder. As the user scrolls through ~120vh of
 // runway, a blueprint-style rocket draws itself layer by layer, fills with
 // color, and "launches" upward.
 //
@@ -86,7 +86,7 @@ export function RocketBlueprint({ language = 'ro' }: RocketBlueprintProps) {
     <section
       ref={containerRef}
       className="relative"
-      style={{ height: '180vh' }}
+      style={{ height: '120vh' }}
       aria-label={isEn ? 'Rocket build animation' : 'Animație construire rachetă'}
     >
       {/* Sticky viewport — stays pinned while user scrolls through the runway */}

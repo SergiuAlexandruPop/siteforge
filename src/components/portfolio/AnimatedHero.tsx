@@ -1,8 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { TypewriterText } from '@/components/animations'
 import { TechMarquee } from './TechMarquee'
-import { ChatInput } from './ChatInput'
 
 // ---------------------------------------------------------------------------
 // AnimatedHero — Rocket.new-inspired hero for the portfolio homepage.
@@ -10,12 +10,19 @@ import { ChatInput } from './ChatInput'
 // Layout:
 //   - Static name as main headline
 //   - "Build production ready..." with typewriter cycling words
-//   - Chat input (Smartsupp/WhatsApp integration)
+//   - Two CTA buttons: primary (scroll to projects) + secondary (link to contact)
 //   - Dark mode: radial gradient glow behind headline
 //   - TechMarquee at the bottom of the hero
 //
-// Inspired by https://www.rocket.new/
+// Phase 8B: ChatInput replaced with CTA buttons. Visitors arrive via
+// LinkedIn/email links — they need clear next actions, not a text box.
 // ---------------------------------------------------------------------------
+
+interface CTAButton {
+  label: string
+  href: string
+  variant: 'primary' | 'secondary'
+}
 
 interface AnimatedHeroProps {
   /** Main headline — the developer's name. */
@@ -26,6 +33,8 @@ interface AnimatedHeroProps {
   typewriterWords: string[]
   /** Optional subtitle paragraph below the headline. */
   subtitle?: string
+  /** CTA buttons rendered below the typewriter. */
+  ctas?: CTAButton[]
   /** Language for i18n. */
   language?: 'ro' | 'en'
   className?: string
@@ -36,6 +45,7 @@ export function AnimatedHero({
   staticPrefix,
   typewriterWords,
   subtitle,
+  ctas = [],
   language = 'ro',
   className = '',
 }: AnimatedHeroProps) {
@@ -83,10 +93,30 @@ export function AnimatedHero({
             </p>
           )}
 
-          {/* Chat input */}
-          <div className="mt-10 w-full">
-            <ChatInput language={language} />
-          </div>
+          {/* CTA buttons */}
+          {ctas.length > 0 && (
+            <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+              {ctas.map((cta) =>
+                cta.variant === 'primary' ? (
+                  <a
+                    key={cta.href}
+                    href={cta.href}
+                    className="inline-flex h-12 min-w-[180px] items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 dark:shadow-[var(--glow-primary)] sm:text-base"
+                  >
+                    {cta.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={cta.href}
+                    href={cta.href}
+                    className="inline-flex h-12 min-w-[180px] items-center justify-center rounded-xl border border-border bg-transparent px-6 text-sm font-semibold text-foreground transition-colors hover:bg-muted/50 sm:text-base"
+                  >
+                    {cta.label}
+                  </Link>
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
 
