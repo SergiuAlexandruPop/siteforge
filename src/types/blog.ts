@@ -8,6 +8,8 @@ export interface BlogMeta {
   published: boolean
   readingTime: number
   tags: string[]
+  /** If true, this post is shown as a featured hero card at the top of the blog page. */
+  pinned: boolean
 }
 
 export interface BlogPost {

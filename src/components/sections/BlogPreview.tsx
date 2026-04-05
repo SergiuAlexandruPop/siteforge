@@ -51,7 +51,7 @@ export async function BlogPreview({
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {latestPosts.map((post) => (
-            <BlogCard key={post.meta.slug} post={post.meta} basePath={basePath} />
+            <BlogCard key={post.meta.slug} post={post.meta} basePath={basePath} language={language} />
           ))}
         </div>
 

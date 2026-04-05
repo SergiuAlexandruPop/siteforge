@@ -196,6 +196,7 @@ function parseBlogMeta(data: Record<string, unknown>, filename: string): BlogMet
     published: data.published !== false,
     readingTime: (data.readingTime as number) ?? 3,
     tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+    pinned: data.pinned === true,
   }
 }
 

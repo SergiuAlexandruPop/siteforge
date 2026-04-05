@@ -21,14 +21,17 @@ export default async function BlogPage() {
   const posts = await getAllBlogPosts('ro')
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <div className="mb-8">
+    <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="mb-10 sm:mb-12">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Blog
         </h1>
+        <p className="mt-3 max-w-2xl text-base text-muted-foreground sm:text-lg">
+          Scriu despre tech, AI, business, sănătate, stoicism și lecții din viață.
+        </p>
       </div>
 
-      <BlogList posts={posts.map((p) => p.meta)} basePath="" />
+      <BlogList posts={posts.map((p) => p.meta)} basePath="" language="ro" />
     </div>
   )
 }
