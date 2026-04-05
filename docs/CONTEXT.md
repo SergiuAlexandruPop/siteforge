@@ -7,13 +7,13 @@
 ---
 
 ## Last Updated
-**Date:** 2026-03-25
-**Updated By:** Claude — Phase 7.5 Chat 5: Polish + Documentation (FINAL)
+**Date:** 2026-04-05
+**Updated By:** Claude — Phase 8: UI/UX Redesign (Phases A–F Complete)
 
 ---
 
 ## Current Phase
-**Phases 1-6 Complete. Phase 7.5 COMPLETE. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
+**Phases 1-8 Complete. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
 
 ---
 
@@ -68,9 +68,17 @@
 - Chat 4: Content — TabbedServices (tabs/accordion), ProjectShowcase (2-col grid, hover glow), projects.ts, ScrollReveal wrapping
 - Chat 5: Polish — reduced-motion audit (all pass), dark mode glow verified, mobile review, docs updated (ARCHITECTURE.md, DEV_NOTES.md, ROADMAP.md, CONTEXT.md)
 
+**Phase 8: UI/UX Redesign (COMPLETE — 1 chat, 6 sub-phases)**
+- Phase 8A: Color system overhaul — primary changed from blue-600 (#2563eb) to terracotta (#B24027 light, #D4613E dark). Added optional `dark.primary` to ThemeColors type. Updated all hardcoded blue rgba values across 7 components. About page pill hover refactored from imperative DOM to React state-driven CSS. Added "click to explore" hint.
+- Phase 8B: Homepage redesign — ChatInput replaced with 2 CTA buttons (scroll to projects + link to contact). RocketBlueprint shortened from 180vh to 120vh. Added StatsRow section (trust metrics with CountUp). Replaced bottom contact form with CtaBanner linking to /contact. Varied section spacing.
+- Phase 8C: Blog redesign — Bigger cards (more padding, text-xl title), hover:scale-[1.02] + shadow lift. Tag pills increased to text-xs. i18n reading time fix. Pinned post support via `pinned: true` frontmatter — renders as hero card above grid. Blog page subtitles in both languages.
+- Phase 8D: Contact page — Custom `ContactPage.tsx` with split layout (left: info/socials/response time, right: form in card). Registered in client-pages. Removed 'use client' to fix server-side env access. Fixed root `[slug]/page.tsx` to always pass `language='ro'` (was using config.defaultLanguage which is 'en').
+- Phase 8E: Projects + Resume polish — `BrowserMockup.tsx` component (macOS browser chrome frame). Applied to ProjectShowcase, ProjectsPage, ProjectDetail image placeholders. Added `outcome`/`outcomeEn` fields to Project type + data. Resume header wrapped in gradient card. Skill pills got hover:scale-105 + glow.
+- Phase 8F: Header + Footer — Active link styling in PortfolioHeader (underline indicator + font-semibold + aria-current). MobileMenu active link support (optional prop, backward compatible). Footer redesigned to compact two-row layout (mini-CTA row + copyright/socials row). Footer now client component using usePathname() for i18n.
+
 ### What Is In Progress
 
-**Nothing actively in progress. Phase 7.5 is complete.**
+**Nothing actively in progress. Phase 8 is complete.**
 
 ### What's Next (choose one)
 1. **Phase 5B/5C** — Write real content (about page, projects page, blog posts), add screenshots, deploy to Vercel
@@ -82,15 +90,18 @@
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
 - Google Fonts not loaded via `<link>` tag — only CSS variables set
 - Next.js icon SVG `dark:fill-white` may not work inside inline SVGs — replace with currentColor if needed
-- Project images are placeholders (colored divs) — need real screenshots before deployment
+- Project images are placeholders (browser mockup frames with text) — need real screenshots before deployment
+- Root `[slug]/page.tsx` hardcodes `language='ro'` — correct for current i18n convention but coupled to routing pattern
 
 ### Tech Debt
 - Google Fonts loading should dynamically add `<link>` for non-Inter fonts
 - Novel editor image upload shows no loading indicator during upload
 - Phase 5B (portfolio content polish, more pages) not done
 - Phase 5C (Vercel deployment) not done
-- Project screenshots needed in `clients/portfolio/public/projects/`
+- Project screenshots needed in `clients/portfolio/public/projects/` — search for `TODO: Replace with real screenshot` in code
 - ROADMAP.md Phases 2-4 detail was compressed — restore if full history needed
+- `config.defaultLanguage` is `'en'` but root routes (`/`, `/about`, `/contact`) serve Romanian — this works but is conceptually confusing. The `defaultLanguage` field affects `html lang` and SEO metadata, not routing.
+- ChatInput component still exists but is no longer used on homepage — can be removed or repurposed
 
 ---
 
@@ -158,6 +169,18 @@ All architecture and business decisions. Claude should reference this before sug
 | 56 | AnimatedHero accepts rotatingWords as prop | Content is per-client, not hardcoded in component | Phase 7.5 C3 |
 | 57 | Dual-render tabs/accordion for mobile | Both layouts in DOM, toggled via Tailwind. No resize listener, no hydration mismatch | Phase 7.5 C4 |
 | 58 | Motion (MIT, ~11KB) for scroll animation | useScroll/useTransform needed for continuous scroll→SVG mapping; too complex for pure rAF. Tree-shaken import from "motion/react" | Rocket Anim |
+| 59 | Primary color: terracotta #B24027 | Default blue-600 looks AI-generated. Terracotta is warm, distinctive, already used on About page | Phase 8A |
+| 60 | Dark mode primary: #D4613E (lighter) | #B24027 fails WCAG AA on dark backgrounds. Added optional `dark.primary` to ThemeColors type | Phase 8A |
+| 61 | About page pill hover via React state | Imperative DOM style manipulation was fragile, didn't respond to theme changes | Phase 8A |
+| 62 | ChatInput → CTA buttons on homepage | Visitors arrive via LinkedIn/email, not SEO. Clear CTAs > freeform text box | Phase 8B |
+| 63 | RocketBlueprint 180vh → 120vh | 180vh was too much decorative scroll with zero informational content | Phase 8B |
+| 64 | Homepage form → CtaBanner to /contact | Paul Boag: don't duplicate conversion points. Homepage invites, /contact converts | Phase 8B |
+| 65 | Blog pinned post via frontmatter | `pinned: true` in markdown frontmatter. Scalable, content-controlled, no config dependency | Phase 8C |
+| 66 | ContactPage custom component | Split layout replaces generic markdown renderer. Per-client contact pages supported | Phase 8D |
+| 67 | Root [slug] routes hardcode language='ro' | i18n convention: / = Romanian, /en/ = English. Was using config.defaultLanguage ('en') which broke i18n | Phase 8D |
+| 68 | BrowserMockup for project placeholders | macOS-style chrome frame makes empty placeholders look designed, not broken | Phase 8E |
+| 69 | Footer: compact two-row with mini-CTA | Old footer was large, showed lots of space for little info. New: CTA row + copyright row | Phase 8F |
+| 70 | Header active links via pathname | isActivePath() with prefix matching. Home = exact, others = startsWith. aria-current for a11y | Phase 8F |
 
 ---
 
@@ -165,7 +188,7 @@ All architecture and business decisions. Claude should reference this before sug
 
 | Client | Folder Name | Domain | Status | Features Enabled |
 |--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 7.5 COMPLETE | blog, i18n, darkMode, contactForm |
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 8 COMPLETE | blog, i18n, darkMode, contactForm |
 | ElectroWill | `electrowill-solutions` | TBD | Scaffolded | TBD |
 | Doctor | `doctor-maria` | TBD | Not started | TBD |
 | Electrician | `electrician-ion` | TBD | Not started | TBD |
@@ -236,6 +259,8 @@ All architecture and business decisions. Claude should reference this before sug
 | `docs/CLIENT_SETUP_CHECKLIST.md` | Quick-reference operational checklist |
 | `clients/portfolio/DESIGN.md` | **Portfolio design & animation architecture** |
 
+---
+
 ## Notes for Claude
 
 - The user has NO backend/database/DevOps experience. Explain everything step by step.
@@ -251,3 +276,27 @@ All architecture and business decisions. Claude should reference this before sug
 - **Zero commercial-license dependencies.** Only MIT/Apache/BSD. No GSAP, no paid plugins.
 - **Explicit import registries** (not dynamic imports) for Turbopack reliability.
 - **User prefers original slate-blue dark palette** over deeper gray-950. Do not change dark colors.
+- **Primary color is terracotta** (#B24027 light, #D4613E dark). Not blue.
+- **i18n routing convention:** `/` = Romanian, `/en/` = English. Root `[slug]` routes hardcode `'ro'`. This is independent of `config.defaultLanguage`.
+- **Blueprint rocket keeps blue artwork** — it's an illustration, not a UI element. Blueprint CSS vars stay neutral.
+
+---
+
+## Next Steps
+
+**Phase 8 is complete.** Two paths forward:
+
+**Option A: Phase 5B/5C — Content + Deployment**
+- Write real page content (about, projects, contact) in Romanian
+- Add project screenshots to replace BrowserMockup placeholders
+- Set up Vercel, Resend, GA4, Search Console
+- Deploy the portfolio live
+- This makes the portfolio your sales tool
+
+**Option B: Phase 7 — Second Client**
+- Use `yarn new-client` to scaffold a second client
+- Customize theme, content, features
+- Deploy to Vercel as separate project
+- Validate that the multi-client architecture works end-to-end
+
+**Recommendation:** Phase 5B/5C first — get your portfolio live, then use it as proof when onboarding clients.

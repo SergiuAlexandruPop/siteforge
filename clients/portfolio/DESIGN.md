@@ -4,7 +4,7 @@
 > This is the single source of truth for the portfolio site's visual design, animation system,
 > component architecture, and implementation decisions.
 >
-> Last updated: 2026-03-25 (planning session)
+> Last updated: 2026-04-05 (Phase 8: UI/UX Redesign complete)
 
 ---
 
@@ -58,6 +58,12 @@ Every animation component checks `prefers-reduced-motion: reduce`. When active:
 
 ## 3. Color System
 
+### Primary Accent
+**Terracotta** — chosen in Phase 8A to replace the default blue-600 which looked AI-generated.
+- Light mode: `#B24027` (hsl ~10, 48%, 42%) — passes WCAG AA on white (5.3:1)
+- Dark mode: `#D4613E` (hsl ~10, 55%, 54%) — lighter for contrast on dark backgrounds
+- Set in `clients/portfolio/theme.ts` via `colors.primary` and `colors.dark.primary`
+
 ### Light Mode (default)
 ```
 background:      #ffffff
@@ -65,34 +71,38 @@ foreground:      #0f172a  (slate-900)
 muted:           #f1f5f9  (slate-100)
 mutedForeground: #64748b  (slate-500)
 border:          #e2e8f0  (slate-200)
-primary:         #2563eb  (blue-600)
+primary:         #B24027  (terracotta)
 primaryFg:       #ffffff
 ```
 
 ### Dark Mode (premium treatment)
 ```
-background:      #030712  (gray-950 — deeper than current, more dramatic)
+background:      #0f172a  (slate-900)
 foreground:      #f8fafc  (slate-50)
-muted:           #111827  (gray-900 — subtle contrast with background)
+muted:           #1e293b  (slate-800)
 mutedForeground: #94a3b8  (slate-400)
-border:          #1f2937  (gray-800 — less visible, more premium)
-primary:         #2563eb  (blue-600 — pops against deep background)
+border:          #334155  (slate-700)
+primary:         #D4613E  (terracotta, lightened)
 primaryFg:       #ffffff
 ```
 
 ### Dark Mode Glow Effects (CSS variables in globals.css)
 ```css
 .dark {
-  --glow-primary: 0 0 80px rgba(37, 99, 235, 0.15);
-  --glow-muted: 0 0 120px rgba(37, 99, 235, 0.05);
+  --glow-primary: 0 0 80px rgba(178, 64, 39, 0.15);
+  --glow-muted: 0 0 120px rgba(178, 64, 39, 0.05);
 }
 ```
 Used via: `dark:shadow-[var(--glow-primary)]` on hero elements, CTA buttons, cards.
 
 ### Dark Mode Gradients
-- **Hero background**: `radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 60%)` — subtle blue glow at top center
-- **CTA banner**: `linear-gradient(to right, rgba(37,99,235,0.1), rgba(37,99,235,0.05))` overlay
+- **Hero background**: `radial-gradient(ellipse at 50% 0%, rgba(178,64,39,0.08) 0%, transparent 60%)` — subtle warm glow at top center
+- **CTA banner**: `linear-gradient(135deg, rgba(178,64,39,0.06) 0%, rgba(178,64,39,0.02) 50%, transparent 100%)` overlay
+- **Footer top edge**: `linear-gradient(90deg, transparent 0%, rgba(178,64,39,0.3) 50%, transparent 100%)`
 - **Section separators**: faint gradient border instead of solid `border-border`
+
+### Blueprint Rocket (exception)
+The RocketSVG uses blue body + red nosecone as artwork. Blueprint CSS vars (`--blueprint-stroke`, `--blueprint-grid`, `--blueprint-bg`) stay in neutral blue hues — this is an illustration, not a UI element.
 
 ---
 
@@ -200,13 +210,22 @@ src/
 
     portfolio/                   ← PORTFOLIO-SPECIFIC compositions
       PortfolioLayout.tsx          SmoothScroll + PortfolioHeader + PortfolioFooter
-      PortfolioHeader.tsx          Transparent → blur-on-scroll header
-      PortfolioFooter.tsx          Enhanced footer with gradient
+      PortfolioHeader.tsx          Transparent → blur-on-scroll header + active links
+      PortfolioFooter.tsx          Compact two-row footer with mini-CTA
       HomePage.tsx                 Homepage section composition (server component)
-      AnimatedHero.tsx             Full hero: gradient bg, rotating text, parallax, CTAs
+      AnimatedHero.tsx             Full hero: gradient bg, typewriter text, CTA buttons
       TechMarquee.tsx              Tech stack logo marquee
       TabbedServices.tsx           Tabbed panel with numbered steps
-      ProjectShowcase.tsx          Project cards with hover + scroll reveal
+      ProjectShowcase.tsx          Project cards with browser mockup + hover glow
+      ProjectsPage.tsx             Full projects page with alternating cards
+      ProjectDetail.tsx            Case study layout for /projects/[slug]
+      StatsRow.tsx                 Trust metrics row with CountUp animation
+      CtaBanner.tsx                Homepage closing CTA linking to /contact
+      BrowserMockup.tsx            macOS-style browser chrome frame
+      ContactPage.tsx              Split-layout contact page
+      AboutPage.tsx                ped.ro-inspired interactive bio
+      ResumePage.tsx               Timeline + skills + education
+      ChatInput.tsx                Message input (unused on homepage, available)
       icons.tsx                    Inline SVG tech logos (~8 icons)
       index.ts
 
@@ -243,11 +262,12 @@ layout.tsx
 
 page.tsx
   → getClientHomePage('portfolio') → PortfolioHomePage
-    → AnimatedHero (RotatingText, gradient, parallax image, TechMarquee)
-    → ScrollReveal > TabbedServices
+    → AnimatedHero (TypewriterText, gradient, CTA buttons, TechMarquee)
+    → RocketBlueprint (~120vh scroll-driven animation)
+    → StatsRow (CountUp metrics)
     → ScrollReveal > ProjectShowcase
     → ScrollReveal > BlogPreview (if blog enabled)
-    → ScrollReveal > CtaBanner
+    → ScrollReveal > CtaBanner (→ /contact)
 ```
 
 ---
@@ -255,11 +275,12 @@ page.tsx
 ## 7. Homepage Section Order
 
 ### Portfolio Homepage Sections (top to bottom)
-1. **AnimatedHero** — full viewport, gradient bg, rotating headline, subtitle, CTAs, hero image, tech marquee
-2. **TabbedServices** — "Ce ofer" — 4 tabs with numbered feature lists
-3. **ProjectShowcase** — project cards from `clients/portfolio/data/projects.ts`
-4. **BlogPreview** — latest 3 posts (gated by `features.blog`)
-5. **CtaBanner** — "Ai nevoie de un site profesional?" — gradient background, glow in dark mode
+1. **AnimatedHero** — full viewport, gradient bg, typewriter headline, 2 CTA buttons (scroll to projects + link to contact), tech marquee
+2. **RocketBlueprint** — scroll-driven rocket build animation (~120vh runway)
+3. **StatsRow** — 3+ years / 10+ projects / 8+ technologies / 100% TypeScript (CountUp, tight spacing)
+4. **ProjectShowcase** — project cards with browser mockup frames from `clients/portfolio/data/projects.ts`
+5. **BlogPreview** — latest 3 posts (gated by `features.blog`)
+6. **CtaBanner** — "Hai să construim ceva împreună" — links to /contact, warm gradient in dark mode
 
 ### Future: ScrollVideoHero
 When a video asset is ready, `ScrollVideoHero` is a separate component that replaces `AnimatedHero` in the homepage composition. It binds `video.currentTime` to scroll position via `useScrollVideo` hook. This is a one-line swap in `HomePage.tsx` — import ScrollVideoHero instead of AnimatedHero. The AnimatedHero stays available as a fallback.
@@ -272,12 +293,14 @@ These effects ONLY appear in dark mode (via CSS `dark:` prefix). In light mode, 
 
 | Section | Dark Mode Treatment |
 |---------|-------------------|
-| AnimatedHero | Radial gradient glow behind headline area; CTA button glow shadow |
-| TabbedServices | Active tab indicator glow; card borders subtly brighter |
-| ProjectShowcase | Card hover glow (--glow-primary); image overlay gradient |
-| CtaBanner | Full-width gradient background with blue glow |
+| AnimatedHero | Radial terracotta gradient glow behind headline; CTA button glow shadow |
+| TabbedServices | Active tab indicator glow (terracotta); card borders subtly brighter |
+| ProjectShowcase | Card hover glow (--glow-primary, terracotta); browser mockup frame |
+| CtaBanner | Warm terracotta gradient overlay |
+| ContactPage | Radial terracotta gradient on top area |
+| ResumePage | Header card with radial terracotta gradient |
 | PortfolioHeader | Stronger backdrop-blur; faint bottom border glow |
-| PortfolioFooter | Gradient fade at top edge |
+| PortfolioFooter | Warm terracotta gradient top edge line |
 
 Implementation: extra `<div>` elements with `hidden dark:block` where needed for gradient overlays. No runtime JS branching.
 
@@ -368,6 +391,18 @@ Implementation: extra `<div>` elements with `hidden dark:block` where needed for
 | 53 | ScrollVideoHero as separate future component | SRP — does not bloat AnimatedHero |
 | 54 | CSS-only dark mode premium effects | dark: prefix + CSS vars, no runtime branching |
 | 55 | Deeper dark palette (gray-950 base) | More contrast, more dramatic, rocket.new feel |
+| 59 | Primary color: terracotta #B24027 | Default blue-600 looks AI-generated. Terracotta is warm, distinctive |
+| 60 | Dark mode primary: #D4613E | Lighter variant for WCAG AA contrast on dark backgrounds |
+| 61 | About page pills via React state | Imperative DOM style was fragile, didn't respond to theme changes |
+| 62 | ChatInput → CTA buttons on homepage | Visitors arrive via direct links, not search. Clear CTAs > freeform text |
+| 63 | RocketBlueprint 180vh → 120vh | Less decorative scroll, faster to meaningful content |
+| 64 | Homepage form → CtaBanner | One conversion point per page (Paul Boag) |
+| 65 | Blog pinned post via frontmatter | `pinned: true` — scalable, content-controlled |
+| 66 | ContactPage custom split layout | Per-client contact pages, replaces generic markdown |
+| 67 | Root [slug] routes hardcode 'ro' | i18n convention fix — / = RO, /en/ = EN |
+| 68 | BrowserMockup for project placeholders | Makes empty placeholders look designed |
+| 69 | Compact two-row footer | Less space, more purpose (mini-CTA + copyright) |
+| 70 | Header active links via pathname | Prefix matching, aria-current for a11y |
 
 ---
 
