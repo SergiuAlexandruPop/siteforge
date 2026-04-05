@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { projects } from '../../../clients/portfolio/data/projects'
 import type { Project } from '../../../clients/portfolio/data/projects'
 import { ScrollReveal } from '@/components/animations/ScrollReveal'
+import { BrowserMockup } from './BrowserMockup'
 import {
   NextjsIcon,
   TypeScriptIcon,
@@ -16,17 +17,16 @@ import {
 // ---------------------------------------------------------------------------
 // ProjectsPage — Full projects page with vertical stack layout.
 // ---------------------------------------------------------------------------
+// Phase 8E: Added BrowserMockup frames, outcome line per card.
+//
 // Three wide horizontal cards stacked vertically, alternating image/content
-// sides (left-right-left). Each card leads with a value-first impact headline,
-// has a type badge, description, stat pills, tech icons, and a CTA button
-// linking to the detail sub-route.
+// sides (left-right-left). Each card leads with a value-first impact headline.
 //
 // Supports i18n via `language` prop.
 // Dark mode: card hover glow, gradient image placeholder.
 // Mobile: stacks to single column naturally.
 // ---------------------------------------------------------------------------
 
-// Maps tech names to icon components. Returns null for techs without an icon.
 const techIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'Next.js': NextjsIcon,
   TypeScript: TypeScriptIcon,
@@ -53,6 +53,7 @@ function ProjectCard({
   const description = isEn ? project.descriptionEn : project.description
   const badge = isEn ? project.typeBadgeEn : project.typeBadge
   const stats = project.stats.map((s) => (isEn ? s.labelEn : s.label))
+  const outcome = isEn ? project.outcomeEn : project.outcome
   const isPrivate = !project.liveUrl
 
   return (
@@ -61,41 +62,35 @@ function ProjectCard({
         reversed ? 'md:flex-row-reverse' : ''
       } flex flex-col md:flex-row`}
     >
-      {/* Image / Video placeholder */}
-      <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-muted md:aspect-auto md:w-5/12">
-        {project.videoUrl ? (
-          <video
-            src={project.videoUrl}
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full min-h-[240px] w-full flex-col items-center justify-center gap-3 p-6">
-            <div className="flex gap-2">
-              {project.techStack.slice(0, 3).map((tech) => {
-                const Icon = techIconMap[tech]
-                return Icon ? (
-                  <Icon key={tech} className="h-8 w-8 opacity-40" />
-                ) : null
-              })}
+      {/* Image / Video placeholder with browser mockup */}
+      <div className="w-full p-4 md:w-5/12">
+        <BrowserMockup url={project.liveUrl || `${project.title.toLowerCase()}.app`}>
+          {project.videoUrl ? (
+            <video
+              src={project.videoUrl}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="aspect-video w-full object-cover"
+            />
+          ) : (
+            /* TODO: Replace with real screenshot <img src={project.image} /> */
+            <div className="flex aspect-video w-full flex-col items-center justify-center gap-3 bg-muted">
+              <div className="flex gap-2">
+                {project.techStack.slice(0, 3).map((tech) => {
+                  const Icon = techIconMap[tech]
+                  return Icon ? (
+                    <Icon key={tech} className="h-8 w-8 opacity-40" />
+                  ) : null
+                })}
+              </div>
+              <span className="text-sm font-medium text-muted-foreground/50">
+                {project.title}
+              </span>
             </div>
-            <span className="text-sm font-medium text-muted-foreground/50">
-              {project.title}
-            </span>
-          </div>
-        )}
-        {/* Dark mode overlay gradient */}
-        <div
-          className="pointer-events-none absolute inset-0 hidden dark:block"
-          aria-hidden="true"
-          style={{
-            background:
-              'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)',
-          }}
-        />
+          )}
+        </BrowserMockup>
       </div>
 
       {/* Content */}
@@ -123,6 +118,11 @@ function ProjectCard({
         {/* Description */}
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
           {description}
+        </p>
+
+        {/* Outcome line */}
+        <p className="mt-3 text-sm font-medium text-primary/80 italic">
+          → {outcome}
         </p>
 
         {/* Stats pills */}

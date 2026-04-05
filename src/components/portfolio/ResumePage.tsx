@@ -51,7 +51,16 @@ interface ResumePageProps {
 function ResumeHeader({ isEn }: { isEn: boolean }) {
   const d = resumeData
   return (
-    <header className="mb-12 sm:mb-16">
+    <header className="relative mb-12 overflow-hidden rounded-2xl border border-border bg-muted/30 p-6 dark:border-border/50 dark:bg-muted/10 sm:mb-16 sm:p-10">
+      {/* Dark mode gradient */}
+      <div
+        className="pointer-events-none absolute inset-0 hidden dark:block"
+        aria-hidden="true"
+        style={{
+          background:
+            'radial-gradient(ellipse at 30% 0%, rgba(178,64,39,0.06) 0%, transparent 60%)',
+        }}
+      />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
@@ -267,7 +276,7 @@ function SkillGroupCard({ group, isEn }: { group: SkillGroup; isEn: boolean }) {
           return (
             <span
               key={skill.name}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/30 dark:border-border/50 dark:bg-muted/30 dark:hover:shadow-[0_0_8px_rgba(178,64,39,0.1)]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground transition-all duration-200 hover:scale-105 hover:border-primary/30 hover:shadow-sm dark:border-border/50 dark:bg-muted/30 dark:hover:shadow-[0_0_8px_rgba(178,64,39,0.1)]"
             >
               {Icon && <Icon className="h-3.5 w-3.5" />}
               {skill.name}

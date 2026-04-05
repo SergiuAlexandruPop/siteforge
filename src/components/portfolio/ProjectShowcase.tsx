@@ -2,22 +2,18 @@
 
 import Link from 'next/link'
 import { projects } from '../../../clients/portfolio/data/projects'
+import { BrowserMockup } from './BrowserMockup'
 
 // ---------------------------------------------------------------------------
 // ProjectShowcase — Compact project cards for the portfolio homepage.
 // ---------------------------------------------------------------------------
-// Displays featured projects as compact preview cards linking to the full
-// detail pages at /projects/[slug].
+// Phase 8E: Added BrowserMockup around image placeholders, outcome line.
 //
 // Layout:
 //   Desktop: 3-column grid (one card per project)
 //   Mobile: single-column stack
 //
-// Dark mode (DESIGN.md Section 8):
-//   - Card hover glow (--glow-primary)
-//
-// ScrollReveal is applied from outside in HomePage.tsx — this component
-// does not wrap itself in ScrollReveal (SRP).
+// Dark mode: card hover glow (--glow-primary)
 // ---------------------------------------------------------------------------
 
 interface ProjectShowcaseProps {
@@ -49,6 +45,7 @@ export function ProjectShowcase({ className = '', language = 'ro' }: ProjectShow
           {featured.map((project) => {
             const badge = isEn ? project.typeBadgeEn : project.typeBadge
             const description = isEn ? project.descriptionEn : project.description
+            const outcome = isEn ? project.outcomeEn : project.outcome
 
             return (
               <Link
@@ -56,20 +53,16 @@ export function ProjectShowcase({ className = '', language = 'ro' }: ProjectShow
                 href={project.href}
                 className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/30 hover:shadow-lg dark:border-border/50 dark:bg-card dark:hover:border-primary/40 dark:hover:shadow-[var(--glow-primary)]"
               >
-                {/* Image placeholder */}
-                <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden bg-muted">
-                  <span className="text-sm font-medium text-muted-foreground/50">
-                    {project.title}
-                  </span>
-                  {/* Dark mode overlay gradient */}
-                  <div
-                    className="pointer-events-none absolute inset-0 hidden dark:block"
-                    aria-hidden="true"
-                    style={{
-                      background:
-                        'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)',
-                    }}
-                  />
+                {/* Browser mockup image placeholder */}
+                <div className="m-3 mb-0">
+                  <BrowserMockup url={project.liveUrl || `${project.title.toLowerCase()}.app`}>
+                    {/* TODO: Replace with real screenshot <img src={project.image} /> */}
+                    <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                      <span className="text-sm font-medium text-muted-foreground/50">
+                        {project.title}
+                      </span>
+                    </div>
+                  </BrowserMockup>
                 </div>
 
                 {/* Card body */}
@@ -84,6 +77,11 @@ export function ProjectShowcase({ className = '', language = 'ro' }: ProjectShow
                   </h3>
                   <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
                     {description}
+                  </p>
+
+                  {/* Outcome line */}
+                  <p className="mt-3 text-xs font-medium text-primary/80 italic">
+                    → {outcome}
                   </p>
 
                   {/* Tech stack tags */}

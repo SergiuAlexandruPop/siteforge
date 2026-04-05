@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import type { Project } from '../../../clients/portfolio/data/projects'
+import { BrowserMockup } from './BrowserMockup'
 import { ScrollReveal } from '@/components/animations/ScrollReveal'
 import {
   NextjsIcon,
@@ -133,40 +134,43 @@ export function ProjectDetail({ project, language = 'ro' }: ProjectDetailProps) 
             </div>
 
             {/* Hero media placeholder */}
-            <div className="mt-8 overflow-hidden rounded-xl border border-border bg-muted dark:border-border/50">
-              {project.videoUrl ? (
-                <video
-                  src={project.videoUrl}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="aspect-video w-full object-cover"
-                />
-              ) : (
-                <div className="flex aspect-video items-center justify-center">
-                  <div className="flex flex-col items-center gap-3 text-muted-foreground/40">
-                    <svg
-                      width="48"
-                      height="48"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="2" y="3" width="20" height="14" rx="2" />
-                      <path d="M8 21h8" />
-                      <path d="M12 17v4" />
-                    </svg>
-                    <span className="text-sm">
-                      {isEn ? 'Demo video coming soon' : 'Video demonstrativ în curând'}
-                    </span>
+            <div className="mt-8">
+              <BrowserMockup url={project.liveUrl || `${project.title.toLowerCase()}.app`}>
+                {project.videoUrl ? (
+                  <video
+                    src={project.videoUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="aspect-video w-full object-cover"
+                  />
+                ) : (
+                  /* TODO: Replace with real screenshot <img src={project.image} /> */
+                  <div className="flex aspect-video items-center justify-center bg-muted">
+                    <div className="flex flex-col items-center gap-3 text-muted-foreground/40">
+                      <svg
+                        width="48"
+                        height="48"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <path d="M8 21h8" />
+                        <path d="M12 17v4" />
+                      </svg>
+                      <span className="text-sm">
+                        {isEn ? 'Demo video coming soon' : 'Video demonstrativ în curând'}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </BrowserMockup>
             </div>
           </header>
         </ScrollReveal>

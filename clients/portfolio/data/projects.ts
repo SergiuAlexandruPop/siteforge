@@ -38,6 +38,9 @@ export interface Project {
   liveUrl: string
   featured: boolean
   stats: ProjectStat[]
+  /** One-line outcome/result for card display. */
+  outcome: string
+  outcomeEn: string
   problem: string
   problemEn: string
   solution: string
@@ -70,6 +73,8 @@ export const projects: Project[] = [
       { label: 'Completare automată date', labelEn: 'Auto-fill client data' },
       { label: 'Export instant', labelEn: 'Instant export' },
     ],
+    outcome: 'Reduce timpul de pregătire documente de la 2h la 5 minute',
+    outcomeEn: 'Cuts document preparation from 2 hours to 5 minutes',
     problem:
       'Firmele de instalații electrice completează manual zeci de documente pentru fiecare client — contracte, notificări, procese verbale. Este un proces repetitiv, consumator de timp și predispus la erori. Fiecare document cere aceleași date introduse din nou.',
     problemEn:
@@ -118,6 +123,8 @@ export const projects: Project[] = [
       { label: 'Rapoarte consum', labelEn: 'Consumption reports' },
       { label: 'Alertă stoc minim', labelEn: 'Low stock alerts' },
     ],
+    outcome: 'Vizibilitate completă asupra stocului în timp real',
+    outcomeEn: 'Complete real-time inventory visibility',
     problem:
       'Firmele de instalații electrice pierd timp și bani din cauza gestionării manuale a stocurilor de materiale. Nu știu exact ce au în depozit, cât s-a consumat pe fiecare șantier și când trebuie să reaprovizioneze.',
     problemEn:
@@ -166,6 +173,8 @@ export const projects: Project[] = [
       { label: 'Dark mode + i18n', labelEn: 'Dark mode + i18n' },
       { label: 'Blog CMS integrat', labelEn: 'Built-in blog CMS' },
     ],
+    outcome: 'Un singur codebase alimentează multiple site-uri independente',
+    outcomeEn: 'One codebase powers multiple independent websites',
     problem:
       'Crearea unui site de prezentare pentru fiecare client de la zero înseamnă cod duplicat, mentenanță multiplicată și timp pierdut. Fiecare proiect nou necesită aceeași infrastructură — rutare, blog, formular de contact, SEO, teme.',
     problemEn:
