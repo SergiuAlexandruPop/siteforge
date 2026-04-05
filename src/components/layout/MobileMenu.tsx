@@ -3,14 +3,37 @@
 import { useEffect } from 'react'
 import type { NavigationItem } from '@/types/config'
 
+// ---------------------------------------------------------------------------
+// MobileMenu — Slide-in mobile navigation panel.
+// ---------------------------------------------------------------------------
+// Phase 8F: Added active link styling via currentPathname prop.
+// The prop is optional for backward compatibility with the default header.
+// ---------------------------------------------------------------------------
+
 interface MobileMenuProps {
   open: boolean
   onClose: () => void
   items: NavigationItem[]
   currentLanguage: 'ro' | 'en'
+  /** Current pathname for active link detection. Optional for backward compat. */
+  currentPathname?: string
 }
 
-export function MobileMenu({ open, onClose, items, currentLanguage }: MobileMenuProps) {
+function isActivePath(pathname: string, href: string): boolean {
+  const normalizedPathname = pathname.replace(/^\/en/, '') || '/'
+  const normalizedHref = href.replace(/^\/en/, '') || '/'
+
+  if (normalizedHref === '/') return normalizedPathname === '/'
+  return normalizedPathname.startsWith(normalizedHref)
+}
+
+export function MobileMenu({
+  open,
+  onClose,
+  items,
+  currentLanguage,
+  currentPathname,
+}: MobileMenuProps) {
   // Lock body scroll when menu is open
   useEffect(() => {
     if (open) {
@@ -86,12 +109,21 @@ export function MobileMenu({ open, onClose, items, currentLanguage }: MobileMenu
               ? `/en${item.href === '/' ? '' : item.href}`
               : item.href
 
+            const active = currentPathname
+              ? isActivePath(currentPathname, href)
+              : false
+
             return (
               <li key={item.href}>
                 <a
                   href={href}
                   onClick={onClose}
-                  className="flex h-11 items-center rounded-md px-3 text-base font-medium text-foreground hover:bg-muted transition-colors"
+                  className={`flex h-11 items-center rounded-md px-3 text-base transition-colors ${
+                    active
+                      ? 'font-semibold text-primary bg-primary/5'
+                      : 'font-medium text-foreground hover:bg-muted'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
                 >
                   {label}
                 </a>
