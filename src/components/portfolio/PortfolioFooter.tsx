@@ -27,7 +27,7 @@ export function PortfolioFooter({ displayName, contact }: PortfolioFooterProps) 
         className="pointer-events-none absolute inset-x-0 top-0 h-px hidden dark:block"
         style={{
           background:
-            'linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.3) 50%, transparent 100%)',
+            'linear-gradient(90deg, transparent 0%, rgba(178, 64, 39, 0.3) 50%, transparent 100%)',
         }}
         aria-hidden="true"
       />

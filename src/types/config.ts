@@ -94,6 +94,10 @@ export interface ThemeColors {
     muted: string
     mutedForeground: string
     border: string
+    /** Dark mode primary — optional, uses light primary if omitted */
+    primary?: string
+    /** Dark mode primary foreground — optional, uses light primaryForeground if omitted */
+    primaryForeground?: string
   }
 }
 

@@ -2,7 +2,7 @@ import type { ClientTheme } from '../../src/types/config'
 
 const theme: ClientTheme = {
   colors: {
-    primary: '#2563eb',
+    primary: '#B24027',
     primaryForeground: '#ffffff',
     secondary: '#64748b',
     background: '#ffffff',
@@ -16,6 +16,8 @@ const theme: ClientTheme = {
       muted: '#1e293b',
       mutedForeground: '#94a3b8',
       border: '#334155',
+      primary: '#D4613E',
+      primaryForeground: '#ffffff',
     },
   },
   fonts: {

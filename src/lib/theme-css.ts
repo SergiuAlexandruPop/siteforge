@@ -80,8 +80,8 @@ export function generateThemeCss(theme: ClientTheme): string {
     `--card-foreground: ${hexToHsl(colors.dark.foreground)};`,
     `--popover: ${hexToHsl(colors.dark.background)};`,
     `--popover-foreground: ${hexToHsl(colors.dark.foreground)};`,
-    `--primary: ${hexToHsl(colors.primary)};`,
-    `--primary-foreground: ${hexToHsl(colors.primaryForeground)};`,
+    `--primary: ${hexToHsl(colors.dark.primary ?? colors.primary)};`,
+    `--primary-foreground: ${hexToHsl(colors.dark.primaryForeground ?? colors.primaryForeground)};`,
     `--secondary: ${hexToHsl(colors.dark.muted)};`,
     `--secondary-foreground: ${hexToHsl(colors.dark.foreground)};`,
     `--muted: ${hexToHsl(colors.dark.muted)};`,
@@ -90,7 +90,7 @@ export function generateThemeCss(theme: ClientTheme): string {
     `--accent-foreground: ${hexToHsl(colors.dark.foreground)};`,
     `--border: ${hexToHsl(colors.dark.border)};`,
     `--input: ${hexToHsl(colors.dark.border)};`,
-    `--ring: ${hexToHsl(colors.primary)};`,
+    `--ring: ${hexToHsl(colors.dark.primary ?? colors.primary)};`,
   ]
 
   return `:root { ${lightVars.join(' ')} } .dark { ${darkVars.join(' ')} }`

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ---------------------------------------------------------------------------
@@ -12,21 +12,24 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 //   - Keywords are UPPERCASE with pill borders, always visible or chain-revealed
 //   - Hidden text is blurred — clicking a keyword toggles reveal on/off
 //   - Click again to collapse (blur) the text back
-//   - Revealed text is WHITE by default — turns #B24027 only on HOVER
+//   - Revealed text is WHITE by default — turns accent (primary) only on HOVER
 //   - Hovering anywhere on a revealed sentence highlights both the sentence
-//     AND its parent keyword pill in #B24027
+//     AND its parent keyword pill in accent color
 //   - Cascade collapse: keywords revealed by a parent collapse when parent
 //     is toggled off (same-idea chains)
 //   - Everything flows inline as one continuous paragraph
 //   - Natural word-wrap at large font creates the artistic typographic layout
+//
+// Color:
+//   Accent color uses hsl(var(--primary)) CSS variable so it stays in sync
+//   with the site-wide theme. Pill hover states are driven via React state,
+//   not imperative DOM manipulation (Phase 8A refactor).
 //
 // Segment types:
 //   summary  — always visible text (e.g. "Hey! I'm ", "I build ")
 //   keyword  — pill-shaped, uppercase, clickable (toggle)
 //   hidden   — blurred until parent keyword is clicked
 // ---------------------------------------------------------------------------
-
-const ACCENT = '#B24027'
 
 interface AboutPageProps {
   language?: 'ro' | 'en'
@@ -123,7 +126,6 @@ function getChildKeywordIds(segments: Segment[], parentId: string): string[] {
   for (const seg of segments) {
     if (seg.type === 'keyword' && seg.revealedBy === parentId) {
       children.push(seg.id)
-      // Recurse: if ANYMORE is a child of SERGIU, and something is a child of ANYMORE
       children.push(...getChildKeywordIds(segments, seg.id))
     }
   }
@@ -153,10 +155,10 @@ function Pill({
   onClick: () => void
   onHoverChange: (hovered: boolean) => void
 }) {
-  const isHidden = !visible && !reducedMotion
+  const [isHovered, setIsHovered] = useState(false)
+  const isBlurred = !visible && !reducedMotion
 
   const handleClick = () => {
-    // If already active and has href, open link. Otherwise toggle.
     if (active && href) {
       window.open(href, '_blank', 'noopener,noreferrer')
     }
@@ -170,14 +172,22 @@ function Pill({
     }
   }
 
-  // Color logic for clickable pills:
-  // - default (no hover): white bg, black text
-  // - hover / clicked+hover: orange bg, black text
-  // - after click (not hovering): white bg, black text
-  // - highlighted (sentence hovered): orange border, black text, white bg
-  const borderColor = highlighted ? ACCENT : 'rgba(255, 255, 255, 0.4)'
-  const textColor = '#000'
-  const bgColorDefault = '#fff'
+  const handleMouseEnter = () => {
+    setIsHovered(true)
+    onHoverChange(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    onHoverChange(false)
+  }
+
+  // State-driven color logic:
+  // - default: white bg, dark text, subtle border
+  // - hovered: accent bg, accent border
+  // - highlighted (sentence hovered): accent border, white bg
+  const showAccentBg = isHovered
+  const showAccentBorder = isHovered || highlighted
 
   return (
     <span
@@ -185,39 +195,26 @@ function Pill({
       tabIndex={visible ? 0 : -1}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       aria-hidden={!visible}
+      className="inline cursor-pointer uppercase transition-all duration-500 ease-out"
       style={{
-        display: 'inline',
-        cursor: 'pointer',
         borderWidth: '1.5px',
         borderStyle: 'solid',
-        borderColor,
-        backgroundColor: bgColorDefault,
-        color: textColor,
+        borderColor: showAccentBorder ? 'hsl(var(--primary))' : 'rgba(255, 255, 255, 0.4)',
+        backgroundColor: showAccentBg ? 'hsl(var(--primary))' : '#fff',
+        color: showAccentBg ? '#fff' : '#000',
         borderRadius: '0.75em',
         padding: '0.02em 0.3em',
         fontSize: '0.75em',
         fontWeight: 600,
         letterSpacing: '0.05em',
-        textTransform: 'uppercase' as const,
         fontFamily: 'var(--font-inter), system-ui, sans-serif',
         lineHeight: 'inherit',
         verticalAlign: 'baseline',
-        filter: isHidden ? 'blur(4px)' : 'blur(0px)',
-        opacity: isHidden ? 0.3 : 1,
-        transition: 'all 0.5s ease-out',
-      }}
-      onMouseEnter={(e) => {
-        onHoverChange(true)
-        e.currentTarget.style.backgroundColor = ACCENT
-        e.currentTarget.style.borderColor = ACCENT
-        e.currentTarget.style.color = '#000'
-      }}
-      onMouseLeave={(e) => {
-        onHoverChange(false)
-        e.currentTarget.style.backgroundColor = bgColorDefault
-        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)'
-        e.currentTarget.style.color = '#000'
+        filter: isBlurred ? 'blur(4px)' : 'blur(0px)',
+        opacity: isBlurred ? 0.3 : 1,
       }}
     >
       {children}
@@ -242,11 +239,11 @@ function HiddenText({
 
   return (
     <span
+      className="transition-all duration-500 ease-out"
       style={{
-        color: highlighted && revealed ? ACCENT : 'inherit',
+        color: highlighted && revealed ? 'hsl(var(--primary))' : 'inherit',
         filter: shouldBlur ? 'blur(4px)' : 'blur(0px)',
         opacity: shouldBlur ? 0.3 : 1,
-        transition: 'all 0.5s ease-out',
         cursor: revealed ? 'default' : undefined,
       }}
       onMouseEnter={() => {
@@ -284,6 +281,40 @@ function GrainOverlay() {
 }
 
 // ---------------------------------------------------------------------------
+// Explore hint — fades out after 3s or after first click
+// ---------------------------------------------------------------------------
+function ExploreHint({
+  language,
+  hasInteracted,
+}: {
+  language: 'ro' | 'en'
+  hasInteracted: boolean
+}) {
+  const [visible, setVisible] = useState(true)
+
+  useEffect(() => {
+    if (hasInteracted) {
+      setVisible(false)
+      return
+    }
+    const timer = setTimeout(() => setVisible(false), 4000)
+    return () => clearTimeout(timer)
+  }, [hasInteracted])
+
+  return (
+    <span
+      className="mt-6 block text-center text-sm text-white/40 transition-opacity duration-700 sm:mt-8"
+      style={{ opacity: visible ? 1 : 0 }}
+      aria-hidden="true"
+    >
+      {language === 'ro'
+        ? 'Apasă pe cuvinte pentru a descoperi mai multe'
+        : 'Click the words to explore'}
+    </span>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -296,13 +327,13 @@ export function AboutPage({ language = 'en' }: AboutPageProps) {
     () => new Set<string>(),
   )
   const [hoveredKeyword, setHoveredKeyword] = useState<string | null>(null)
+  const [hasInteracted, setHasInteracted] = useState(false)
 
-  // Toggle click: add if missing, remove + cascade-collapse if present
   const handleClick = useCallback((id: string) => {
+    setHasInteracted(true)
     setClickedKeywords((prev) => {
       const next = new Set(prev)
       if (next.has(id)) {
-        // Collapse: remove this keyword and all its children
         next.delete(id)
         for (const childId of getChildKeywordIds(segments, id)) {
           next.delete(childId)
@@ -340,7 +371,6 @@ export function AboutPage({ language = 'en' }: AboutPageProps) {
       <div className="relative z-10 flex min-h-screen items-center justify-center">
         <div
           className="mx-auto max-w-5xl px-6 py-16 sm:px-10 sm:py-24 lg:px-16"
-          aria-live="polite"
         >
           <p className="font-editorial text-2xl font-light leading-relaxed text-white sm:text-3xl sm:leading-relaxed lg:text-4xl lg:leading-relaxed">
             {segments.map((seg, i) => {
@@ -355,7 +385,6 @@ export function AboutPage({ language = 'en' }: AboutPageProps) {
                 case 'keyword': {
                   const visible =
                     seg.alwaysVisible || isRevealed(seg.revealedBy)
-                  // Is this pill's linked sentence currently hovered?
                   const highlighted = hoveredKeyword === seg.id
 
                   return (
@@ -378,7 +407,6 @@ export function AboutPage({ language = 'en' }: AboutPageProps) {
 
                 case 'hidden': {
                   const revealed = isRevealed(seg.revealedBy)
-                  // Highlight when hoveredKeyword matches this segment's parent
                   const highlighted = hoveredKeyword === seg.revealedBy
 
                   return (
@@ -401,6 +429,11 @@ export function AboutPage({ language = 'en' }: AboutPageProps) {
               }
             })}
           </p>
+
+          {/* Explore hint */}
+          {!reducedMotion && (
+            <ExploreHint language={lang} hasInteracted={hasInteracted} />
+          )}
         </div>
       </div>
 

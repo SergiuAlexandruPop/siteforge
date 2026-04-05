@@ -121,7 +121,7 @@ export function TabbedServices({ className = '' }: TabbedServicesProps) {
                 {/* Active indicator line + dark glow */}
                 {activeTab === index && (
                   <span
-                    className="absolute inset-x-0 -bottom-px h-0.5 bg-primary dark:shadow-[0_0_12px_rgba(37,99,235,0.4)]"
+                    className="absolute inset-x-0 -bottom-px h-0.5 bg-primary dark:shadow-[0_0_12px_rgba(178,64,39,0.4)]"
                     aria-hidden="true"
                   />
                 )}

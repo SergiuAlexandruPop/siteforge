@@ -16,6 +16,9 @@ const theme: ClientTheme = {
       muted: '#1e293b',
       mutedForeground: '#94a3b8',
       border: '#334155',
+      // Optional: dark mode primary override for better contrast
+      // primary: '#...hex...',
+      // primaryForeground: '#ffffff',
     },
   },
   fonts: {

@@ -162,14 +162,14 @@ function TimelineEntry({
       {/* Timeline line */}
       {!isLast && (
         <div
-          className="absolute left-[7px] top-3 bottom-0 w-px bg-border dark:bg-border/50 dark:shadow-[0_0_8px_rgba(37,99,235,0.1)]"
+          className="absolute left-[7px] top-3 bottom-0 w-px bg-border dark:bg-border/50 dark:shadow-[0_0_8px_rgba(178,64,39,0.1)]"
           aria-hidden="true"
         />
       )}
 
       {/* Timeline dot */}
       <div
-        className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-primary bg-background dark:shadow-[0_0_8px_rgba(37,99,235,0.3)]"
+        className="absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-primary bg-background dark:shadow-[0_0_8px_rgba(178,64,39,0.3)]"
         aria-hidden="true"
       />
 
@@ -267,7 +267,7 @@ function SkillGroupCard({ group, isEn }: { group: SkillGroup; isEn: boolean }) {
           return (
             <span
               key={skill.name}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/30 dark:border-border/50 dark:bg-muted/30 dark:hover:shadow-[0_0_8px_rgba(37,99,235,0.1)]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted/50 px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/30 dark:border-border/50 dark:bg-muted/30 dark:hover:shadow-[0_0_8px_rgba(178,64,39,0.1)]"
             >
               {Icon && <Icon className="h-3.5 w-3.5" />}
               {skill.name}

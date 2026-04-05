@@ -236,29 +236,6 @@ All architecture and business decisions. Claude should reference this before sug
 | `docs/CLIENT_SETUP_CHECKLIST.md` | Quick-reference operational checklist |
 | `clients/portfolio/DESIGN.md` | **Portfolio design & animation architecture** |
 
----
-
-## Next Steps
-
-**Phase 7.5 is complete.** Two paths forward:
-
-**Option A: Phase 5B/5C — Content + Deployment**
-- Write real page content (about, projects, contact) in Romanian
-- Add project screenshots to `clients/portfolio/public/projects/`
-- Set up Vercel, Resend, GA4, Search Console
-- Deploy the portfolio live
-- This makes the portfolio your sales tool
-
-**Option B: Phase 7 — Second Client**
-- Use `yarn new-client` to scaffold a second client
-- Customize theme, content, features
-- Deploy to Vercel as separate project
-- Validate that the multi-client architecture works end-to-end
-
-**Recommendation:** Phase 5B/5C first — get your portfolio live, then use it as proof when onboarding clients.
-
----
-
 ## Notes for Claude
 
 - The user has NO backend/database/DevOps experience. Explain everything step by step.

@@ -49,7 +49,7 @@ export function AnimatedHero({
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 60%)',
+            'radial-gradient(ellipse at 50% 0%, rgba(178,64,39,0.08) 0%, transparent 60%)',
         }}
       />
 
