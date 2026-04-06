@@ -1,18 +1,13 @@
-'use client'
-
-import { usePathname } from 'next/navigation'
 import type { ClientContact } from '@/types/config'
 
 // ---------------------------------------------------------------------------
-// PortfolioFooter — Compact two-row footer with mini-CTA.
+// PortfolioFooter — Compact single-row footer.
 // ---------------------------------------------------------------------------
-// Phase 8F: Redesigned from large multi-section footer to compact two-row.
-//
-// Row 1: Mini-CTA — "Have a project? Let's talk" + email link
-// Row 2: Copyright + social icons + subtle SiteForge credit
+// Copyright + social icons + subtle SiteForge credit.
+// Mini-CTA removed to avoid duplicating the homepage CtaBanner
+// (Paul Boag principle: one conversion point per page).
 //
 // Dark mode: warm gradient top edge (terracotta).
-// Tighter padding (py-6 sm:py-8) vs. old (py-10 sm:py-12).
 // ---------------------------------------------------------------------------
 
 interface PortfolioFooterProps {
@@ -24,8 +19,6 @@ export function PortfolioFooter({
   displayName,
   contact,
 }: PortfolioFooterProps) {
-  const pathname = usePathname()
-  const isEn = pathname.startsWith('/en')
   const year = new Date().getFullYear()
 
   return (
@@ -41,23 +34,7 @@ export function PortfolioFooter({
       />
 
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
-        {/* Row 1: Mini-CTA */}
-        <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-1.5 sm:text-left">
-          <p className="text-sm text-muted-foreground">
-            {isEn ? 'Have a project in mind?' : 'Ai un proiect în minte?'}
-          </p>
-          <a
-            href={`mailto:${contact.email}`}
-            className="text-sm font-medium text-primary transition-colors hover:text-primary/80"
-          >
-            {isEn ? "Let's talk →" : 'Hai să discutăm →'}
-          </a>
-        </div>
-
-        {/* Divider */}
-        <div className="my-4 h-px bg-border/50 sm:my-5" />
-
-        {/* Row 2: Copyright + socials + credit */}
+        {/* Row: Copyright + socials + credit */}
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
           {/* Copyright */}
           <p className="text-xs text-muted-foreground">

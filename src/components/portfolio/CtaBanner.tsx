@@ -35,14 +35,12 @@ export function CtaBanner({ language = 'ro', className = '' }: CtaBannerProps) {
 
           <div className="relative z-10">
             <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-              {isEn
-                ? "Let's build something together"
-                : 'Hai să construim ceva împreună'}
+              {isEn ? 'Building something?' : 'Construiești ceva?'}
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-base text-muted-foreground sm:text-lg">
               {isEn
-                ? 'Have a project in mind? Get in touch and let\u2019s discuss how I can help.'
-                : 'Ai un proiect în minte? Contactează-mă și discutăm cum te pot ajuta.'}
+                ? 'I help independent clients ship products and join teams on large-scale builds.'
+                : 'Ajut clienți independenți să livreze produse și mă alătur echipelor pe proiecte mari.'}
             </p>
             <div className="mt-8">
               <Link

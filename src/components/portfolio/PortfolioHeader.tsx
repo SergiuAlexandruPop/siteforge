@@ -66,83 +66,85 @@ export function PortfolioHeader({
   }, [])
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-30 transition-[background-color,border-color,backdrop-filter] duration-300 ${
-        isScrolled
-          ? 'bg-background/95 backdrop-blur-md border-b border-border dark:border-border/50'
-          : 'bg-transparent border-b border-transparent'
-      }`}
-    >
-      <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-center px-4 sm:px-6">
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-          {navigation.map((item) => {
-            const label =
-              lang === 'en' && item.labelEn ? item.labelEn : item.label
-            const href =
-              lang === 'en'
-                ? `/en${item.href === '/' ? '' : item.href}`
-                : item.href
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-30 transition-[background-color,border-color,backdrop-filter] duration-300 ${
+          isScrolled
+            ? 'bg-background/95 backdrop-blur-md border-b border-border dark:border-border/50'
+            : 'bg-transparent border-b border-transparent'
+        }`}
+      >
+        <div className="relative mx-auto flex h-16 max-w-5xl items-center justify-center px-4 sm:px-6">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+            {navigation.map((item) => {
+              const label =
+                lang === 'en' && item.labelEn ? item.labelEn : item.label
+              const href =
+                lang === 'en'
+                  ? `/en${item.href === '/' ? '' : item.href}`
+                  : item.href
 
-            const active = isActivePath(pathname, href)
+              const active = isActivePath(pathname, href)
 
-            return (
-              <a
-                key={item.href}
-                href={href}
-                className={`relative rounded-md px-3 py-2 text-sm transition-colors ${
-                  active
-                    ? 'font-semibold text-foreground'
-                    : 'font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-                aria-current={active ? 'page' : undefined}
-              >
-                {label}
-                {/* Active underline indicator */}
-                {active && (
-                  <span
-                    className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary"
-                    aria-hidden="true"
-                  />
-                )}
-              </a>
-            )
-          })}
+              return (
+                <a
+                  key={item.href}
+                  href={href}
+                  className={`relative rounded-md px-3 py-2 text-sm transition-colors ${
+                    active
+                      ? 'font-semibold text-foreground'
+                      : 'font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {label}
+                  {/* Active underline indicator */}
+                  {active && (
+                    <span
+                      className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary"
+                      aria-hidden="true"
+                    />
+                  )}
+                </a>
+              )
+            })}
 
-          {/* Toggle slots */}
-          {languageToggle}
-          {themeToggle}
-        </nav>
+            {/* Toggle slots */}
+            {languageToggle}
+            {themeToggle}
+          </nav>
 
-        {/* Mobile: toggles + hamburger */}
-        <div className="absolute right-4 flex items-center gap-2 md:hidden">
-          {languageToggle}
-          {themeToggle}
+          {/* Mobile: toggles + hamburger */}
+          <div className="absolute right-4 flex items-center gap-2 md:hidden">
+            {languageToggle}
+            {themeToggle}
 
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
-            aria-label="Open menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-11 w-11 items-center justify-center rounded-md hover:bg-muted/50 transition-colors"
+              aria-label="Open menu"
+              aria-expanded={mobileMenuOpen}
             >
-              <line x1="4" x2="20" y1="12" y2="12" />
-              <line x1="4" x2="20" y1="6" y2="6" />
-              <line x1="4" x2="20" y1="18" y2="18" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="4" x2="20" y1="12" y2="12" />
+                <line x1="4" x2="20" y1="6" y2="6" />
+                <line x1="4" x2="20" y1="18" y2="18" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
+      </header>
 
       <MobileMenu
         open={mobileMenuOpen}
@@ -151,6 +153,6 @@ export function PortfolioHeader({
         currentLanguage={lang}
         currentPathname={pathname}
       />
-    </header>
+    </>
   )
 }

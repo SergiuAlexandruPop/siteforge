@@ -13,7 +13,7 @@ import { ScrollReveal } from '@/components/animations/ScrollReveal'
 // Tighter vertical padding (py-12) to feel like an accent strip, not a
 // full section.
 //
-// Mobile: 2-column grid. Desktop: single row.
+// Mobile: single column (stacked). Desktop (sm+): 3-column row.
 // ---------------------------------------------------------------------------
 
 interface Stat {
@@ -29,16 +29,14 @@ interface StatsRowProps {
 
 const stats: Record<'ro' | 'en', Stat[]> = {
   ro: [
-    { value: 3, suffix: '+', label: 'Ani de experiență' },
-    { value: 10, suffix: '+', label: 'Proiecte livrate' },
-    { value: 8, suffix: '+', label: 'Tehnologii stăpânite' },
-    { value: 100, suffix: '%', label: 'Cod TypeScript strict' },
+    { value: 5, suffix: '+', label: 'Ani de experiență' },
+    { value: 4, suffix: '+', label: 'Industrii livrate' },
+    { value: 100, suffix: '%', label: 'Cod type-safe' },
   ],
   en: [
-    { value: 3, suffix: '+', label: 'Years of experience' },
-    { value: 10, suffix: '+', label: 'Projects delivered' },
-    { value: 8, suffix: '+', label: 'Technologies mastered' },
-    { value: 100, suffix: '%', label: 'Strict TypeScript code' },
+    { value: 5, suffix: '+', label: 'Years of experience' },
+    { value: 4, suffix: '+', label: 'Industries delivered in' },
+    { value: 100, suffix: '%', label: 'Type-safe code' },
   ],
 }
 
@@ -49,7 +47,7 @@ export function StatsRow({ language = 'ro', className = '' }: StatsRowProps) {
     <section className={`py-12 sm:py-16 ${className}`}>
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <ScrollReveal direction="up" delay={0}>
-          <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8">
             {items.map((stat, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">

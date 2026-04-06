@@ -71,8 +71,8 @@ export async function PortfolioHomePage({ language = 'ro' }: PortfolioHomePagePr
             title={isEn ? 'Latest articles' : 'Ultimele articole'}
             subtitle={
               isEn
-                ? 'Writing about tech, web development and lessons from career transition.'
-                : 'Scriu despre tech, dezvoltare web și lecții din tranziția profesională.'
+                ? 'Notes on tech, web development, life, and a bit of stoicism along the way.'
+                : 'Note despre tech, dezvoltare web, viață și puțin stoicism pe drum.'
             }
             count={3}
             language={language}
