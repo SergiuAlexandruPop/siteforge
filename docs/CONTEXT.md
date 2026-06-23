@@ -16,12 +16,12 @@
 
 ## Last Updated
 **Date:** 2026-06-23
-**Updated By:** Claude — extracted portfolio living state to `clients/portfolio/CLAUDE.md` (Decision #73)
+**Updated By:** Claude — added Vitest test infrastructure + CI; P0/P1 tests for theme-css, i18n, content, auth, and a client config/theme contract test (Decisions #74, #75)
 
 ---
 
 ## Current Phase
-**Phases 1-8 Complete. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
+**Phases 1-8 Complete. Phase 9 (testing) 9A+9B done; 9C pending. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
 
 ---
 
@@ -83,6 +83,8 @@
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
 - Next.js icon SVG `dark:fill-white` may not work inside inline SVGs — replace with currentColor if needed
 - ROADMAP.md Phases 2-4 detail was compressed — restore if full history needed
+- Test coverage so far: lib units (theme-css, i18n, content, auth) + client config/theme contract. NOT yet covered: route handlers (auth/contact/blog/upload) and per-client E2E (review §8 P2)
+- Removed stale `dev:/build:doctor-maria` and `dev:/build:electrician-ion` scripts (no such client folders). `new-client` adds scripts per real client
 
 > Per-client known issues / tech debt live in each `clients/<name>/CLAUDE.md`.
 
@@ -167,6 +169,9 @@ All architecture and business decisions. Claude should reference this before sug
 | 71 | Agent-driven docs: root CLAUDE.md + client router + per-client CLAUDE.md | Multi-client repo needs a routing layer so any agent on any surface knows what a client is and where it lives. Per-client living state = single source of truth per client | Agent Docs |
 | 72 | Docs auto-update (no ask-permission) | Agents update the matching doc as the final task step; user reviews git diff at commit. Replaces the old "ask before updating" rule. Enables hands-off temporal parallelism | Agent Docs |
 | 73 | Per-client living state moves to clients/<name>/CLAUDE.md | CONTEXT.md slimmed to platform state + Decision Log + registry. One fact, one home; avoids drift across docs | Agent Docs |
+| 74 | Vitest for unit + contract tests | Native ESM/TS, fast, zero-config (no Jest). Node env, `@` alias mirrors tsconfig, globals off (explicit imports). First suites: theme-css, i18n, content, auth | Phase 9 |
+| 75 | Client config/theme **contract test** as multi-tenant guardrail | Auto-discovers every `clients/*` via `import.meta.glob` and asserts schema coherence (valid hex, feature-flag↔required-fields, no `NaN` from theme CSS). One broken client config now fails fast and names the client instead of breaking everyone's build | Phase 9 |
+| 76 | CI gate: typecheck + lint + test, then per-client build matrix | A broken client config/theme should fail CI, not production. GitHub Actions on PR + push to main | Phase 9 |
 
 ---
 
@@ -207,6 +212,7 @@ All architecture and business decisions. Claude should reference this before sug
 | cross-env | ^7.0.3 | Cross-platform env |
 | lenis | latest | Smooth scrolling (MIT, ~5KB) |
 | motion | ^12.38.0 | Scroll-linked SVG animation (MIT, ~11KB tree-shaken) |
+| vitest | ^3.2.0 | Test runner (dev only) — unit + contract tests |
 
 ---
 

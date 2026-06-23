@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Lint, type-check and run the test suite. This is the fast gate that must
+  # pass on every PR.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: Lint, type-check & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type-check
+        run: yarn tsc --noEmit
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+  # ---------------------------------------------------------------------------
+  # Build every client. A broken client config/theme should fail CI here, not
+  # in production. Add new clients to the matrix as they are created.
+  # NOTE: if a client build needs runtime env (it currently should not, since
+  # R2/Resend/GitHub are only used at request time), add them as repo secrets.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (${{ matrix.client }})
+    runs-on: ubuntu-latest
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        client: [portfolio, electrowill-solutions]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build:${{ matrix.client }}

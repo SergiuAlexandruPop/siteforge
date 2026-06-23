@@ -153,6 +153,34 @@
 
 ---
 
+## Phase 9: Testing Infrastructure
+**Status: IN PROGRESS (P0 + P1 units complete; route/E2E pending)**
+
+Motivation: one shared codebase fans out to many independent sites, so a change
+for client B can silently break client A. Tests are the guardrail. See the
+June 2026 architecture review §8.
+
+### 9A: Setup + P0 tests (COMPLETE)
+- [x] Add Vitest (`vitest.config.ts`, node env, `@`→`src` alias, globals off)
+- [x] `package.json` scripts: `test`, `test:watch`, `typecheck`
+- [x] `.github/workflows/ci.yml` — typecheck + lint + test, then per-client build matrix
+- [x] `tests/contract/clients.contract.test.ts` — auto-discovers every client, asserts config/theme schema coherence (the multi-tenant guardrail)
+- [x] `tests/unit/theme-css.test.ts` — hex→HSL + generateThemeCss, dark fallback, malformed-hex documentation
+- [x] `tests/unit/i18n.test.ts` — all language helpers (mocked client-config)
+
+### 9B: P1 tests (COMPLETE)
+- [x] `tests/unit/content.test.ts` — frontmatter parse, published filter, date sort, missing-folder, parseBlogMeta defaults (markdown fixtures under `tests/fixtures/`)
+- [x] `tests/unit/auth.test.ts` — verifyPassword + JWT round-trip / tampered / expired / wrong-secret rejection (mocked `next/headers`)
+
+### 9C: P2 tests (NOT STARTED)
+- [ ] Route-handler integration tests (`api/auth`, `api/contact`, `api/blog`) with mocked github/resend/r2 — verify auth gating + validation wiring
+- [ ] `image-optimize.validateImageFile` + extracted contact validators
+- [ ] Playwright E2E: build one client, smoke-test home/blog/contact + dark-mode toggle
+
+**Milestone (9A+9B): 94 tests green covering theme, i18n, content and auth logic plus a config contract across all clients. ✅**
+
+---
+
 ## Future Phases (Not Scheduled)
 
 - [ ] Next.js Image proxy for branded R2 URLs per client domain
