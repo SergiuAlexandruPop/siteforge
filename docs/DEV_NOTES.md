@@ -86,11 +86,11 @@ If you add a new animation component, it MUST check `useReducedMotion()` and pro
 Dark mode glow effects are defined in `globals.css`:
 ```css
 .dark {
-  --glow-primary: 0 0 80px rgba(37, 99, 235, 0.15);
-  --glow-muted: 0 0 120px rgba(37, 99, 235, 0.05);
+  --glow-primary: 0 0 80px rgba(178, 64, 39, 0.15);
+  --glow-muted: 0 0 120px rgba(178, 64, 39, 0.05);
 }
 ```
-Used via Tailwind: `dark:shadow-[var(--glow-primary)]`. These are portfolio-specific but defined globally because CSS variables need to be in scope. Other clients can override or ignore them.
+Used via Tailwind: `dark:shadow-[var(--glow-primary)]`. These are portfolio-specific but defined globally because CSS variables need to be in scope. Other clients can override or ignore them. Authoritative palette: `clients/portfolio/DESIGN.md` §3.
 
 ### Inline SVG Icons (icons.tsx)
 - 8 tech logos are inline SVGs in `src/components/portfolio/icons.tsx`
@@ -176,7 +176,7 @@ Images are processed BEFORE upload to R2:
 - 1 custom domain
 
 ### Domain Verification
-To send from `noreply@alexdev.ro` instead of Resend's default, you need to verify the domain in Resend:
+To send from `noreply@<your-domain>` instead of Resend's default, you need to verify the domain in Resend:
 1. Go to Resend Dashboard → Domains → Add Domain
 2. Add DNS records (MX, TXT, DKIM) to your domain registrar
 3. Wait for verification (~5 minutes)

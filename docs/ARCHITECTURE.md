@@ -42,7 +42,7 @@ Each deployed site is fully independent: own domain, own R2 bucket, own Resend c
 siteforge/
 ├── docs/
 │   ├── ARCHITECTURE.md          # This file — system design reference
-│   ├── CONTEXT.md               # Living state — updated every chat
+│   ├── CONTEXT.md               # Platform state, Decision Log, client registry
 │   ├── ROADMAP.md               # Phased plan with status tracking
 │   ├── DEV_NOTES.md             # Gotchas, tips, debugging guides
 │   ├── NEW_CLIENT_GUIDE.md      # Step-by-step client setup
@@ -281,7 +281,7 @@ Key interfaces: `ClientConfig`, `ClientTheme`, `ClientFeatures` in `src/types/co
 
 | Vercel Project | Domain | Build Command |
 |---|---|---|
-| siteforge-portfolio | alexdev.ro | `yarn build:portfolio` |
+| siteforge-portfolio | TBD (not deployed) | `yarn build:portfolio` |
 | siteforge-doctor | doctormaria.ro | `yarn build:doctor-maria` |
 
 Each build sets `ACTIVE_CLIENT` → Next.js loads that client's config/theme/content.
