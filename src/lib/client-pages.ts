@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react'
+import type { Language } from '@/types/config'
 import { AboutPage } from '@/components/portfolio/AboutPage'
 import { ProjectsPage } from '@/components/portfolio/ProjectsPage'
 import { ResumePage } from '@/components/portfolio/ResumePage'
@@ -18,7 +19,7 @@ import { ContactPage } from '@/components/portfolio/ContactPage'
 // in [slug]/page.tsx.
 // ---------------------------------------------------------------------------
 
-type PageComponent = ComponentType<{ language?: 'ro' | 'en' }>
+type PageComponent = ComponentType<{ language?: Language }>
 
 const pages: Record<string, Record<string, PageComponent>> = {
   'portfolio': {

@@ -23,11 +23,11 @@ interface Stat {
 }
 
 interface StatsRowProps {
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 
-const stats: Record<'ro' | 'en', Stat[]> = {
+const stats: Record<string, Stat[]> = {
   ro: [
     { value: 5, suffix: '+', label: 'Ani de experiență' },
     { value: 4, suffix: '+', label: 'Industrii livrate' },
@@ -41,7 +41,7 @@ const stats: Record<'ro' | 'en', Stat[]> = {
 }
 
 export function StatsRow({ language = 'ro', className = '' }: StatsRowProps) {
-  const items = stats[language]
+  const items = stats[language] ?? stats.ro
 
   return (
     <section className={`py-12 sm:py-16 ${className}`}>

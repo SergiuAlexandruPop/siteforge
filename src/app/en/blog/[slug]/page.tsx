@@ -2,23 +2,28 @@ import { getClientConfig } from '@/lib/client-config'
 import { getBlogBySlug, getBlogSlugs } from '@/lib/content'
 import { BlogPost } from '@/components/blog/BlogPost'
 import { NotAvailable } from '@/components/i18n/NotAvailable'
+import { getDefaultLanguage, isLanguageSupported } from '@/lib/i18n'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+
+const THIS_LANG = 'en'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  // Generate for both RO and EN slugs so we can show NotAvailable for RO-only posts
-  const roSlugs = getBlogSlugs('ro')
-  const enSlugs = getBlogSlugs('en')
-  const allSlugs = [...new Set([...roSlugs, ...enSlugs])]
+  if (!isLanguageSupported(THIS_LANG)) return []
+  const defaultSlugs = getBlogSlugs(getDefaultLanguage())
+  const enSlugs = getBlogSlugs(THIS_LANG)
+  const allSlugs = [...new Set([...defaultSlugs, ...enSlugs])]
   return allSlugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  if (!isLanguageSupported(THIS_LANG)) return {}
   const { slug } = await params
-  const post = await getBlogBySlug(slug, 'en')
+  const post = await getBlogBySlug(slug, THIS_LANG)
 
   if (!post) return {}
 
@@ -32,15 +37,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: post.meta.date,
     },
     alternates: {
-      languages: { ro: `/blog/${slug}` },
+      languages: { [getDefaultLanguage()]: `/blog/${slug}` },
     },
   }
 }
 
 export default async function EnglishBlogPostPage({ params }: PageProps) {
+  if (!isLanguageSupported(THIS_LANG)) notFound()
   const { slug } = await params
   const config = getClientConfig()
-  const post = await getBlogBySlug(slug, 'en')
+  const post = await getBlogBySlug(slug, THIS_LANG)
 
   if (!post) {
     return <NotAvailable romanianHref={`/blog/${slug}`} />

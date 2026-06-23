@@ -4,7 +4,16 @@ const config: ClientConfig = {
   name: 'portfolio',
   displayName: 'Sergiu Pop',
   domain: 'localhost',
-  defaultLanguage: 'en',
+  defaultLanguage: 'ro',
+
+  i18n: {
+    supportedLanguages: ['ro', 'en'],
+    defaultLanguage: 'ro',
+  },
+
+  theme: {
+    defaultTheme: 'dark',
+  },
 
   features: {
     i18n: true,

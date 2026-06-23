@@ -1,8 +1,16 @@
-# SiteForge — Living Context
+# SiteForge — Living Context (Platform)
 
 > **This file lives at `docs/CONTEXT.md` in the repo.**
-> Claude MUST read this file at the start of every new chat.
-> Claude MUST update this file at the end of every implementation chat (with user permission).
+> Scope: **platform-level** state, the Decision Log, and the client registry.
+> **Per-client living state does NOT live here** — it lives in `clients/<name>/CLAUDE.md`
+> (single source of truth, one fact one home). Do not duplicate client status into this file.
+>
+> **Auto-update:** agents update the matching doc as the final step of any change, without being
+> asked, then report which docs changed so the user can review the `git diff` at commit. There is
+> no ask-permission step. Full protocol: root `CLAUDE.md` -> "Documentation auto-update protocol".
+> Update THIS file only for: a new client (registry row), a platform-wide change, or a new Decision.
+>
+> **Entry point for agents is root `CLAUDE.md`** (context + client router + auto-update protocol).
 
 ---
 
@@ -181,17 +189,22 @@ All architecture and business decisions. Claude should reference this before sug
 | 68 | BrowserMockup for project placeholders | macOS-style chrome frame makes empty placeholders look designed, not broken | Phase 8E |
 | 69 | Footer: compact two-row with mini-CTA | Old footer was large, showed lots of space for little info. New: CTA row + copyright row | Phase 8F |
 | 70 | Header active links via pathname | isActivePath() with prefix matching. Home = exact, others = startsWith. aria-current for a11y | Phase 8F |
+| 71 | Agent-driven docs: root CLAUDE.md + client router + per-client CLAUDE.md | Multi-client repo needs a routing layer so any agent on any surface knows what a client is and where it lives. Per-client living state = single source of truth per client | Agent Docs |
+| 72 | Docs auto-update (no ask-permission) | Agents update the matching doc as the final task step; user reviews git diff at commit. Replaces the old "ask before updating" rule. Enables hands-off temporal parallelism | Agent Docs |
+| 73 | Per-client living state moves to clients/<name>/CLAUDE.md | CONTEXT.md slimmed to platform state + Decision Log + registry. One fact, one home; avoids drift across docs | Agent Docs |
 
 ---
 
 ## Client Registry
 
-| Client | Folder Name | Domain | Status | Features Enabled |
-|--------|-------------|--------|--------|-----------------|
-| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 8 COMPLETE | blog, i18n, darkMode, contactForm |
-| ElectroWill | `electrowill-solutions` | TBD | Scaffolded | TBD |
-| Doctor | `doctor-maria` | TBD | Not started | TBD |
-| Electrician | `electrician-ion` | TBD | Not started | TBD |
+> Per-client living state lives in each client's `clients/<folder>/CLAUDE.md` (linked below).
+
+| Client | Folder Name | Domain | Status | Features Enabled | Agent brief |
+|--------|-------------|--------|--------|-----------------|-------------|
+| Portfolio (you) | `portfolio` | localhost (TBD) | Phase 8 COMPLETE | blog, i18n, darkMode, contactForm | `clients/portfolio/CLAUDE.md` |
+| ElectroWill | `electrowill-solutions` | electrowill.ro (planned) | Bare scaffold | blog, darkMode, contactForm | `clients/electrowill-solutions/CLAUDE.md` |
+| Doctor | `doctor-maria` | TBD | Not started | TBD | (none yet) |
+| Electrician | `electrician-ion` | TBD | Not started | TBD | (none yet) |
 
 ---
 
@@ -253,6 +266,10 @@ All architecture and business decisions. Claude should reference this before sug
 |------|---------|
 | `docs/ARCHITECTURE.md` | System design, file structure, data flows |
 | `docs/CONTEXT.md` | Living state — this file |
+| `CLAUDE.md` (root) | Agent entry point: context + client router + auto-update protocol |
+| `docs/CLAUDE-PROJECT-INSTRUCTIONS.md` | claude.ai Project seed (mirrors root CLAUDE.md) |
+| `docs/WORKFLOW.md` | Surfaces, deploy, DNS, prompt templates |
+| `clients/<name>/CLAUDE.md` | Per-client agent brief + living state (source of truth per client) |
 | `docs/ROADMAP.md` | Phased plan with completion status |
 | `docs/DEV_NOTES.md` | Gotchas, debugging, environment tips |
 | `docs/NEW_CLIENT_GUIDE.md` | Detailed step-by-step client setup |

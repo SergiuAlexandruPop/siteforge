@@ -23,7 +23,7 @@ import { CtaBanner } from './CtaBanner'
 // ---------------------------------------------------------------------------
 
 interface PortfolioHomePageProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export async function PortfolioHomePage({ language = 'ro' }: PortfolioHomePageProps) {

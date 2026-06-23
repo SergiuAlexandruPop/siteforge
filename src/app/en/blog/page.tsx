@@ -1,18 +1,24 @@
 import { getAllBlogPosts } from '@/lib/content'
 import { BlogList } from '@/components/blog/BlogList'
+import { getDefaultLanguage, isLanguageSupported } from '@/lib/i18n'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
+const THIS_LANG = 'en'
+
 export async function generateMetadata(): Promise<Metadata> {
+  if (!isLanguageSupported(THIS_LANG)) return {}
   return {
     title: 'Blog',
     alternates: {
-      languages: { ro: '/blog' },
+      languages: { [getDefaultLanguage()]: '/blog' },
     },
   }
 }
 
 export default async function EnglishBlogPage() {
-  const posts = await getAllBlogPosts('en')
+  if (!isLanguageSupported(THIS_LANG)) notFound()
+  const posts = await getAllBlogPosts(THIS_LANG)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">

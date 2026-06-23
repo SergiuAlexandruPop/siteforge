@@ -6,7 +6,7 @@ interface BlogPreviewProps {
   subtitle?: string
   /** Number of posts to show (default: 3) */
   count?: number
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 

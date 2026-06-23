@@ -41,7 +41,7 @@ const techIconMap: Record<string, React.ComponentType<{ className?: string }>> =
 
 interface ProjectDetailProps {
   project: Project
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export function ProjectDetail({ project, language = 'ro' }: ProjectDetailProps) {

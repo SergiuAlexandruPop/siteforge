@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 interface ChatInputProps {
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 
@@ -27,7 +27,7 @@ const labels = {
 export function ChatInput({ language = 'ro', className = '' }: ChatInputProps) {
   const [message, setMessage] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
-  const t = labels[language]
+  const t = (labels as Record<string, typeof labels.ro>)[language] ?? labels.ro
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

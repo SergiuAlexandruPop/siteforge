@@ -2,29 +2,28 @@ import { getClientConfig } from '@/lib/client-config'
 import { getClientPage } from '@/lib/client-pages'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
 import { ContactForm } from '@/components/contact/ContactForm'
+import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
 // ---------------------------------------------------------------------------
-// Root-level [slug] routes are ALWAYS Romanian.
-// English routes are served by /en/[slug]/page.tsx.
-// This is the i18n routing convention (Decision #25).
+// Root-level [slug] routes serve the client's default language.
+// Non-default languages are served by /<lang>/[slug]/page.tsx (currently /en).
 // ---------------------------------------------------------------------------
-const LANGUAGE = 'ro' as const
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  const slugs = getPageSlugs(LANGUAGE)
+  const slugs = getPageSlugs(getDefaultLanguage())
   return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const config = getClientConfig()
-  const page = await getPageBySlug(slug, LANGUAGE)
+  const page = await getPageBySlug(slug, getDefaultLanguage())
 
   if (!page) return {}
 
@@ -37,7 +36,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     ...(config.features.i18n && {
       alternates: {
-        languages: { en: `/en/${slug}` },
+        languages: Object.fromEntries(
+          getSupportedLanguages()
+            .filter((lang) => lang !== getDefaultLanguage())
+            .map((lang) => [lang, localizeHref(`/${slug}`, lang)])
+        ),
       },
     }),
   }
@@ -48,9 +51,9 @@ export default async function DynamicPage({ params }: PageProps) {
   const config = getClientConfig()
 
   const CustomPage = getClientPage(config.name, slug)
-  if (CustomPage) return <CustomPage language={LANGUAGE} />
+  if (CustomPage) return <CustomPage language={getDefaultLanguage()} />
 
-  const page = await getPageBySlug(slug, LANGUAGE)
+  const page = await getPageBySlug(slug, getDefaultLanguage())
 
   if (!page) notFound()
 
@@ -75,7 +78,7 @@ export default async function DynamicPage({ params }: PageProps) {
 
         {slug === 'contact' && config.features.contactForm && (
           <div className="mt-8 max-w-lg">
-            <ContactForm language={LANGUAGE} />
+            <ContactForm language={getDefaultLanguage()} />
           </div>
         )}
       </div>

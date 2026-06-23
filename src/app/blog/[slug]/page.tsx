@@ -1,6 +1,7 @@
 import { getClientConfig } from '@/lib/client-config'
 import { getBlogBySlug, getBlogSlugs } from '@/lib/content'
 import { BlogPost } from '@/components/blog/BlogPost'
+import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -9,14 +10,14 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  const slugs = getBlogSlugs('ro')
+  const slugs = getBlogSlugs(getDefaultLanguage())
   return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const config = getClientConfig()
-  const post = await getBlogBySlug(slug, 'ro')
+  const post = await getBlogBySlug(slug, getDefaultLanguage())
 
   if (!post) return {}
 
@@ -39,7 +40,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     ...(config.features.i18n && {
       alternates: {
-        languages: { en: `/en/blog/${slug}` },
+        languages: Object.fromEntries(
+          getSupportedLanguages()
+            .filter((lang) => lang !== getDefaultLanguage())
+            .map((lang) => [lang, localizeHref(`/blog/${slug}`, lang)])
+        ),
       },
     }),
     other: {
@@ -53,7 +58,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params
   const config = getClientConfig()
-  const post = await getBlogBySlug(slug, 'ro')
+  const post = await getBlogBySlug(slug, getDefaultLanguage())
 
   if (!post) notFound()
 

@@ -16,7 +16,7 @@ interface BlogListProps {
   /** URL prefix: '' for Romanian, '/en' for English */
   basePath: string
   /** Language for i18n. */
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export function BlogList({ posts, basePath, language = 'ro' }: BlogListProps) {

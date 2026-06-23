@@ -32,7 +32,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 // ---------------------------------------------------------------------------
 
 interface AboutPageProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -287,7 +287,7 @@ function ExploreHint({
   language,
   hasInteracted,
 }: {
-  language: 'ro' | 'en'
+  language: string
   hasInteracted: boolean
 }) {
   const [visible, setVisible] = useState(true)

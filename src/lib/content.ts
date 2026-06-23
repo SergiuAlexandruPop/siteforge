@@ -4,6 +4,8 @@ import matter from 'gray-matter'
 import { remark } from 'remark'
 import html from 'remark-html'
 import type { BlogMeta, BlogPost } from '@/types/blog'
+import type { Language } from '@/types/config'
+import { contentFolderSuffix, getDefaultLanguage } from './i18n'
 
 // ---------------------------------------------------------------------------
 // Content Library
@@ -51,9 +53,16 @@ async function markdownToHtml(markdown: string): Promise<string> {
  * Get all page slugs from the pages/ directory (for generateStaticParams).
  * Excludes index.md — that's the homepage, handled by app/page.tsx.
  */
-export function getPageSlugs(language: 'ro' | 'en' = 'ro'): string[] {
-  const folder = language === 'en' ? 'pages-en' : 'pages'
-  const pagesDir = path.join(getContentDir(), folder)
+function pagesFolder(language: Language): string {
+  return `pages${contentFolderSuffix(language)}`
+}
+
+function blogFolder(language: Language): string {
+  return `blog${contentFolderSuffix(language)}`
+}
+
+export function getPageSlugs(language: Language = getDefaultLanguage()): string[] {
+  const pagesDir = path.join(getContentDir(), pagesFolder(language))
 
   if (!fs.existsSync(pagesDir)) return []
 
@@ -68,10 +77,9 @@ export function getPageSlugs(language: 'ro' | 'en' = 'ro'): string[] {
  */
 export async function getPageBySlug(
   slug: string,
-  language: 'ro' | 'en' = 'ro'
+  language: Language = getDefaultLanguage()
 ): Promise<PageContent | null> {
-  const folder = language === 'en' ? 'pages-en' : 'pages'
-  const filePath = path.join(getContentDir(), folder, `${slug}.md`)
+  const filePath = path.join(getContentDir(), pagesFolder(language), `${slug}.md`)
 
   if (!fs.existsSync(filePath)) return null
 
@@ -97,10 +105,9 @@ export async function getPageBySlug(
  * Get all published blog posts, sorted by date descending.
  */
 export async function getAllBlogPosts(
-  language: 'ro' | 'en' = 'ro'
+  language: Language = getDefaultLanguage()
 ): Promise<BlogPost[]> {
-  const folder = language === 'en' ? 'blog-en' : 'blog'
-  const blogDir = path.join(getContentDir(), folder)
+  const blogDir = path.join(getContentDir(), blogFolder(language))
 
   if (!fs.existsSync(blogDir)) return []
 
@@ -133,10 +140,9 @@ export async function getAllBlogPosts(
  */
 export async function getBlogBySlug(
   slug: string,
-  language: 'ro' | 'en' = 'ro'
+  language: Language = getDefaultLanguage()
 ): Promise<BlogPost | null> {
-  const folder = language === 'en' ? 'blog-en' : 'blog'
-  const blogDir = path.join(getContentDir(), folder)
+  const blogDir = path.join(getContentDir(), blogFolder(language))
 
   if (!fs.existsSync(blogDir)) return null
 
@@ -161,9 +167,8 @@ export async function getBlogBySlug(
 /**
  * Get all published blog post slugs (for generateStaticParams).
  */
-export function getBlogSlugs(language: 'ro' | 'en' = 'ro'): string[] {
-  const folder = language === 'en' ? 'blog-en' : 'blog'
-  const blogDir = path.join(getContentDir(), folder)
+export function getBlogSlugs(language: Language = getDefaultLanguage()): string[] {
+  const blogDir = path.join(getContentDir(), blogFolder(language))
 
   if (!fs.existsSync(blogDir)) return []
 
@@ -208,10 +213,9 @@ function parseBlogMeta(data: Record<string, unknown>, filename: string): BlogMet
  * Get the homepage content (index.md).
  */
 export async function getHomePage(
-  language: 'ro' | 'en' = 'ro'
+  language: Language = getDefaultLanguage()
 ): Promise<PageContent | null> {
-  const folder = language === 'en' ? 'pages-en' : 'pages'
-  const filePath = path.join(getContentDir(), folder, 'index.md')
+  const filePath = path.join(getContentDir(), pagesFolder(language), 'index.md')
 
   if (!fs.existsSync(filePath)) return null
 

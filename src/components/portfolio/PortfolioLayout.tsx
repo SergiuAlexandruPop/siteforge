@@ -4,6 +4,7 @@ import { PortfolioHeader } from './PortfolioHeader'
 import { PortfolioFooter } from './PortfolioFooter'
 import { LanguageToggle } from '@/components/i18n/LanguageToggle'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
+import { getDefaultLanguage, getSupportedLanguages } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
 // PortfolioLayout — Premium layout shell for the portfolio client.
@@ -32,8 +33,17 @@ export function PortfolioLayout({ config, children }: PortfolioLayoutProps) {
         <PortfolioHeader
           displayName={config.displayName}
           navigation={config.navigation}
-          currentLanguage={config.defaultLanguage}
-          languageToggle={config.features.i18n ? <LanguageToggle /> : undefined}
+          currentLanguage={getDefaultLanguage()}
+          defaultLanguage={getDefaultLanguage()}
+          supportedLanguages={getSupportedLanguages()}
+          languageToggle={
+            config.features.i18n ? (
+              <LanguageToggle
+                supportedLanguages={getSupportedLanguages()}
+                defaultLanguage={getDefaultLanguage()}
+              />
+            ) : undefined
+          }
           themeToggle={config.features.darkMode ? <ThemeToggle /> : undefined}
         />
 

@@ -3,6 +3,7 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { LanguageToggle } from '@/components/i18n/LanguageToggle'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
+import { getDefaultLanguage, getSupportedLanguages } from '@/lib/i18n'
 
 interface LayoutShellProps {
   config: ClientConfig
@@ -15,8 +16,16 @@ export function LayoutShell({ config, children }: LayoutShellProps) {
       <Header
         displayName={config.displayName}
         navigation={config.navigation}
-        currentLanguage={config.defaultLanguage}
-        languageToggle={config.features.i18n ? <LanguageToggle /> : undefined}
+        currentLanguage={getDefaultLanguage()}
+        defaultLanguage={getDefaultLanguage()}
+        languageToggle={
+          config.features.i18n ? (
+            <LanguageToggle
+              supportedLanguages={getSupportedLanguages()}
+              defaultLanguage={getDefaultLanguage()}
+            />
+          ) : undefined
+        }
         themeToggle={config.features.darkMode ? <ThemeToggle /> : undefined}
       />
 

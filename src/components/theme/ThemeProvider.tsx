@@ -11,65 +11,41 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-const STORAGE_KEY = 'siteforge-theme'
-
-function getInitialTheme(): Theme {
-  // Server render — default to dark (portfolio preference).
-  // The inline script in layout.tsx applies .dark before React hydrates.
-  if (typeof window === 'undefined') return 'dark'
-
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (stored === 'dark' || stored === 'light') return stored
-
-  // No stored preference — default to dark
-  return 'dark'
-}
-
-function applyTheme(theme: Theme) {
-  const root = document.documentElement
-  if (theme === 'dark') {
-    root.classList.add('dark')
-  } else {
-    root.classList.remove('dark')
-  }
-}
-
 interface ThemeProviderProps {
   children: React.ReactNode
+  /** Per-client localStorage key (e.g. 'portfolio-theme'). */
+  storageKey: string
+  /** Default theme when no stored preference exists. */
+  defaultTheme: Theme
 }
 
-export function ThemeProvider({ children }: ThemeProviderProps) {
+export function ThemeProvider({ children, storageKey, defaultTheme }: ThemeProviderProps) {
+  const getInitialTheme = useCallback((): Theme => {
+    if (typeof window === 'undefined') return defaultTheme
+    const stored = localStorage.getItem(storageKey)
+    if (stored === 'dark' || stored === 'light') return stored
+    return defaultTheme
+  }, [storageKey, defaultTheme])
+
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
 
   // Apply theme to <html> on mount and on change
   useEffect(() => {
-    applyTheme(theme)
-  }, [theme])
-
-  // Listen for system preference changes (only when no stored preference)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-
-    function handleChange(e: MediaQueryListEvent) {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      // Only follow system if user hasn't explicitly chosen
-      if (!stored) {
-        const next = e.matches ? 'dark' : 'light'
-        setTheme(next)
-      }
+    const root = document.documentElement
+    if (theme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
     }
-
-    mq.addEventListener('change', handleChange)
-    return () => mq.removeEventListener('change', handleChange)
-  }, [])
+  }, [theme])
 
   const toggle = useCallback(() => {
     setTheme((prev) => {
       const next: Theme = prev === 'dark' ? 'light' : 'dark'
-      localStorage.setItem(STORAGE_KEY, next)
+      localStorage.setItem(storageKey, next)
       return next
     })
-  }, [])
+  }, [storageKey])
 
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>

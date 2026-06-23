@@ -41,7 +41,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 interface ResumePageProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 // ---------------------------------------------------------------------------

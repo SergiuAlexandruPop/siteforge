@@ -3,6 +3,12 @@
 import { useEffect } from 'react'
 import type { NavigationItem } from '@/types/config'
 
+function localizeHref(href: string, lang: string, defaultLang: string): string {
+  if (lang === defaultLang) return href
+  if (href === '/' || href === '') return `/${lang}`
+  return `/${lang}${href.startsWith('/') ? href : `/${href}`}`
+}
+
 // ---------------------------------------------------------------------------
 // MobileMenu — Slide-in mobile navigation panel.
 // ---------------------------------------------------------------------------
@@ -14,7 +20,8 @@ interface MobileMenuProps {
   open: boolean
   onClose: () => void
   items: NavigationItem[]
-  currentLanguage: 'ro' | 'en'
+  currentLanguage: string
+  defaultLanguage: string
   /** Current pathname for active link detection. Optional for backward compat. */
   currentPathname?: string
 }
@@ -32,6 +39,7 @@ export function MobileMenu({
   onClose,
   items,
   currentLanguage,
+  defaultLanguage,
   currentPathname,
 }: MobileMenuProps) {
   // Lock body scroll when menu is open
@@ -105,9 +113,7 @@ export function MobileMenu({
             const label = currentLanguage === 'en' && item.labelEn
               ? item.labelEn
               : item.label
-            const href = currentLanguage === 'en'
-              ? `/en${item.href === '/' ? '' : item.href}`
-              : item.href
+            const href = localizeHref(item.href, currentLanguage, defaultLanguage)
 
             const active = currentPathname
               ? isActivePath(currentPathname, href)

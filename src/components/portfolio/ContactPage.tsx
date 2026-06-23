@@ -24,7 +24,7 @@ import { ContactForm } from '@/components/contact/ContactForm'
 // ---------------------------------------------------------------------------
 
 interface ContactPageProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 const i18n = {
@@ -48,7 +48,7 @@ const i18n = {
 
 export function ContactPage({ language = 'ro' }: ContactPageProps) {
   const config = getClientConfig()
-  const t = i18n[language]
+  const t = (i18n as Record<string, typeof i18n.ro>)[language] ?? i18n.ro
 
   return (
     <section className="relative overflow-hidden">

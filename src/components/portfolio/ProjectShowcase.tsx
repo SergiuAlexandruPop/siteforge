@@ -18,7 +18,7 @@ import { BrowserMockup } from './BrowserMockup'
 
 interface ProjectShowcaseProps {
   className?: string
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export function ProjectShowcase({ className = '', language = 'ro' }: ProjectShowcaseProps) {

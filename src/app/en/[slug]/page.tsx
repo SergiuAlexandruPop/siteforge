@@ -3,27 +3,28 @@ import { getClientPage } from '@/lib/client-pages'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { NotAvailable } from '@/components/i18n/NotAvailable'
+import { getDefaultLanguage, isLanguageSupported } from '@/lib/i18n'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+
+const THIS_LANG = 'en'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  // Generate params for all Romanian slugs — English pages that don't exist
-  // will show the NotAvailable placeholder instead of 404
-  const config = getClientConfig()
-  const roSlugs = getPageSlugs('ro')
-  const enSlugs = getPageSlugs('en')
-
-  // Union of both so we cover all possible slugs
-  const allSlugs = [...new Set([...roSlugs, ...enSlugs])]
+  if (!isLanguageSupported(THIS_LANG)) return []
+  const defaultSlugs = getPageSlugs(getDefaultLanguage())
+  const enSlugs = getPageSlugs(THIS_LANG)
+  const allSlugs = [...new Set([...defaultSlugs, ...enSlugs])]
   return allSlugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  if (!isLanguageSupported(THIS_LANG)) return {}
   const { slug } = await params
-  const page = await getPageBySlug(slug, 'en')
+  const page = await getPageBySlug(slug, THIS_LANG)
 
   if (!page) return {}
 
@@ -35,19 +36,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: page.frontmatter.description,
     },
     alternates: {
-      languages: { ro: `/${slug}` },
+      languages: { [getDefaultLanguage()]: `/${slug}` },
     },
   }
 }
 
 export default async function EnglishDynamicPage({ params }: PageProps) {
+  if (!isLanguageSupported(THIS_LANG)) notFound()
   const { slug } = await params
   const config = getClientConfig()
 
   const CustomPage = getClientPage(config.name, slug)
-  if (CustomPage) return <CustomPage language="en" />
+  if (CustomPage) return <CustomPage language={THIS_LANG} />
 
-  const page = await getPageBySlug(slug, 'en')
+  const page = await getPageBySlug(slug, THIS_LANG)
 
   if (!page) {
     return <NotAvailable romanianHref={`/${slug}`} />

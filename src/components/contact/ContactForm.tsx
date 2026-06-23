@@ -14,7 +14,7 @@ interface FormErrors {
 }
 
 interface ContactFormProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 const i18n = {
@@ -89,7 +89,7 @@ function validateForm(
 }
 
 export function ContactForm({ language = 'ro' }: ContactFormProps) {
-  const t = i18n[language]
+  const t = (i18n as Record<string, typeof i18n.ro>)[language] ?? i18n.ro
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')

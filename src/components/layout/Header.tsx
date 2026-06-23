@@ -4,10 +4,17 @@ import { useState } from 'react'
 import type { NavigationItem } from '@/types/config'
 import { MobileMenu } from './MobileMenu'
 
+function localizeHref(href: string, lang: string, defaultLang: string): string {
+  if (lang === defaultLang) return href
+  if (href === '/' || href === '') return `/${lang}`
+  return `/${lang}${href.startsWith('/') ? href : `/${href}`}`
+}
+
 interface HeaderProps {
   displayName: string
   navigation: NavigationItem[]
-  currentLanguage: 'ro' | 'en'
+  currentLanguage: string
+  defaultLanguage: string
   /** Slot for LanguageToggle component (Phase 2D) */
   languageToggle?: React.ReactNode
   /** Slot for ThemeToggle component (Phase 4A) */
@@ -18,6 +25,7 @@ export function Header({
   displayName,
   navigation,
   currentLanguage,
+  defaultLanguage,
   languageToggle,
   themeToggle,
 }: HeaderProps) {
@@ -38,9 +46,7 @@ export function Header({
               const label = currentLanguage === 'en' && item.labelEn
                 ? item.labelEn
                 : item.label
-              const href = currentLanguage === 'en'
-                ? `/en${item.href === '/' ? '' : item.href}`
-                : item.href
+              const href = localizeHref(item.href, currentLanguage, defaultLanguage)
 
               return (
                 <a
@@ -94,6 +100,7 @@ export function Header({
         onClose={() => setMobileMenuOpen(false)}
         items={navigation}
         currentLanguage={currentLanguage}
+        defaultLanguage={defaultLanguage}
       />
     </>
   )

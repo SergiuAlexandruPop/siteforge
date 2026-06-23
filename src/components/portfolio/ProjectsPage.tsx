@@ -37,7 +37,7 @@ const techIconMap: Record<string, React.ComponentType<{ className?: string }>> =
 }
 
 interface ProjectsPageProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 function ProjectCard({

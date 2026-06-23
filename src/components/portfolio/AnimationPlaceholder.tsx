@@ -1,5 +1,5 @@
 interface AnimationPlaceholderProps {
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 

@@ -1,6 +1,7 @@
 import { projects } from '../../../../clients/portfolio/data/projects'
 import { ProjectDetail } from '@/components/portfolio/ProjectDetail'
 import { getClientConfig } from '@/lib/client-config'
+import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -36,7 +37,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     ...(config.features.i18n && {
       alternates: {
-        languages: { en: `/en/projects/${slug}` },
+        languages: Object.fromEntries(
+          getSupportedLanguages()
+            .filter((lang) => lang !== getDefaultLanguage())
+            .map((lang) => [lang, localizeHref(`/projects/${slug}`, lang)])
+        ),
       },
     }),
   }
@@ -48,5 +53,5 @@ export default async function ProjectPage({ params }: PageProps) {
 
   if (!project) notFound()
 
-  return <ProjectDetail project={project} language="ro" />
+  return <ProjectDetail project={project} language={getDefaultLanguage()} />
 }

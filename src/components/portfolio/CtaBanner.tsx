@@ -12,7 +12,7 @@ import Link from 'next/link'
 // ---------------------------------------------------------------------------
 
 interface CtaBannerProps {
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 

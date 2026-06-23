@@ -6,8 +6,17 @@ const config: ClientConfig = {
   domain: 'localhost',
   defaultLanguage: 'ro',
 
+  i18n: {
+    supportedLanguages: ['ro'],
+    defaultLanguage: 'ro',
+  },
+
+  theme: {
+    defaultTheme: 'light',
+  },
+
   features: {
-    i18n: true,
+    i18n: false,
     blog: true,
     darkMode: true,
     contactForm: true,

@@ -19,7 +19,7 @@ interface BlogCardProps {
   /** Display variant. Default 'card' for grid, 'hero' for pinned post. */
   variant?: 'card' | 'hero'
   /** Language for i18n strings. */
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export function BlogCard({

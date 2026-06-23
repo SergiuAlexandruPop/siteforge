@@ -82,17 +82,21 @@ function getEnvStatus() {
 // Runs before React hydrates — reads localStorage and applies .dark class
 // immediately so the user never sees a white flash.
 // ---------------------------------------------------------------------------
-const themeInitScript = `
+function buildThemeInitScript(storageKey: string, defaultTheme: 'light' | 'dark'): string {
+  return `
 (function(){
   try {
-    var stored = localStorage.getItem('siteforge-theme');
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (stored !== 'light') {
+    var stored = localStorage.getItem(${JSON.stringify(storageKey)});
+    var mode = stored === 'light' || stored === 'dark' ? stored : ${JSON.stringify(defaultTheme)};
+    if (mode === 'dark') {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   } catch(e) {}
 })();
 `
+}
 
 export default function RootLayout({
   children,
@@ -104,6 +108,9 @@ export default function RootLayout({
   const themeCss = generateThemeCss(theme)
   const isDev = process.env.NODE_ENV === 'development'
   const darkModeEnabled = config.features.darkMode
+  const defaultTheme: 'light' | 'dark' = config.theme?.defaultTheme ?? 'dark'
+  const themeStorageKey = `${config.name}-theme`
+  const themeInitScript = buildThemeInitScript(themeStorageKey, defaultTheme)
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID ?? ''
   const smartsuppId = process.env.NEXT_PUBLIC_SMARTSUPP_ID ?? ''
 
@@ -156,7 +163,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${newsreader.variable} font-sans antialiased transition-colors duration-200`}>
         {darkModeEnabled ? (
-          <ThemeProvider>{appContent}</ThemeProvider>
+          <ThemeProvider storageKey={themeStorageKey} defaultTheme={defaultTheme}>
+            {appContent}
+          </ThemeProvider>
         ) : (
           appContent
         )}

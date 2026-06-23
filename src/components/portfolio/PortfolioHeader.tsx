@@ -5,6 +5,12 @@ import { usePathname } from 'next/navigation'
 import type { NavigationItem } from '@/types/config'
 import { MobileMenu } from '@/components/layout/MobileMenu'
 
+function localizeHref(href: string, lang: string, defaultLang: string): string {
+  if (lang === defaultLang) return href
+  if (href === '/' || href === '') return `/${lang}`
+  return `/${lang}${href.startsWith('/') ? href : `/${href}`}`
+}
+
 // ---------------------------------------------------------------------------
 // PortfolioHeader — Premium transparent-to-blur header.
 // ---------------------------------------------------------------------------
@@ -23,15 +29,30 @@ import { MobileMenu } from '@/components/layout/MobileMenu'
 interface PortfolioHeaderProps {
   displayName: string
   navigation: NavigationItem[]
-  currentLanguage: 'ro' | 'en'
+  currentLanguage: string
+  defaultLanguage: string
+  supportedLanguages: string[]
   languageToggle?: React.ReactNode
   themeToggle?: React.ReactNode
 }
 
-function isActivePath(pathname: string, href: string): boolean {
-  // Strip /en prefix for comparison if present
-  const normalizedPathname = pathname.replace(/^\/en/, '') || '/'
-  const normalizedHref = href.replace(/^\/en/, '') || '/'
+function stripLangPrefix(p: string, languages: string[], defaultLang: string): string {
+  for (const l of languages) {
+    if (l === defaultLang) continue
+    if (p === `/${l}`) return '/'
+    if (p.startsWith(`/${l}/`)) return p.slice(l.length + 1)
+  }
+  return p
+}
+
+function isActivePath(
+  pathname: string,
+  href: string,
+  languages: string[],
+  defaultLang: string
+): boolean {
+  const normalizedPathname = stripLangPrefix(pathname, languages, defaultLang) || '/'
+  const normalizedHref = stripLangPrefix(href, languages, defaultLang) || '/'
 
   // Home: exact match only
   if (normalizedHref === '/') return normalizedPathname === '/'
@@ -44,12 +65,17 @@ export function PortfolioHeader({
   displayName,
   navigation,
   currentLanguage,
+  defaultLanguage,
+  supportedLanguages,
   languageToggle,
   themeToggle,
 }: PortfolioHeaderProps) {
   const pathname = usePathname()
-  const detectedLanguage = pathname.startsWith('/en') ? 'en' : 'ro'
-  const lang = detectedLanguage as 'ro' | 'en'
+  const nonDefault = supportedLanguages.filter((l) => l !== defaultLanguage)
+  const lang =
+    nonDefault.find(
+      (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`)
+    ) ?? currentLanguage
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
@@ -80,12 +106,9 @@ export function PortfolioHeader({
             {navigation.map((item) => {
               const label =
                 lang === 'en' && item.labelEn ? item.labelEn : item.label
-              const href =
-                lang === 'en'
-                  ? `/en${item.href === '/' ? '' : item.href}`
-                  : item.href
+              const href = localizeHref(item.href, lang, defaultLanguage)
 
-              const active = isActivePath(pathname, href)
+              const active = isActivePath(pathname, href, supportedLanguages, defaultLanguage)
 
               return (
                 <a
@@ -151,6 +174,7 @@ export function PortfolioHeader({
         onClose={() => setMobileMenuOpen(false)}
         items={navigation}
         currentLanguage={lang}
+        defaultLanguage={defaultLanguage}
         currentPathname={pathname}
       />
     </>

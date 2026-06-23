@@ -17,15 +17,31 @@ const config: ClientConfig = {
   // Production domain without protocol (e.g. 'example.ro')
   domain: 'localhost',
 
-  // Default language: 'ro' for Romanian (pages in content/pages/)
-  //                   'en' for English (pages in content/pages-en/)
+  // Default language. Content for the default language lives in unsuffixed
+  // folders (content/pages/, content/blog/). Non-default languages live in
+  // suffixed folders (content/pages-en/, content/blog-en/).
+  // The default language is served at '/', non-default at '/<lang>'.
   defaultLanguage: 'ro',
+
+  // I18n configuration — required when features.i18n is true.
+  // `defaultLanguage` must match the top-level `defaultLanguage` above and
+  // must be included in `supportedLanguages`.
+  i18n: {
+    supportedLanguages: ['ro'],
+    defaultLanguage: 'ro',
+  },
+
+  // Theme configuration — required when features.darkMode is true.
+  // Binary light/dark only; users can toggle at runtime.
+  theme: {
+    defaultTheme: 'light', // 'light' | 'dark'
+  },
 
   // Feature flags — set each to true/false based on client needs
   features: {
-    i18n: false,          // English language support under /en/
+    i18n: false,          // Multi-language support (see `i18n` above)
     blog: false,          // Blog section + CMS admin panel
-    darkMode: false,      // Dark/light theme toggle
+    darkMode: false,      // Dark/light theme toggle (see `theme` above)
     contactForm: false,   // Contact form + Resend email
     smartsupp: false,     // Smartsupp live chat widget
     supabase: false,      // Supabase database features

@@ -36,7 +36,7 @@ interface AnimatedHeroProps {
   /** CTA buttons rendered below the typewriter. */
   ctas?: CTAButton[]
   /** Language for i18n. */
-  language?: 'ro' | 'en'
+  language?: string
   className?: string
 }
 

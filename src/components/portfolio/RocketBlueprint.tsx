@@ -29,7 +29,7 @@ import { RocketSVG } from './RocketSVG'
 // ---------------------------------------------------------------------------
 
 interface RocketBlueprintProps {
-  language?: 'ro' | 'en'
+  language?: string
 }
 
 export function RocketBlueprint({ language = 'ro' }: RocketBlueprintProps) {
