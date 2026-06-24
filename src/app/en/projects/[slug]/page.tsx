@@ -1,5 +1,4 @@
-import { projects } from '../../../../../clients/portfolio/data/projects'
-import { ProjectDetail } from '@/components/portfolio/ProjectDetail'
+import { activeClient } from '@/lib/active-client.generated'
 import { getClientConfig } from '@/lib/client-config'
 import { getDefaultLanguage, isLanguageSupported } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
@@ -10,7 +9,8 @@ const THIS_LANG = 'en'
 // ---------------------------------------------------------------------------
 // /en/projects/[slug] — Project detail route (English).
 // ---------------------------------------------------------------------------
-// Same as the Romanian route but passes language="en" to ProjectDetail.
+// Same as the Romanian route but passes language="en". Client-agnostic:
+// delegates to the active client's projectDetail capability.
 // ---------------------------------------------------------------------------
 
 interface PageProps {
@@ -19,24 +19,25 @@ interface PageProps {
 
 export async function generateStaticParams() {
   if (!isLanguageSupported(THIS_LANG)) return []
-  return projects.map((p) => ({ slug: p.slug }))
+  return (activeClient.projectDetail?.slugs ?? []).map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   if (!isLanguageSupported(THIS_LANG)) return {}
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const meta = activeClient.projectDetail?.getMetadata(slug, THIS_LANG)
 
-  if (!project) return {}
+  if (!meta) return {}
 
   const config = getClientConfig()
+  const fullTitle = `${meta.title} — ${config.seo.siteName}`
 
   return {
-    title: `${project.title} — ${config.seo.siteName}`,
-    description: project.descriptionEn,
+    title: fullTitle,
+    description: meta.description,
     openGraph: {
-      title: `${project.title} — ${config.seo.siteName}`,
-      description: project.descriptionEn,
+      title: fullTitle,
+      description: meta.description,
     },
     alternates: {
       languages: { [getDefaultLanguage()]: `/projects/${slug}` },
@@ -47,9 +48,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function EnglishProjectPage({ params }: PageProps) {
   if (!isLanguageSupported(THIS_LANG)) notFound()
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const pd = activeClient.projectDetail
 
-  if (!project) notFound()
+  if (!pd) notFound()
 
-  return <ProjectDetail project={project} language="en" />
+  const { Component } = pd
+  return <Component slug={slug} language={THIS_LANG} />
 }

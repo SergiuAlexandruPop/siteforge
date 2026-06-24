@@ -1,5 +1,4 @@
-import { getClientConfig } from '@/lib/client-config'
-import { getClientPage } from '@/lib/client-pages'
+import { getClientConfig, getClientPage } from '@/lib/client-config'
 import { getPageBySlug, getPageSlugs } from '@/lib/content'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
@@ -50,7 +49,7 @@ export default async function DynamicPage({ params }: PageProps) {
   const { slug } = await params
   const config = getClientConfig()
 
-  const CustomPage = getClientPage(config.name, slug)
+  const CustomPage = getClientPage(slug)
   if (CustomPage) return <CustomPage language={getDefaultLanguage()} />
 
   const page = await getPageBySlug(slug, getDefaultLanguage())

@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Newsreader } from 'next/font/google'
 
-import { getClientConfig, getClientTheme } from '@/lib/client-config'
-import { getClientLayout } from '@/lib/client-layout'
+import { getClientConfig, getClientTheme, getClientLayout } from '@/lib/client-config'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
@@ -114,8 +113,8 @@ export default function RootLayout({
   const ga4Id = process.env.NEXT_PUBLIC_GA4_ID ?? ''
   const smartsuppId = process.env.NEXT_PUBLIC_SMARTSUPP_ID ?? ''
 
-  // --- Registry: resolve layout for this client ---
-  const ClientLayout = getClientLayout(config.name)
+  // --- Resolve layout for the active client ---
+  const ClientLayout = getClientLayout()
 
   const appContent = (
     <>

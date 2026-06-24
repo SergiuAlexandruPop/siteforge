@@ -1,5 +1,4 @@
-import { projects } from '../../../../clients/portfolio/data/projects'
-import { ProjectDetail } from '@/components/portfolio/ProjectDetail'
+import { activeClient } from '@/lib/active-client.generated'
 import { getClientConfig } from '@/lib/client-config'
 import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
 import { notFound } from 'next/navigation'
@@ -8,8 +7,9 @@ import type { Metadata } from 'next'
 // ---------------------------------------------------------------------------
 // /projects/[slug] — Project detail route (Romanian).
 // ---------------------------------------------------------------------------
-// Statically generates a page for each project in projects.ts.
-// Renders the ProjectDetail case study component.
+// Client-agnostic: delegates entirely to the active client's projectDetail
+// capability (clients/<name>/index.ts). Clients without projects omit the
+// capability, so this route generates no pages and imports no client code.
 // ---------------------------------------------------------------------------
 
 interface PageProps {
@@ -17,23 +17,24 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return projects.map((p) => ({ slug: p.slug }))
+  return (activeClient.projectDetail?.slugs ?? []).map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const meta = activeClient.projectDetail?.getMetadata(slug, getDefaultLanguage())
 
-  if (!project) return {}
+  if (!meta) return {}
 
   const config = getClientConfig()
+  const fullTitle = `${meta.title} — ${config.seo.siteName}`
 
   return {
-    title: `${project.title} — ${config.seo.siteName}`,
-    description: project.description,
+    title: fullTitle,
+    description: meta.description,
     openGraph: {
-      title: `${project.title} — ${config.seo.siteName}`,
-      description: project.description,
+      title: fullTitle,
+      description: meta.description,
     },
     ...(config.features.i18n && {
       alternates: {
@@ -49,9 +50,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProjectPage({ params }: PageProps) {
   const { slug } = await params
-  const project = projects.find((p) => p.slug === slug)
+  const pd = activeClient.projectDetail
 
-  if (!project) notFound()
+  if (!pd) notFound()
 
-  return <ProjectDetail project={project} language={getDefaultLanguage()} />
+  const { Component } = pd
+  return <Component slug={slug} language={getDefaultLanguage()} />
 }

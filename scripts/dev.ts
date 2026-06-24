@@ -8,7 +8,8 @@ import { execSync } from 'node:child_process'
 // ---------------------------------------------------------------------------
 // 1. Reads the client name from CLI args
 // 2. Copies env/.env.{client} → .env.local
-// 3. Starts Next.js dev server with Turbopack
+// 3. Generates src/lib/active-client.generated.ts for this client
+// 4. Starts Next.js dev server with Turbopack
 // ---------------------------------------------------------------------------
 
 const clientName = process.argv[2]
@@ -48,6 +49,14 @@ if (!existsSync(envSource)) {
 // Copy env file
 copyFileSync(envSource, envTarget)
 console.log(`✅ Copied env/.env.${clientName} → .env.local`)
+
+// Generate the active-client entry for this client before starting dev.
+execSync('tsx scripts/gen-active-client.ts', {
+  cwd: root,
+  stdio: 'inherit',
+  env: { ...process.env, ACTIVE_CLIENT: clientName },
+})
+
 console.log(`🚀 Starting dev server for: ${clientName}`)
 console.log('')
 

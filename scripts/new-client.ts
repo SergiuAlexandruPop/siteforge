@@ -224,39 +224,24 @@ Bine ați venit pe site-ul ${displayName}.
 }
 
 // ---------------------------------------------------------------------------
-// Register client in client-config.ts
+// Client entry/manifest — clients/<name>/index.ts
 // ---------------------------------------------------------------------------
+// This is the only wiring a new client needs. No shared file is edited: the
+// build resolves ACTIVE_CLIENT → this manifest via scripts/gen-active-client.ts.
+// Config + theme only by default; add layout/homepage/pages here for custom UI.
 
-function registerClient(name: string): void {
-  const configPath = join(root, 'src', 'lib', 'client-config.ts')
-  let content = readFileSync(configPath, 'utf-8')
+function generateIndexTs(): string {
+  return `import type { ClientManifest } from '@/types/config'
+import config from './config'
+import theme from './theme'
 
-  // Add import lines after the last existing import
-  const importLine = `import ${camelCase(name)}Config from '../../clients/${name}/config'\nimport ${camelCase(name)}Theme from '../../clients/${name}/theme'`
-
-  // Find the last import line
-  const importLines = content.split('\n').filter((l) => l.startsWith('import '))
-  const lastImport = importLines[importLines.length - 1]
-
-  content = content.replace(lastImport, `${lastImport}\n${importLine}`)
-
-  // Add to configs map
-  content = content.replace(
-    /const configs: Record<string, ClientConfig> = \{/,
-    `const configs: Record<string, ClientConfig> = {\n  '${name}': ${camelCase(name)}Config,`
-  )
-
-  // Add to themes map
-  content = content.replace(
-    /const themes: Record<string, ClientTheme> = \{/,
-    `const themes: Record<string, ClientTheme> = {\n  '${name}': ${camelCase(name)}Theme,`
-  )
-
-  writeFileSync(configPath, content, 'utf-8')
+export const manifest: ClientManifest = {
+  config,
+  theme,
 }
 
-function camelCase(kebab: string): string {
-  return kebab.replace(/-([a-z])/g, (_, c) => c.toUpperCase())
+export default manifest
+`
 }
 
 // ---------------------------------------------------------------------------
@@ -268,7 +253,8 @@ function addPackageScripts(name: string): void {
   const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 
   pkg.scripts[`dev:${name}`] = `tsx scripts/dev.ts ${name}`
-  pkg.scripts[`build:${name}`] = `cross-env ACTIVE_CLIENT=${name} next build`
+  pkg.scripts[`build:${name}`] =
+    `cross-env ACTIVE_CLIENT=${name} tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=${name} next build`
 
   writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n', 'utf-8')
 }
@@ -383,6 +369,10 @@ async function main() {
   )
   console.log(`✅ Creat clients/${name}/theme.ts`)
 
+  // 3b. Generate the client entry/manifest (index.ts)
+  writeFileSync(join(clientDir, 'index.ts'), generateIndexTs(), 'utf-8')
+  console.log(`✅ Creat clients/${name}/index.ts`)
+
   // 4. Generate placeholder content
   writeFileSync(
     join(clientDir, 'content', 'pages', 'index.md'),
@@ -403,10 +393,6 @@ async function main() {
   // 6. Add scripts to package.json
   addPackageScripts(name)
   console.log(`✅ Adăugat yarn dev:${name} și yarn build:${name}`)
-
-  // 7. Register in client-config.ts
-  registerClient(name)
-  console.log(`✅ Înregistrat în src/lib/client-config.ts`)
 
   console.log('')
   console.log('══════════════════════════════════════════')

@@ -154,7 +154,7 @@
 ---
 
 ## Phase 9: Testing Infrastructure
-**Status: IN PROGRESS (P0 + P1 units complete; route/E2E pending)**
+**Status: COMPLETE**
 
 Motivation: one shared codebase fans out to many independent sites, so a change
 for client B can silently break client A. Tests are the guardrail. See the
@@ -172,12 +172,17 @@ June 2026 architecture review §8.
 - [x] `tests/unit/content.test.ts` — frontmatter parse, published filter, date sort, missing-folder, parseBlogMeta defaults (markdown fixtures under `tests/fixtures/`)
 - [x] `tests/unit/auth.test.ts` — verifyPassword + JWT round-trip / tampered / expired / wrong-secret rejection (mocked `next/headers`)
 
-### 9C: P2 tests (NOT STARTED)
-- [ ] Route-handler integration tests (`api/auth`, `api/contact`, `api/blog`) with mocked github/resend/r2 — verify auth gating + validation wiring
-- [ ] `image-optimize.validateImageFile` + extracted contact validators
-- [ ] Playwright E2E: build one client, smoke-test home/blog/contact + dark-mode toggle
+### 9C: Route integration + P2 tests (COMPLETE)
+- [x] Route-handler integration tests (`api/auth`, `api/contact`, `api/blog`) with mocked auth/github/resend — verify auth gating + validation wiring (`tests/integration/`)
+- [x] `api/upload` route + `image-optimize` (`tests/integration/upload.route.test.ts` + `tests/unit/image-optimize.test.ts`). Upload route: auth gate, validation→400, filename sanitization, R2 wiring (r2/optimize mocked). image-optimize: **real sharp** — resize cap, no-enlarge, WebP conversion, EXIF strip, plus `validateImageFile` rules
+- [x] Bug fix: upload route mapped validation failures (bad type / oversize) to **500**; now returns **400** (client error). Parse/validate moved out of the optimize/upload try block
+- [x] `projectDetail` manifest contract assertions (in `client-manifest.contract.test.ts`): slugs/getMetadata(known+unknown)/Component shape, auto-applied to every client
+- [x] Playwright E2E (Apache-2.0): production build of **portfolio**, **chromium-only**, smoke home/blog/contact + dark-mode toggle (`e2e/smoke.spec.ts`, `playwright.config.ts`)
+- [x] CI: added `e2e` job (after `verify`) — installs chromium, runs `yarn test:e2e`, uploads the report artifact
 
 **Milestone (9A+9B): 94 tests green covering theme, i18n, content and auth logic plus a config contract across all clients. ✅**
+**Milestone (9C route tests): +26 tests — auth/contact/blog handlers assert auth gating, validation, and create-vs-update wiring with all I/O mocked. 120 total. ✅**
+**Milestone (9C upload + projectDetail + E2E): +40 Vitest tests (160 total green) covering the upload route, the real sharp pipeline, and the projectDetail contract; plus a chromium Playwright smoke suite against a production portfolio build, wired into CI. Phase 9 complete. ✅**
 
 ---
 

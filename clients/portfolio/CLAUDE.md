@@ -35,11 +35,13 @@
 - `content/pages/` · `content/pages-en/` — page content (RO / EN)
 - `content/blog/` · `content/blog-en/` — blog posts (RO / EN)
 - `data/projects.ts` · `data/resume.ts` — structured project & resume data
+- `index.ts` — client manifest (config/theme/layout/homepage/pages + `projectDetail` capability)
+- `components/ProjectDetailRoute.tsx` — server wrapper feeding `manifest.projectDetail.Component`
 - `public/` — assets (logo, favicon, og-image, project screenshots)
 - Components live in `src/components/portfolio/` (co-located by domain, not in client folder)
 
 ## Living state   ← AUTO-UPDATED
-- **Last updated:** 2026-06-23
+- **Last updated:** 2026-06-24
 - **Status:** Phase 8 (UI/UX Redesign) complete. Not yet deployed.
 - **What's built:**
   - Custom `PortfolioLayout` (SmoothScroll + PortfolioHeader transparent→blur + compact two-row
@@ -50,6 +52,8 @@
   - Terracotta color system (Phase 8A) with dark-mode glow/gradient treatments.
   - Custom ContactPage (split layout), AboutPage, ResumePage, ProjectsPage, ProjectDetail.
   - Blog redesign: bigger cards, pinned-post via `pinned: true` frontmatter.
+  - Project-detail routes now resolve via `manifest.projectDetail` (Decision #77) — portfolio's
+    `projects`/`ProjectDetail` no longer leak into other clients' bundles via shared `src/app`.
 - **Known issues / TODO:**
   - Project images are placeholders (BrowserMockup frames) — need real screenshots in
     `public/projects/` (search `TODO: Replace with real screenshot`).

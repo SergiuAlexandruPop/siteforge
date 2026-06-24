@@ -39,5 +39,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Generated per-client entry (regenerated before every dev/build, on postinstall)
+src/lib/active-client.generated.ts
+
+# Playwright E2E
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Vercel
 .vercel

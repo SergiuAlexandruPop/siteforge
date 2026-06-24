@@ -60,3 +60,38 @@ jobs:
 
       - name: Build
         run: yarn build:${{ matrix.client }}
+
+  # ---------------------------------------------------------------------------
+  # End-to-end smoke test. Builds + starts the portfolio client (Playwright's
+  # webServer handles that) and runs the chromium smoke specs against the real
+  # production build. Portfolio-only / chromium-only by design — see the E2E
+  # rationale in playwright.config.ts. Runs after the fast gate passes.
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: E2E (portfolio, chromium)
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright chromium + OS deps
+        run: yarn playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: yarn test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -9,13 +9,18 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report",
     "typecheck": "tsc --noEmit",
+    "pretypecheck": "tsx scripts/gen-active-client.ts",
+    "postinstall": "tsx scripts/gen-active-client.ts",
+    "gen:client": "tsx scripts/gen-active-client.ts",
     "new-client": "tsx scripts/new-client.ts",
     "toggle-feature": "tsx scripts/toggle-feature.ts",
     "dev:portfolio": "tsx scripts/dev.ts portfolio",
-    "build:portfolio": "cross-env ACTIVE_CLIENT=portfolio next build",
+    "build:portfolio": "cross-env ACTIVE_CLIENT=portfolio tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=portfolio next build",
     "dev:electrowill-solutions": "tsx scripts/dev.ts electrowill-solutions",
-    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions next build"
+    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions next build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1015.0",
@@ -37,6 +42,7 @@
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",

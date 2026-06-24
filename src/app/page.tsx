@@ -1,5 +1,4 @@
-import { getClientConfig } from '@/lib/client-config'
-import { getClientHomePage } from '@/lib/client-homepage'
+import { getClientConfig, getClientHomePage } from '@/lib/client-config'
 import { getDefaultLanguage, getSupportedLanguages, localizeHref } from '@/lib/i18n'
 import type { Metadata } from 'next'
 
@@ -20,8 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const config = getClientConfig()
-  const ClientHomePage = getClientHomePage(config.name)
+  const ClientHomePage = getClientHomePage()
 
   return <ClientHomePage language={getDefaultLanguage()} />
 }

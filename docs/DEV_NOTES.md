@@ -6,6 +6,27 @@
 
 ---
 
+## Gotcha: `active-client.generated.ts` is generated, not committed
+
+`src/lib/active-client.generated.ts` is written by `scripts/gen-active-client.ts`
+and is **gitignored**. It's a single static import of the active client's
+`clients/<name>/index.ts` manifest — the mechanism that keeps each build
+single-client (no cross-client bundle leak).
+
+- It's regenerated automatically before every `yarn dev:<client>` / `yarn
+  build:<client>`, and on `postinstall` and `pretypecheck` (defaulting to
+  `_template`). A fresh checkout has no generated file until `yarn install`
+  runs `postinstall` — if you see "Cannot find module './active-client.generated'",
+  run `yarn gen:client` (or any `dev:`/`build:` script).
+- Never edit it by hand. Adding a client requires NO edit to `src/lib/` — only a
+  new `clients/<name>/index.ts`. The old four registries (`client-layout`/
+  `-homepage`/`-pages`) are gone; `client-config.ts` is now just accessors.
+- To verify the leak stays fixed after a build: `grep` the `.next` output for
+  another client's identifiers — they must be absent. (Build must run on the
+  dev machine; the toolchain's native binaries are platform-specific.)
+
+---
+
 ## Environment Setup (Windows 11 + WebStorm)
 
 ### Prerequisites
@@ -267,6 +288,20 @@ function getRequiredEnv(key: string): string {
 - Glow is intentionally subtle — check in a dark room or increase the opacity in the CSS variable temporarily
 
 ---
+
+## Testing Notes (Phase 9)
+
+### Vitest
+- Run: `yarn test` (CI) / `yarn test:watch`. Config: `vitest.config.ts` (node env, `@`→`src`, globals off, `include: tests/**/*.test.ts`).
+- `esbuild.jsx: 'automatic'` is required — tsconfig uses `jsx: "preserve"` (Next's automatic runtime). Without it, any test that imports a component fails with **"React is not defined"** (e.g. the manifest contract imports each client's full manifest, components included). See Decision #79.
+- **image-optimize tests use real sharp** (not a mock) — mocking it would test nothing. Fixtures are generated in-memory with sharp, so there are no binary files to commit.
+- The **upload route** test mocks `@/lib/auth`, `@/lib/r2`, and `optimizeImage` (via `vi.importActual` so the real `validateImageFile` is kept), and fakes `Date.now()` to assert the timestamped key.
+
+### Playwright E2E
+- Run: `yarn test:e2e`. Config: `playwright.config.ts` (testDir `e2e/`, chromium-only). It builds + starts the **portfolio** production build on **:3100** via `webServer`, so a cold first run includes a full `next build`.
+- One-time local setup after pulling this phase: `yarn install` (picks up `@playwright/test`, refreshes `yarn.lock`) then `yarn playwright install chromium`.
+- Selectors lean on stable accessibility hooks: header `nav[aria-label="Main navigation"]`, theme toggle `button` with aria-label `/Comută la modul/`. Dark mode is asserted via the `dark` class on `<html>` (server default is dark).
+- Vitest and Playwright never collide: Vitest is scoped to `tests/**/*.test.ts`, Playwright to `e2e/**`.
 
 ## Performance Targets
 

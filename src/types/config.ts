@@ -137,3 +137,63 @@ export interface ClientTheme {
   /** CSS border-radius value (e.g. '0.5rem') */
   borderRadius: string
 }
+
+// ---------------------------------------------------------------------------
+// Client Manifest — the single entry point per client.
+// ---------------------------------------------------------------------------
+// Each clients/<name>/index.ts exports one `manifest: ClientManifest`. At build
+// time, scripts/gen-active-client.ts resolves ACTIVE_CLIENT to exactly one of
+// these and re-exports it as `activeClient`. This is what makes the bundle
+// single-client: no other client's code is ever imported into the graph.
+//
+// `layout`, `homepage`, and `pages` are optional — omit them to fall through to
+// the shared defaults (LayoutShell / DefaultHomePage / markdown renderer).
+// ---------------------------------------------------------------------------
+
+import type { ComponentType, ReactNode } from 'react'
+
+/** Wraps the whole page (header + children + footer). */
+export type ClientLayoutComponent = ComponentType<{
+  config: ClientConfig
+  children: ReactNode
+}>
+
+/** Full-page composition rendered at the client's home route. */
+export type ClientHomePageComponent = ComponentType<{ language?: Language }>
+
+/** Custom page for a given slug; falls back to the markdown renderer if absent. */
+export type ClientPageComponent = ComponentType<{ language?: Language }>
+
+/** Metadata for a single project-detail page, language-resolved. */
+export interface ProjectDetailMetadata {
+  title: string
+  description: string
+}
+
+/**
+ * Optional dynamic project-detail route capability. When present, the shared
+ * /projects/[slug] (and /en/...) routes delegate entirely to it — they import
+ * no client-specific data or components, so nothing leaks into other clients'
+ * bundles. `Component` does its own data lookup and calls notFound() internally.
+ */
+export interface ProjectDetailCapability {
+  /** Slugs to statically generate (drives generateStaticParams). */
+  slugs: string[]
+  /** Per-slug metadata for generateMetadata; null when the slug is unknown. */
+  getMetadata: (slug: string, language: Language) => ProjectDetailMetadata | null
+  /** Renders the detail page for a slug; handles its own lookup + notFound. */
+  Component: ComponentType<{ slug: string; language: Language }>
+}
+
+export interface ClientManifest {
+  config: ClientConfig
+  theme: ClientTheme
+  /** Custom layout. Defaults to LayoutShell when omitted. */
+  layout?: ClientLayoutComponent
+  /** Custom homepage. Defaults to DefaultHomePage when omitted. */
+  homepage?: ClientHomePageComponent
+  /** Custom pages keyed by slug. Slugs without an entry use the markdown renderer. */
+  pages?: Record<string, ClientPageComponent>
+  /** Dynamic project-detail route capability. Omit for clients without projects. */
+  projectDetail?: ProjectDetailCapability
+}

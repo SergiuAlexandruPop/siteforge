@@ -131,14 +131,36 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-Add yarn script to `package.json`:
+Add yarn scripts to `package.json` (the build script regenerates the active-client entry first):
 ```json
 {
   "scripts": {
-    "dev:doctor-maria": "tsx scripts/dev.ts doctor-maria"
+    "dev:doctor-maria": "tsx scripts/dev.ts doctor-maria",
+    "build:doctor-maria": "cross-env ACTIVE_CLIENT=doctor-maria tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=doctor-maria next build"
   }
 }
 ```
+
+Create the client entry `clients/{client-name}/index.ts` (the ONLY wiring a
+client needs — no shared file is edited; the build resolves `ACTIVE_CLIENT` →
+this manifest via `scripts/gen-active-client.ts`):
+```typescript
+import type { ClientManifest } from '@/types/config'
+import config from './config'
+import theme from './theme'
+
+export const manifest: ClientManifest = {
+  config,
+  theme,
+  // Optional custom UI — omit to use shared defaults:
+  // layout: MyLayout, homepage: MyHomePage, pages: { about: MyAboutPage },
+}
+
+export default manifest
+```
+
+> The CLI (Option A) generates `index.ts` and both scripts automatically. There
+> is no longer any registry to edit in `src/lib/`.
 
 ---
 

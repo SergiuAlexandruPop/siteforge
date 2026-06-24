@@ -125,9 +125,8 @@ siteforge/
 │   │   └── dev/                 # DevBanner
 │   │
 │   ├── lib/
-│   │   ├── client-config.ts     # Explicit import registry for clients
-│   │   ├── client-layout.ts     # Per-client layout registry
-│   │   ├── client-homepage.ts   # Per-client homepage registry
+│   │   ├── client-config.ts             # Accessors over the active client's manifest
+│   │   ├── active-client.generated.ts   # GENERATED single-client entry (gitignored)
 │   │   ├── content.ts           # Markdown reading
 │   │   ├── r2.ts                # Cloudflare R2 utilities
 │   │   ├── resend.ts            # Email sending
@@ -165,33 +164,47 @@ siteforge/
 
 ## 3. Per-Client Layout & Homepage Architecture
 
-### 3.1 Registry Pattern (Decision #24, #42, #43)
+### 3.1 Single-Manifest + Codegen Pattern (Decision #24, #42, #43, #50)
 
-Two registries use explicit imports (no dynamic `import()`) for Turbopack reliability:
+Each client exposes ONE entry — `clients/<name>/index.ts` — exporting a
+`ClientManifest` (`config`, `theme`, optional `layout`/`homepage`/`pages`). At
+build time `scripts/gen-active-client.ts` reads `ACTIVE_CLIENT` and writes
+`src/lib/active-client.generated.ts` with a single static import of that one
+client's manifest. `src/lib/client-config.ts` exposes accessors over it.
 
-**`src/lib/client-layout.ts`** — maps `ACTIVE_CLIENT` → layout component
-```
-'portfolio' → PortfolioLayout (SmoothScroll + custom header/footer)
-default    → LayoutShell (standard sticky header + footer)
-```
+This replaces the four parallel registries (`client-config`/`-layout`/
+`-homepage`/`-pages`), which statically imported EVERY client and so leaked all
+clients' code into every build (and grew O(N) per client). Now the module graph
+can only ever reach the active client. Mechanism stays fully static (no dynamic
+`import()`) so dev (Turbopack) and build behave identically. Generation runs
+before every dev/build and on `postinstall`/`pretypecheck` (defaulting to
+`_template` so fresh checkouts type-check); the generated file is gitignored.
 
-**`src/lib/client-homepage.ts`** — maps `ACTIVE_CLIENT` → homepage component
-```
-'portfolio' → PortfolioHomePage (animated hero + services + projects + blog + CTA)
-default    → DefaultHomePage (generic sections)
-```
+Fallbacks: `manifest.layout ?? LayoutShell`, `manifest.homepage ??
+DefaultHomePage`, `manifest.pages?.[slug] ?? null` (→ markdown renderer).
+
+**Dynamic project-detail routes (Decision #77).** The shared `src/app/projects/[slug]`
+and `src/app/en/projects/[slug]` routes are client-agnostic: they read the
+optional `manifest.projectDetail` capability (`slugs` for `generateStaticParams`,
+`getMetadata(slug, language)` for `generateMetadata`, and a server-component
+`Component` that owns the lookup + `notFound()` and renders the client's detail
+component). Clients without projects omit the key, so the routes generate zero
+pages and pull in no client code. Portfolio supplies it from `index.ts` via
+`clients/portfolio/components/ProjectDetailRoute.tsx` — the single place portfolio's
+`projects` data and `ProjectDetail` component enter the route graph. This closes
+the residual data+component leak the four-registry removal (#73) left behind.
 
 ### 3.2 Portfolio Data Flow
 ```
 layout.tsx
-  → getClientLayout('portfolio') → PortfolioLayout
+  → getClientLayout() → manifest.layout → PortfolioLayout
     → SmoothScroll (Lenis wrapper)
     → PortfolioHeader (transparent → blur on scroll, fixed position)
     → main (pt-16 offset for fixed header)
     → PortfolioFooter (dark mode gradient top edge)
 
 page.tsx
-  → getClientHomePage('portfolio') → PortfolioHomePage
+  → getClientHomePage() → manifest.homepage → PortfolioHomePage
     → AnimatedHero (RotatingText, radial glow, CTAs, TechMarquee)
     → ScrollReveal > TabbedServices (tabs desktop / accordion mobile)
     → ScrollReveal > ProjectShowcase (2-col grid, hover glow)

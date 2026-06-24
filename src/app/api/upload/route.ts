@@ -20,21 +20,33 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Neautorizat.' }, { status: 401 })
   }
 
+  // 2. Parse + validate the upload. Anything wrong here is a CLIENT error → 400
+  //    (bad multipart body, missing file, disallowed type, oversize). The
+  //    optimize/upload try block further down is reserved for genuine
+  //    server-side failures (sharp/R2) → 500.
+  let file: File
   try {
-    // 2. Parse the multipart form data
     const formData = await request.formData()
-    const file = formData.get('file')
+    const candidate = formData.get('file')
 
-    if (!file || !(file instanceof File)) {
+    if (!candidate || !(candidate instanceof File)) {
       return NextResponse.json(
         { error: 'Niciun fișier trimis. Adaugă un câmp "file" în formular.' },
         { status: 400 }
       )
     }
 
-    // 3. Validate file type and size
-    validateImageFile(file.type, file.size, file.name)
+    // 3. Validate file type and size (throws on disallowed type / oversize).
+    validateImageFile(candidate.type, candidate.size, candidate.name)
+    file = candidate
+  } catch (error) {
+    const message = error instanceof Error
+      ? error.message
+      : 'Fișier nevalid.'
+    return NextResponse.json({ error: message }, { status: 400 })
+  }
 
+  try {
     // 4. Read file into buffer
     const arrayBuffer = await file.arrayBuffer()
     const inputBuffer = Buffer.from(arrayBuffer)

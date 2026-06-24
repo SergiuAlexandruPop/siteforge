@@ -1,67 +1,49 @@
-import type { ClientConfig, ClientTheme } from '@/types/config'
-
-import portfolioConfig from '../../clients/portfolio/config'
-import portfolioTheme from '../../clients/portfolio/theme'
-import templateConfig from '../../clients/_template/config'
-import templateTheme from '../../clients/_template/theme'
-import electrowillSolutionsConfig from '../../clients/electrowill-solutions/config'
-import electrowillSolutionsTheme from '../../clients/electrowill-solutions/theme'
-
-// ---------------------------------------------------------------------------
-// Client Registry
-// ---------------------------------------------------------------------------
-// When adding a new client, import their config/theme above and add entries
-// to both maps below. The Phase 6 CLI script automates this.
-// ---------------------------------------------------------------------------
-
-const configs: Record<string, ClientConfig> = {
-  'electrowill-solutions': electrowillSolutionsConfig,
-  portfolio: portfolioConfig,
-  _template: templateConfig,
-}
-
-const themes: Record<string, ClientTheme> = {
-  'electrowill-solutions': electrowillSolutionsTheme,
-  portfolio: portfolioTheme,
-  _template: templateTheme,
-}
+import type {
+  ClientConfig,
+  ClientHomePageComponent,
+  ClientLayoutComponent,
+  ClientPageComponent,
+  ClientTheme,
+} from '@/types/config'
+import { activeClient } from '@/lib/active-client.generated'
+import { LayoutShell } from '@/components/layout/LayoutShell'
+import { DefaultHomePage } from '@/components/sections/DefaultHomePage'
 
 // ---------------------------------------------------------------------------
-// Public API
+// Active-client accessors
 // ---------------------------------------------------------------------------
-
-function getActiveClientName(): string {
-  const client = process.env.ACTIVE_CLIENT
-  if (!client) {
-    throw new Error(
-      'ACTIVE_CLIENT environment variable is not set.\n' +
-      'Start the dev server with: yarn dev:portfolio'
-    )
-  }
-  return client
-}
+// All per-client wiring now flows through a single manifest resolved at build
+// time by scripts/gen-active-client.ts (re-exported as `activeClient`). Only the
+// active client's code is ever imported, so no other client leaks into the
+// bundle. Adding a client requires NO change here — only a new
+// clients/<name>/index.ts.
+//
+// Shared fallbacks (LayoutShell / DefaultHomePage) are imported here because
+// they're common to every build; the markdown renderer is the page fallback.
+// ---------------------------------------------------------------------------
 
 export function getClientConfig(): ClientConfig {
-  const name = getActiveClientName()
-  const config = configs[name]
-  if (!config) {
-    throw new Error(
-      `Unknown client: "${name}".\n` +
-      `Available clients: ${Object.keys(configs).join(', ')}\n` +
-      `Did you forget to register it in src/lib/client-config.ts?`
-    )
-  }
-  return config
+  return activeClient.config
 }
 
 export function getClientTheme(): ClientTheme {
-  const name = getActiveClientName()
-  const theme = themes[name]
-  if (!theme) {
-    throw new Error(
-      `No theme found for client: "${name}".\n` +
-      `Register it in src/lib/client-config.ts`
-    )
-  }
-  return theme
+  return activeClient.theme
+}
+
+/** Layout for the active client, or the shared default. */
+export function getClientLayout(): ClientLayoutComponent {
+  return activeClient.layout ?? LayoutShell
+}
+
+/** Homepage for the active client, or the shared default. */
+export function getClientHomePage(): ClientHomePageComponent {
+  return activeClient.homepage ?? DefaultHomePage
+}
+
+/**
+ * Custom page for the given slug on the active client, or null if none is
+ * registered (the route then falls back to the markdown renderer).
+ */
+export function getClientPage(slug: string): ClientPageComponent | null {
+  return activeClient.pages?.[slug] ?? null
 }

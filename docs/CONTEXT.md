@@ -15,13 +15,13 @@
 ---
 
 ## Last Updated
-**Date:** 2026-06-23
-**Updated By:** Claude — added Vitest test infrastructure + CI; P0/P1 tests for theme-css, i18n, content, auth, and a client config/theme contract test (Decisions #74, #75)
+**Date:** 2026-06-24
+**Updated By:** Claude — Phase 9C complete. Added upload-route + real-sharp image-optimize tests, projectDetail manifest contract, and a chromium Playwright E2E smoke suite (production portfolio build) wired into CI. Fixed upload-route validation to return 400 (was 500). 160 Vitest tests green (Decisions #78–80)
 
 ---
 
 ## Current Phase
-**Phases 1-8 Complete. Phase 9 (testing) 9A+9B done; 9C pending. Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
+**Phases 1-8 Complete. Phase 9 (testing) COMPLETE (9A+9B+9C). Next: Phase 5B/5C (content + deployment) or Phase 7 (second client).**
 
 ---
 
@@ -83,7 +83,8 @@
 - Complex markdown (tables, footnotes) may not round-trip perfectly through Novel editor
 - Next.js icon SVG `dark:fill-white` may not work inside inline SVGs — replace with currentColor if needed
 - ROADMAP.md Phases 2-4 detail was compressed — restore if full history needed
-- Test coverage so far: lib units (theme-css, i18n, content, auth) + client config/theme contract. NOT yet covered: route handlers (auth/contact/blog/upload) and per-client E2E (review §8 P2)
+- Test coverage: lib units (theme-css, i18n, content, auth, **image-optimize via real sharp**) + client config/theme + manifest (incl. **projectDetail**) contracts + route-handler integration (api/auth, api/contact, api/blog, **api/upload**) = 160 Vitest tests. **Playwright E2E** smoke-tests a production **portfolio** build (chromium) for home/blog/contact + dark-mode. E2E is portfolio-only/chromium-only by design — widen the matrix/engines later if needed
+- E2E gotcha: `yarn install` must be re-run after this phase to pick up `@playwright/test` and refresh `yarn.lock` (CI uses `--frozen-lockfile`); then `yarn playwright install chromium` once locally before `yarn test:e2e`
 - Removed stale `dev:/build:doctor-maria` and `dev:/build:electrician-ion` scripts (no such client folders). `new-client` adds scripts per real client
 
 > Per-client known issues / tech debt live in each `clients/<name>/CLAUDE.md`.
@@ -168,10 +169,15 @@ All architecture and business decisions. Claude should reference this before sug
 | 70 | Header active links via pathname | isActivePath() with prefix matching. Home = exact, others = startsWith. aria-current for a11y | Phase 8F |
 | 71 | Agent-driven docs: root CLAUDE.md + client router + per-client CLAUDE.md | Multi-client repo needs a routing layer so any agent on any surface knows what a client is and where it lives. Per-client living state = single source of truth per client | Agent Docs |
 | 72 | Docs auto-update (no ask-permission) | Agents update the matching doc as the final task step; user reviews git diff at commit. Replaces the old "ask before updating" rule. Enables hands-off temporal parallelism | Agent Docs |
+| 73 | Build-time per-client code-splitting via single manifest + codegen | The 4 registries (`client-config`/`-layout`/`-homepage`/`-pages`) statically imported every client, leaking all clients' code into every bundle and growing O(N). Replaced with one `clients/<name>/index.ts` manifest; `scripts/gen-active-client.ts` resolves `ACTIVE_CLIENT` → `active-client.generated.ts` (single static import). Codegen chosen over a Turbopack/webpack alias because it keeps dev and build on the identical fully-static mechanism (no dual-resolver risk). Supersedes Decisions #24/#42/#43 | P0 Split |
 | 73 | Per-client living state moves to clients/<name>/CLAUDE.md | CONTEXT.md slimmed to platform state + Decision Log + registry. One fact, one home; avoids drift across docs | Agent Docs |
 | 74 | Vitest for unit + contract tests | Native ESM/TS, fast, zero-config (no Jest). Node env, `@` alias mirrors tsconfig, globals off (explicit imports). First suites: theme-css, i18n, content, auth | Phase 9 |
 | 75 | Client config/theme **contract test** as multi-tenant guardrail | Auto-discovers every `clients/*` via `import.meta.glob` and asserts schema coherence (valid hex, feature-flag↔required-fields, no `NaN` from theme CSS). One broken client config now fails fast and names the client instead of breaking everyone's build | Phase 9 |
 | 76 | CI gate: typecheck + lint + test, then per-client build matrix | A broken client config/theme should fail CI, not production. GitHub Actions on PR + push to main | Phase 9 |
+| 78 | Playwright (Apache-2.0) for E2E; portfolio-only, chromium-only, production build | License clears the MIT/Apache/BSD rule. `webServer` runs `build:portfolio` + `next start` so the smoke suite hits the same artifact Vercel ships (not the dev server). One client + one engine keeps CI minutes low — the multi-tenant guardrail is already the Vitest config/manifest contracts; widen later if needed | Phase 9C |
+| 79 | Vitest esbuild `jsx: 'automatic'` | tsconfig uses `jsx: "preserve"` (Next's automatic runtime). Without telling esbuild, Vitest falls back to the classic transform and any test importing a component fails with "React is not defined" (the manifest contract imports each client's full manifest, components included) | Phase 9C |
+| 80 | Upload route: validation failures return 400, not 500 | `validateImageFile` (bad type / oversize) threw inside the optimize/upload try block, surfacing client errors as server errors. Parse+validate moved into their own try → 400; the second try stays for genuine sharp/R2 failures → 500 | Phase 9C |
+| 77 | Project-detail routes resolve via `ClientManifest.projectDetail` | Closing the residual leak from #73: shared `src/app/projects/[slug]` + `/en/...` routes hardcoded `import { projects }` and `ProjectDetail` from `clients/portfolio`, bundling portfolio data **and** component code into every client. Added optional `projectDetail` capability (`slugs` + `getMetadata` + server-component `Component`) to the manifest; routes read `activeClient.projectDetail`. Portfolio supplies it via a server wrapper that owns the lookup + `notFound()`. `resume` needs no equivalent — it's imported only by the portfolio-only `ResumePage`, never from shared `src/app/`. `Project` type stays in portfolio (manifest references only platform types) | P0 Split |
 
 ---
 
@@ -212,7 +218,8 @@ All architecture and business decisions. Claude should reference this before sug
 | cross-env | ^7.0.3 | Cross-platform env |
 | lenis | latest | Smooth scrolling (MIT, ~5KB) |
 | motion | ^12.38.0 | Scroll-linked SVG animation (MIT, ~11KB tree-shaken) |
-| vitest | ^3.2.0 | Test runner (dev only) — unit + contract tests |
+| vitest | ^3.2.0 | Test runner (dev only) — unit + contract + route-integration tests |
+| @playwright/test | ^1.61.1 | E2E test runner (dev only, Apache-2.0) — chromium smoke suite |
 
 ---
 
