@@ -15,8 +15,8 @@
 ---
 
 ## Last Updated
-**Date:** 2026-06-24
-**Updated By:** Claude — Phase 9C complete. Added upload-route + real-sharp image-optimize tests, projectDetail manifest contract, and a chromium Playwright E2E smoke suite (production portfolio build) wired into CI. Fixed upload-route validation to return 400 (was 500). 160 Vitest tests green (Decisions #78–80)
+**Date:** 2026-06-28
+**Updated By:** Claude — Platform hosting decision: **Vercel → Cloudflare Workers via `@opennextjs/cloudflare`** (Decision #81). Added `open-next.config.ts`, `wrangler.jsonc`, and `build:cf:`/`preview:cf:` scripts (ElectroWill Phase G0). Per-client favicon system landed (manifest `icon` capability). Earlier: Phase 9C — 160 Vitest tests + Playwright E2E green (Decisions #78–80).
 
 ---
 
@@ -177,6 +177,8 @@ All architecture and business decisions. Claude should reference this before sug
 | 78 | Playwright (Apache-2.0) for E2E; portfolio-only, chromium-only, production build | License clears the MIT/Apache/BSD rule. `webServer` runs `build:portfolio` + `next start` so the smoke suite hits the same artifact Vercel ships (not the dev server). One client + one engine keeps CI minutes low — the multi-tenant guardrail is already the Vitest config/manifest contracts; widen later if needed | Phase 9C |
 | 79 | Vitest esbuild `jsx: 'automatic'` | tsconfig uses `jsx: "preserve"` (Next's automatic runtime). Without telling esbuild, Vitest falls back to the classic transform and any test importing a component fails with "React is not defined" (the manifest contract imports each client's full manifest, components included) | Phase 9C |
 | 80 | Upload route: validation failures return 400, not 500 | `validateImageFile` (bad type / oversize) threw inside the optimize/upload try block, surfacing client errors as server errors. Parse+validate moved into their own try → 400; the second try stays for genuine sharp/R2 failures → 500 | Phase 9C |
+| 81 | Host on **Cloudflare Workers via `@opennextjs/cloudflare`** (NOT Vercel, NOT next-on-pages) | Vercel Hobby/free is non-commercial only, but the client sites are commercial. Cloudflare's free tier allows commercial use, has unlimited bandwidth, and absorbs DDoS without billing. `@cloudflare/next-on-pages` is Edge-runtime-only and effectively deprecated — it would force an Edge rewrite of the Node `/api/lead` + `/api/track` routes and choke on the repo's `sharp` routes; OpenNext runs the **Node** runtime on Workers (`nodejs_compat`), so those routes work unchanged. DNS end-to-end on Cloudflare, **proxied (orange cloud)** for the free WAF/DDoS. Rate-limiting is Cloudflare-native; the free tier allows **1 rule, 10s period, IP characteristic**, so a single rule guards `/api/lead` (Bot Fight Mode + app-layer honeypot/Turnstile cover the rest). Supersedes the Vercel hosting assumption in Decisions #5/#19 wording. | Phase G |
+| 82 | Per-client favicon via `ClientManifest.icon` | The shared `app/icon.svg` + `app/apple-icon.tsx` were a portfolio rocket, wrong for other clients. Added an `icon` manifest capability (`mark: (px)=>ReactElement` + `appleBackground`) rendered by dynamic `app/icon.tsx` + `app/apple-icon.tsx` via next/og; only the active client's mark is bundled (same pattern as fonts). | Phase G |
 | 77 | Project-detail routes resolve via `ClientManifest.projectDetail` | Closing the residual leak from #73: shared `src/app/projects/[slug]` + `/en/...` routes hardcoded `import { projects }` and `ProjectDetail` from `clients/portfolio`, bundling portfolio data **and** component code into every client. Added optional `projectDetail` capability (`slugs` + `getMetadata` + server-component `Component`) to the manifest; routes read `activeClient.projectDetail`. Portfolio supplies it via a server wrapper that owns the lookup + `notFound()`. `resume` needs no equivalent — it's imported only by the portfolio-only `ResumePage`, never from shared `src/app/`. `Project` type stays in portfolio (manifest references only platform types) | P0 Split |
 
 ---
@@ -229,7 +231,7 @@ All architecture and business decisions. Claude should reference this before sug
 |---------|----------------|------------|-------|
 | GitHub | Yes | Yes | Repo + token for CMS |
 | Cloudflare R2 | Yes | Yes | Bucket + keys configured |
-| Vercel | TBD | No | Need account + project per client |
+| Cloudflare Workers (OpenNext) | TBD | No | Hosting (Decision #81). `@opennextjs/cloudflare` + wrangler.jsonc; one Worker per client. Replaces Vercel. |
 | Resend | TBD | No | Need account + API key |
 | Google Analytics | TBD | No | Need GA4 property per client |
 | Google Search Console | TBD | No | Need verification per domain |

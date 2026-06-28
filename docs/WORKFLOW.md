@@ -50,29 +50,41 @@ Turbopack server. Build checks (`yarn build:<client>`) run at phase boundaries.
 
 ## Deploy flow (per client)
 
-Each client is its own Vercel project pointing at the same GitHub repo, differing only by build
-command and env vars. Full step-by-step is in `docs/CLIENT_SETUP_CHECKLIST.md` §4. Summary:
+Hosting is **Cloudflare Workers via `@opennextjs/cloudflare`** (Decision #81) — one Worker per client,
+all from the same GitHub repo, differing only by build command and env vars. The adapter turns the
+standard `next build` output into a Worker; our Node `/api/*` routes run unchanged under
+`nodejs_compat`. Config lives in `open-next.config.ts` + `wrangler.jsonc`. Summary:
 
-1. Vercel → Add New Project → import the `siteforge` repo.
-2. Project name `siteforge-<client>`, Build Command `yarn build:<client>`, root directory `.`.
-3. Add every non-empty var from `env/.env.<client>` in Settings → Environment Variables.
-4. Deploy. Verify at the preview URL.
-5. Rollback if needed: Vercel → Deployments → Promote a previous good deploy to production.
+1. Local sanity check: `yarn preview:cf:<client>` builds the Worker and serves it in workerd
+   (`opennextjs-cloudflare preview`) so you can test the production artifact before deploying.
+2. Cloudflare dashboard → **Workers & Pages** → Create → connect the `siteforge` GitHub repo.
+3. Build command `yarn build:cf:<client>`; deploy command `npx opennextjs-cloudflare deploy` (or
+   `wrangler deploy`); the Worker name comes from `wrangler.jsonc` (per-client — see the multi-client
+   note in that file).
+4. Add every non-empty var from `env/.env.<client>` in the Worker's **Settings → Variables**
+   (mark secrets as encrypted). `NEXT_PUBLIC_*` must be present at **build** time.
+5. Deploy. Verify at the `*.workers.dev` URL, then attach the custom domain (see DNS setup).
+6. Rollback if needed: Workers → the project → **Deployments** → roll back to a previous version.
 
 ## DNS setup (Cloudflare as unified control plane)
 
 **Architecture rule:** the registrar registers the domain; **Cloudflare handles all DNS** regardless
-of registrar (ROTLD for `.ro`, Porkbun for other TLDs). 1:1:1 mapping of Cloudflare zone → Vercel
-project → SiteForge client folder. Never split DNS records between the registrar panel and Cloudflare
-after nameserver delegation.
+of registrar (ROTLD for `.ro`, Porkbun for other TLDs). 1:1:1 mapping of Cloudflare zone → Cloudflare
+Worker → SiteForge client folder. Never split DNS records between the registrar panel and Cloudflare
+after nameserver delegation. Because hosting is now **on Cloudflare**, records are **proxied (orange
+cloud)** — Cloudflare issues the cert and the free WAF/DDoS sits in front. (The old gray-cloud rule
+was Vercel-specific: Vercel needed to own SSL, so the proxy had to be off.)
 
 1. Register the domain at the registrar (ROTLD for `.ro`).
-2. Create a free Cloudflare account, add the domain as a site, copy Cloudflare's nameservers.
-3. At the registrar, switch nameservers to the Cloudflare ones.
-4. In Cloudflare DNS: add `A @ → 76.76.21.21` and `CNAME www → cname.vercel-dns.com`.
-   Proxy status: **DNS only (gray cloud)** — Vercel manages SSL; the orange proxy causes SSL conflicts.
-5. In Vercel → Project → Settings → Domains: add the root domain and `www`. Vercel auto-issues SSL.
-6. If using Resend with a custom domain: add the DKIM/SPF/DMARC TXT records in Cloudflare.
+2. Create a free Cloudflare account, add the domain as a site, copy Cloudflare's two nameservers.
+3. At the registrar, switch nameservers to the Cloudflare ones (ROTLD: domain admin → Nameservers).
+4. Enable **DNSSEC** (Cloudflare → DNS → Settings) and paste the generated **DS record** into the
+   registrar's DNSSEC section.
+5. In the **Worker → Settings → Domains & Routes → Add custom domain**, add the root domain and `www`.
+   Cloudflare auto-creates the **proxied (orange-cloud)** records and issues SSL — do **not** add manual
+   `A`/`CNAME` records pointing at a host IP (that was the Vercel flow).
+6. If using Resend with a custom domain: add the DKIM/SPF/DMARC **TXT** records in Cloudflare (TXT is
+   never proxied).
 7. Wait 5–30 min for propagation (check dnschecker.org). Visit `https://<domain>` — should load with padlock.
 8. Submit `https://<domain>/sitemap.xml` in Google Search Console.
 

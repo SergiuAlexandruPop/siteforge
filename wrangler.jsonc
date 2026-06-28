@@ -1,0 +1,26 @@
+{
+  // -------------------------------------------------------------------------
+  // Cloudflare Worker config (OpenNext build output).
+  // -------------------------------------------------------------------------
+  // Generated/consumed by `opennextjs-cloudflare build|preview|deploy`.
+  //   main    -> the Worker entry OpenNext emits
+  //   assets  -> static files OpenNext emits (served from Cloudflare's edge)
+  //   nodejs_compat -> lets the Next Node runtime (our /api routes) run on Workers;
+  //                    requires compatibility_date >= 2024-09-23.
+  //
+  // MULTI-CLIENT NOTE: `name` is the deployed Worker name and is currently
+  // ElectroWill-specific (Phase G targets one client). When portfolio (or any
+  // other client) also moves to Workers, parameterize the name per client —
+  // e.g. a per-client wrangler config or `deploy --name <client>` — rather than
+  // hardcoding a second client here. One Worker : one client : one zone.
+  // -------------------------------------------------------------------------
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "electrowill-solutions",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
+}

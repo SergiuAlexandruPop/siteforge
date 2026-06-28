@@ -47,5 +47,9 @@ test-results/
 playwright-report/
 playwright/.cache/
 
+# Cloudflare / OpenNext
+.open-next/
+.wrangler/
+
 # Vercel
 .vercel

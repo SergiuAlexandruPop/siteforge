@@ -2,6 +2,7 @@ import type { ClientManifest } from '@/types/config'
 import config from './config'
 import theme from './theme'
 import { fonts } from './fonts'
+import { icon } from './icon'
 import { ElectroWillLayout } from '@/components/electrowill/ElectroWillLayout'
 import { ElectroWillHomePage } from '@/components/electrowill/HomePage'
 
@@ -17,6 +18,7 @@ export const manifest: ClientManifest = {
   config,
   theme,
   fonts,
+  icon,
   layout: ElectroWillLayout,
   homepage: ElectroWillHomePage,
 }

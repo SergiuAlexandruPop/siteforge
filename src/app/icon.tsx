@@ -3,18 +3,19 @@ import { ImageResponse } from 'next/og'
 import { getClientIcon } from '@/lib/client-config'
 
 // ---------------------------------------------------------------------------
-// app/apple-icon.tsx — per-client iOS home-screen icon (180×180 PNG).
+// app/icon.tsx — per-client browser-tab favicon (32×32 PNG).
 // ---------------------------------------------------------------------------
-// Renders the ACTIVE client's mark from its manifest, centered on that client's
-// rounded tile (`appleBackground`). Previously a hardcoded rocket on a slate
-// gradient — now per-client like the favicon, so only the active client's mark
-// ships. Falls back to a neutral mark + white tile when a client declares none.
+// Replaces the old SHARED static app/icon.svg (a rocket, correct only for
+// portfolio). Renders the ACTIVE client's mark from its manifest via next/og,
+// so each client ships its own favicon and only that client's mark is bundled
+// (same per-client pattern as fonts). A client with no `icon` falls back to a
+// neutral mark (see getClientIcon).
 // ---------------------------------------------------------------------------
 
-export const size = { width: 180, height: 180 }
+export const size = { width: 32, height: 32 }
 export const contentType = 'image/png'
 
-export default function AppleIcon() {
+export default function Icon() {
   const icon = getClientIcon()
 
   return new ImageResponse(
@@ -26,11 +27,9 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: icon.appleBackground,
-          borderRadius: '36px',
         }}
       >
-        {icon.mark(120)}
+        {icon.mark(32)}
       </div>
     ),
     { ...size }

@@ -150,7 +150,7 @@ export interface ClientTheme {
 // the shared defaults (LayoutShell / DefaultHomePage / markdown renderer).
 // ---------------------------------------------------------------------------
 
-import type { ComponentType, ReactNode } from 'react'
+import type { ComponentType, ReactElement, ReactNode } from 'react'
 
 /** Wraps the whole page (header + children + footer). */
 export type ClientLayoutComponent = ComponentType<{
@@ -199,11 +199,28 @@ export interface ClientFonts {
   className: string
 }
 
+// ---------------------------------------------------------------------------
+// Client Icon — optional per-client favicon / app-icon mark (clients/<name>/icon.tsx).
+// ---------------------------------------------------------------------------
+// The app/icon.tsx and app/apple-icon.tsx metadata routes render the ACTIVE
+// client's mark via next/og ImageResponse, so each client ships its own browser
+// tab + home-screen icon (only the active client's manifest is bundled — no
+// cross-client bleed, same pattern as fonts). `mark` is a size-parametric SVG so
+// the one definition serves both the 32px favicon and the 180px apple-icon.
+export interface ClientIcon {
+  /** The icon mark as an inline <svg>, sized to `px`. Rendered centered. */
+  mark: (px: number) => ReactElement
+  /** CSS `background` for the rounded apple-icon tile (e.g. a solid or gradient). */
+  appleBackground: string
+}
+
 export interface ClientManifest {
   config: ClientConfig
   theme: ClientTheme
   /** Per-client fonts (next/font). Falls back to system fonts when omitted. */
   fonts?: ClientFonts
+  /** Per-client favicon / app-icon mark. Falls back to a default mark when omitted. */
+  icon?: ClientIcon
   /** Custom layout. Defaults to LayoutShell when omitted. */
   layout?: ClientLayoutComponent
   /** Custom homepage. Defaults to DefaultHomePage when omitted. */

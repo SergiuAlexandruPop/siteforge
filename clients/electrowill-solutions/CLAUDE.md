@@ -28,7 +28,8 @@
 
 ## Coordinates
 - **Folder:** `clients/electrowill-solutions/`
-- **Domain:** `electrowill.ro` — to be PURCHASED at ROTLD (available), DNS via Cloudflare, gray cloud.
+- **Domain:** `electrowill.ro` — PURCHASED at ROTLD. Hosting on **Cloudflare Workers (OpenNext)**; DNS
+  end-to-end on Cloudflare, **proxied (orange cloud)** so the free WAF/DDoS applies. (Decision #81.)
 - **Env file:** `env/.env.electrowill-solutions` — keys EMPTY except `ACTIVE_CLIENT` + `ADMIN_SESSION_SECRET`.
 - **Dev:** `yarn dev:electrowill-solutions`  ·  **Build:** `yarn build:electrowill-solutions`
 - **Layout (planned):** CUSTOM `ElectroWillLayout` (hosts sticky call/WhatsApp bar) — to build in Phase B.
@@ -118,7 +119,10 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **D) Content & SEO** — copy, FAQ (plain RO), zona BN, LocalBusiness/Electrician JSON-LD (areaServed BN, no address).
 - **E) Photos** — optimize fixed set (Sharp: resize/WebP/strip GPS), feature priza-de-pământ, swap placeholders.
 - **F) Legal** — footer identifiers + Politică confidențialitate + Termeni + ANPC/SOL (user provides certificat de înregistrare).
-- **G) Infra/launch** — buy electrowill.ro (ROTLD) → Cloudflare DNS → Vercel; Resend keys; set up WhatsApp Business on 0750447426; deploy.
+- **G) Infra/launch** — electrowill.ro (ROTLD, bought) → Cloudflare DNS (proxied) → **Cloudflare Workers (OpenNext)**;
+  Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
+  **G0 done (2026-06-28):** `@opennextjs/cloudflare` adapter wired — `open-next.config.ts`, `wrangler.jsonc`
+  (nodejs_compat), `build:cf:`/`preview:cf:electrowill-solutions` scripts. Install deps + run the CF build to verify.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)
@@ -140,7 +144,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 
 ## Living state   ← AUTO-UPDATED
 - **Last updated:** 2026-06-28
-- **Status:** **Phases C + D + F built — awaiting `yarn typecheck` on the dev machine.**
+- **Status:** **Phases C + D + F built + per-client favicon done — awaiting `yarn typecheck` on the dev machine.**
   Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
   Phase F: legal identifiers in footer, `/confidentialitate` + `/termeni` pages, ANPC+SOL, JSON-LD
@@ -161,6 +165,20 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **#3 still-to-do (Phase G):** create a Turnstile site for electrowill.ro → set both keys; add Cloudflare
   edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`, ≈ 30/min/IP on `/api/track`) + Bot Fight Mode.
   (Per the platform decision, rate-limiting is Cloudflare-native, not Upstash.)
+- **WhatsApp — wiring verified OK:** `WhatsAppButton` → `WHATSAPP_URL = https://wa.me/40750447426`
+  (= 0750447426, correct intl format), `data-track="whatsapp"`. Code is done. ONLY remaining: register a
+  **WhatsApp Business account on the 0750447426 SIM** (Orange Yoxo — standard mobile number, verifies fine)
+  so messages actually land (Phase G). Optional nicety: add a prefilled `?text=` to the wa.me link.
+- **Favicon/browser-tab icon — DONE (2026-06-28, per-client like fonts):** added `ClientIcon`
+  (`mark: (px)=>ReactElement` + `appleBackground`) to the manifest with a `getClientIcon()` accessor
+  (neutral built-in fallback). Each client now owns `clients/<name>/icon.tsx`: ElectroWill = a **bolt**
+  in brand green `#1C6B47` on a light-mint apple tile; portfolio keeps the **rocket** (moved off the old
+  shared SVG); `_template` ships a neutral placeholder. The shared `app/icon.tsx` (new) + `app/apple-icon.tsx`
+  (rewritten) render the ACTIVE client's mark via next/og `ImageResponse` (32px favicon / 180px apple-icon),
+  so only the active client's mark is bundled — zero cross-client bleed.
+  ⚠️ **One manual step:** delete the old shared `src/app/icon.svg` (`git rm src/app/icon.svg`) — a dynamic
+  `app/icon.tsx` cannot coexist with a static `app/icon.svg` (Next errors on duplicate `icon` names).
+  The MCP filesystem has no delete; do this before `yarn build:electrowill-solutions`.
 - **What's built (Phase F — legal):**
   - `src/components/electrowill/content/legal.ts` — identifiers from the certificat de înregistrare
     (ELECTROWILL SOLUTIONS S.R.L., CUI 50544190, Nr. Reg. Com. J2024022229009, EUID ROONRC.J2024022229009,
@@ -279,4 +297,6 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - Phone-first: lead capture is phone-only (no email field) — the existing /api/contact requires email, so add a phone-first route.
 - Before deploy, follow `docs/CLIENT_SETUP_CHECKLIST.md`: R2 bucket only if managed gallery (NOT needed — photos are static in public/),
   Resend key, strong `ADMIN_PASSWORD`. GitHub token not needed (blog off).
-- Domain `electrowill.ro` is `.ro` → registrar ROTLD, DNS via Cloudflare, proxy gray (DNS only, no double-CDN).
+- Domain `electrowill.ro` is `.ro` → registrar ROTLD, DNS via Cloudflare, **proxied (orange cloud)**. (Orange is
+  correct now that hosting is Cloudflare Workers — Cloudflare manages the cert and there's no double-CDN; the old
+  "gray cloud" note was Vercel-specific.)

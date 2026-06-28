@@ -2,6 +2,7 @@ import type { ClientManifest } from '@/types/config'
 import config from './config'
 import theme from './theme'
 import { fonts } from './fonts'
+import { icon } from './icon'
 import { PortfolioLayout } from '@/components/portfolio/PortfolioLayout'
 import { PortfolioHomePage } from '@/components/portfolio/HomePage'
 import { AboutPage } from '@/components/portfolio/AboutPage'
@@ -22,6 +23,7 @@ export const manifest: ClientManifest = {
   config,
   theme,
   fonts,
+  icon,
   layout: PortfolioLayout,
   homepage: PortfolioHomePage,
   pages: {

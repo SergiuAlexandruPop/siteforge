@@ -1,7 +1,9 @@
+import { createElement } from 'react'
 import type {
   ClientConfig,
   ClientFonts,
   ClientHomePageComponent,
+  ClientIcon,
   ClientLayoutComponent,
   ClientPageComponent,
   ClientTheme,
@@ -9,6 +11,19 @@ import type {
 import { activeClient } from '@/lib/active-client.generated'
 import { LayoutShell } from '@/components/layout/LayoutShell'
 import { DefaultHomePage } from '@/components/sections/DefaultHomePage'
+
+// Built-in fallback mark for clients that declare no icon (e.g. a freshly
+// scaffolded client before branding). Defined with createElement so this stays a
+// plain .ts module (no JSX). A neutral rounded square in the template blue.
+const FALLBACK_ICON: ClientIcon = {
+  mark: (px) =>
+    createElement(
+      'svg',
+      { width: px, height: px, viewBox: '0 0 32 32' },
+      createElement('rect', { x: 5, y: 5, width: 22, height: 22, rx: 6, fill: '#2563eb' })
+    ),
+  appleBackground: '#ffffff',
+}
 
 // ---------------------------------------------------------------------------
 // Active-client accessors
@@ -38,6 +53,15 @@ export function getClientTheme(): ClientTheme {
  */
 export function getClientFonts(): ClientFonts | null {
   return activeClient.fonts ?? null
+}
+
+/**
+ * Icon mark for the active client, or a neutral built-in fallback. Only the
+ * active client's manifest is bundled, so only its mark is ever rendered. Used
+ * by the app/icon.tsx + app/apple-icon.tsx metadata routes.
+ */
+export function getClientIcon(): ClientIcon {
+  return activeClient.icon ?? FALLBACK_ICON
 }
 
 /** Layout for the active client, or the shared default. */

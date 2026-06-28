@@ -20,10 +20,13 @@
     "dev:portfolio": "tsx scripts/dev.ts portfolio",
     "build:portfolio": "cross-env ACTIVE_CLIENT=portfolio tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=portfolio next build",
     "dev:electrowill-solutions": "tsx scripts/dev.ts electrowill-solutions",
-    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions next build"
+    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions next build",
+    "build:cf:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions opennextjs-cloudflare build",
+    "preview:cf:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions opennextjs-cloudflare preview"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1015.0",
+    "@opennextjs/cloudflare": "^1.20.1",
     "@radix-ui/react-slot": "^1.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -56,6 +59,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "wrangler": "^4.105.0"
   }
 }

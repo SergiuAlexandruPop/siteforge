@@ -37,7 +37,8 @@ portfolio"), do this **before any work**:
 Next.js 15 App Router · TypeScript `strict` · Tailwind v3 · shadcn/ui · Yarn · Turbopack.
 Novel 0.5 (blog editor) · gray-matter + remark (markdown) · jose (JWT CMS auth) ·
 Cloudflare R2 + Sharp (images) · Resend (email) · GA4 · Smartsupp (optional) ·
-Lenis + Motion (animation, both MIT). Hosting: Vercel (one project per client).
+Lenis + Motion (animation, both MIT). Hosting: Cloudflare Workers via `@opennextjs/cloudflare`
+(one Worker per client; DNS end-to-end on Cloudflare, proxied). See Decision #81.
 Dev: Windows 11, WebStorm.
 
 ## Hard rules

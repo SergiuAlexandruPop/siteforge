@@ -2,6 +2,7 @@ import type { ClientManifest } from '@/types/config'
 import config from './config'
 import theme from './theme'
 import { fonts } from './fonts'
+import { icon } from './icon'
 
 // ---------------------------------------------------------------------------
 // _template — client entry/manifest. Copied by `yarn new-client` as the
@@ -16,6 +17,7 @@ export const manifest: ClientManifest = {
   config,
   theme,
   fonts,
+  icon,
 }
 
 export default manifest
