@@ -212,3 +212,18 @@ img[data-align="right"] {
 .animate-blink {
   animation: blink 1s step-end infinite;
 }
+
+/* ---------------------------------------------------------------------------
+   ElectroWill — 45° diagonal hatch photo placeholder (DESIGN.md §2, §4.11).
+   The ONLY gradient allowed in the design, used solely while real work photos
+   are pending (Phase E). `.ew-hatch` = large surfaces (hero, cards, map);
+   `.ew-hatch-sm` = small gallery tiles (finer 12px stripe). Replace the element
+   with a real <Image> when photos land.
+   --------------------------------------------------------------------------- */
+.ew-hatch {
+  background-image: repeating-linear-gradient(45deg, #EDF1EA 0 13px, #E5ECE2 13px 26px);
+}
+
+.ew-hatch-sm {
+  background-image: repeating-linear-gradient(45deg, #EDF1EA 0 12px, #E5ECE2 12px 24px);
+}

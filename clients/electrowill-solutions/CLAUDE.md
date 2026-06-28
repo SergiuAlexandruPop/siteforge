@@ -3,7 +3,7 @@
 > Read this before any work on ElectroWill. **Single source of truth** for `electrowill-solutions`.
 > **Auto-update the "Living state" section as the final step of any change here.**
 > Do not duplicate this client's state into `docs/CONTEXT.md`.
-> Scoping locked 2026-06-26 (see "Scoping brief"). Next phase: Design Direction (Claude Design).
+> Scoping locked 2026-06-26. Phase A (design) + Phase B (core build) done. Next phase: C (lead capture).
 
 ## Identity
 - **What it is:** Electrical contractor in județul **Bistrița-Năsăud**. Two services:
@@ -35,10 +35,8 @@
 - **Homepage (planned):** CUSTOM `ElectroWillHomePage` (lean, photo-led, single scroll) — Phase B.
 - **Components live in:** `src/components/electrowill/` (co-location by domain, like portfolio).
 
-## Features — current config.ts vs target
-- **Current:** i18n ✗ · blog ✓ · darkMode ✓ · contactForm ✓ · smartsupp ✗ · supabase ✗
-- **TARGET (flip in Phase B):** i18n ✗ · **blog ✗** · **darkMode ✗ (light only)** · contactForm ✓ ·
-  smartsupp ✗ · supabase ✗
+## Features — config.ts (Phase B: flipped to target ✅)
+- **Current = target:** i18n ✗ · blog ✗ · darkMode ✗ (light only) · contactForm ✓ · smartsupp ✗ · supabase ✗
 
 ---
 
@@ -124,8 +122,10 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)
-1. Exact ANRE atestat type + number; confirm electrician grades. (Phase B/D — trust block)
-2. Exact denumire + Nr. Reg. Com. (J…) + sediu social — from certificat de înregistrare. (Phase F)
+1. ⚠️ **STILL NEEDED:** Exact ANRE atestat type + number (not on the certificat); confirm electrician grades.
+   Set `src/components/electrowill/content/legal.ts → anreAtestat` + `termeni.md` before launch (Phase G).
+2. ✅ **DONE (Phase F):** denumire (ELECTROWILL SOLUTIONS S.R.L.), Nr. Reg. Com. (J2024022229009), CUI 50544190,
+   sediu social (Sat Măluț, Com. Braniștea, nr. 113) — from certificat de înregistrare 13.09.2024.
 3. Work photos (Phase E). 4. Logo — created at the very end, a later phase (none now; use text wordmark).
 
 ## File map
@@ -137,13 +137,121 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - `public/` — empty. No logo/favicon/og-image yet.
 
 ## Living state   ← AUTO-UPDATED
-- **Last updated:** 2026-06-26
-- **Status:** **Scoped & locked.** Full requirements, copy direction, structure, lead-capture spec,
-  photo brief, and phase plan defined above. No client-specific code built yet. Ready for Phase A (Claude Design).
-- **What's built:** Bare scaffold from `yarn new-client` only.
-- **Known issues / TODO:** see "Open inputs needed" + "Legal" warnings. config.ts/theme.ts still template.
-- **Next step:** Write the Claude Design 3-option brief → user generates options in Claude Design → pick →
-  distill `DESIGN.md` + seed `theme.ts` → then Phase B build.
+- **Last updated:** 2026-06-28
+- **Status:** **Phases C + D + F built — awaiting `yarn typecheck` on the dev machine.**
+  Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
+  cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
+  Phase F: legal identifiers in footer, `/confidentialitate` + `/termeni` pages, ANPC+SOL, JSON-LD
+  legal identity. Phase B (core build) remains done/green per below.
+- **What's built (Phase F — legal):**
+  - `src/components/electrowill/content/legal.ts` — identifiers from the certificat de înregistrare
+    (ELECTROWILL SOLUTIONS S.R.L., CUI 50544190, Nr. Reg. Com. J2024022229009, EUID ROONRC.J2024022229009,
+    CAEN 4321). Shared by footer + JSON-LD. `anreAtestat` left **empty** — not on the certificate.
+  - `clients/electrowill-solutions/content/pages/confidentialitate.md` — RO privacy policy, accurate to the
+    real data flow: phone via lead card, Resend as processor, **cookieless** (no GA4, no cookie banner),
+    consent / pre-contract basis, **12-luni** retention, GDPR rights + ANSPDCP. Auto-routed via `[slug]`.
+  - `clients/electrowill-solutions/content/pages/termeni.md` — RO light terms: informational site, no online
+    prices, firm identifiers **+ sediu social** (Sat Măluț, Com. Braniștea, nr. 113), ANPC + SOL, RO law.
+  - `ElectroWillFooter.tsx` — real legal block: identifiers line + Confidențialitate / Termeni / ANPC / SOL
+    links. Still **no street address** in the footer (service-area framing). ANRE line auto-omitted while empty.
+  - `ElectroWillJsonLd.tsx` — Electrician schema gained `legalName`, `taxID` (CUI), `identifier` (reg com).
+  - Resolves the Phase C TODO: the lead card's "Detalii" → `/confidentialitate` now lands (no more 404).
+- **Phase F decisions:**
+  - Legal pages = **markdown** (`content/pages/*.md`), auto-routed + auto-metadata + in sitemap — no manifest
+    changes. They render in the generic `prose` wrapper (acceptable for legal text; optional brand pass later).
+  - **Abandoned-number rescue kept OFF** (`EW_RESCUE_ENABLED=false`): emailing an unsubmitted number has no
+    clean lawful basis (no consent given; legitimate interest weak under RO ePrivacy/ANSPDCP). Only submitted
+    numbers — which carry the card's consent microcopy — are acted on. *(Not legal advice; have a lawyer review.)*
+  - Sediu social appears ONLY in /termeni + /confidentialitate (controller identity), never in the footer/homepage.
+- **Phase F known issues / TODO:**
+  - ⚠️ **Atestat ANRE number still missing** — set `LEGAL.anreAtestat` and remove the TODO in `termeni.md` before launch (Phase G).
+  - Legal copy is a solid standard draft — **have a lawyer review** the privacy policy + terms before go-live.
+- **What's built (Phase D — content & SEO):**
+  - `src/components/electrowill/content/faq.ts` — single source of truth for the 7 FAQ Q&A (colloquial
+    search phrases + priză-de-pământ explainer). Drives BOTH the accordion and the FAQPage JSON-LD.
+  - `src/components/electrowill/content/service-area.ts` — county + 12 localities; drives the Zona chips
+    and `areaServed`. Whole-county framing; partner carve-out never exposed.
+  - `src/components/electrowill/ElectroWillJsonLd.tsx` — client-local structured data (kept out of the
+    shared `seo/JsonLd.tsx`): **`Electrician`** LocalBusiness (areaServed BN + localities, telephone,
+    email, services, **NO address**, NO openingHours, NO rating) + **`FAQPage`**. Mounted in HomePage.
+  - `FaqAccordion.tsx` — now reads `FAQ_ITEMS` (3 generic → 7 real); a11y unchanged.
+  - `ServiceArea.tsx` — locality chips + whole-county copy (map placeholder still Phase E).
+  - `HomePage.tsx` — mounts `<ElectroWillJsonLd />`.
+- **Phase D decisions:**
+  - Electrician (LocalBusiness subtype) over plain LocalBusiness; service-area (areaServed, no address).
+  - `openingHours` omitted (hours unknown); `aggregateRating` deferred to Phase H (no reviews yet).
+  - FAQ + Zona each have ONE data module shared by the visible UI and the JSON-LD — no drift.
+  - Homepage copy from Phase B left as-is (already on-brief) — avoided a needless rewrite.
+- **Phase D known issues / TODO:**
+  - Footer legal block (CUI/Nr. Reg. Com./atestat nr., ANPC+SOL) + `/confidentialitate` + `/termeni` still Phase F.
+  - Gallery + hero photos still placeholders (Phase E). (Bitter/Mulish fonts — DONE 2026-06-28.)
+  - If business hours become available, add `openingHours` to the Electrician schema.
+- **What's built (Phase C):**
+  - `src/lib/phone-ro.ts` — pure RO phone helpers (`normalizeRoPhone`/`isCompleteRoPhone`); shared by
+    card, rescue hook and the API route so "complete number" means one thing. 10-digit national, 07/02/03.
+  - `src/lib/resend.ts` — **added** `sendLeadEmail({ phone, source, kind })` (no email field; abandoned
+    kind carries the "sună cu blândețe" flag). Existing `sendContactEmail` untouched.
+  - `src/app/api/lead/route.ts` — phone-first route. Reads `request.text()` so it accepts both the card's
+    JSON `fetch` and the rescue `sendBeacon` (text/plain). Validates via phone-ro (400 on bad number).
+    Abandoned beacons are accepted but **not emailed unless `EW_RESCUE_ENABLED==='true'`**. Send errors
+    are logged but still return `success:true` (RESEND keys land in Phase G — a lead must not fail on infra).
+  - `src/app/api/track/route.ts` — cookieless counter (decision **B1-A**): one JSON line per event to Vercel
+    runtime logs (`call`/`whatsapp`/`lead_open`/`lead_submit`). No GA4, no cookie, no PII, always 204.
+  - `src/hooks/useLeadCaptureTrigger.ts` — once/session (`sessionStorage` key `ew_lead_dismissed`), opens on
+    first of ~60% scroll OR ~35s, desktop exit-intent; SSR-safe; NOT on the hero.
+  - `src/hooks/useAbandonedNumber.ts` — beacons a valid-but-unsubmitted number on ~3-min idle or tab-close.
+  - `src/components/electrowill/LeadCaptureCard.tsx` — the card (design language: white, border, radius 18,
+    primary CTA). One `tel` input → "Sună-mă" (submit POST, not a dialer) + "Scrie pe WhatsApp" (reuses
+    `WhatsAppButton`) + consent microcopy + "Detalii" → `/confidentialitate`. Idle/submitting/success/error states.
+  - `src/components/electrowill/LeadCaptureManager.tsx` — modal orchestrator: trigger + `role=dialog`/`aria-modal`,
+    focus move + Tab trap, Esc/overlay/✕ (48px) dismiss, one `lead_open` beacon, reduced-motion-gated entrance.
+    Mounted in `HomePage` only (not /contact or /confidentialitate).
+  - `src/components/electrowill/TapTracker.tsx` — one capture-phase delegated click listener on `[data-track]`;
+    mounted in `ElectroWillLayout` (site-wide, catches sticky-bar taps). Keeps `CallButton`/`WhatsAppButton`
+    as server components — they just gained `data-track="call"|"whatsapp"`.
+  - `env/.env.electrowill-solutions` — added `EW_RESCUE_ENABLED=false`.
+- **Phase C decisions:**
+  - **B1 = A (server logs)** for the cookieless counter — zero infra/deps now; upgrade to Upstash later if live totals are wanted.
+  - **B2 = abandoned-number rescue gated OFF** behind `EW_RESCUE_ENABLED` until Phase F GDPR lawful-basis sign-off.
+    Mechanism ships and is testable; no unconsented number is emailed.
+  - Tap tracking via a single `data-track` listener island (not per-button client components) — leaner, keeps primitives server-rendered.
+  - Composition (hooks), not OOP: `useLeadCaptureTrigger` (when) + `useAbandonedNumber` (rescue) + presentational card + manager island.
+- **Phase C known issues / TODO:**
+  - `/confidentialitate` doesn't exist until Phase F → the card's "Detalii" link 404s until then (correct final target).
+  - RESEND keys empty + `noreply@example.ro` placeholder → no real sends until Phase G; route is correct but a no-op in dev.
+  - Phase F: flip `EW_RESCUE_ENABLED=true` only after confirming GDPR lawful basis; build `/confidentialitate`.
+- **Status (Phase B):** **done.** Custom layout + single-scroll homepage built per DESIGN.md,
+  light-mode only, lean motion. Flags flipped to target. Awaiting `yarn typecheck` / `yarn build:electrowill-solutions`
+  on the dev machine (the build env couldn't run tsc).
+- **What's built:**
+  - `config.ts` — real domain (`electrowill.ro`), phone (`+40 750 447 426`), email, RO-only anchor nav;
+    flags flipped (blog ✗, darkMode ✗, i18n ✗, contactForm ✓).
+  - `index.ts` — manifest now registers `layout: ElectroWillLayout` + `homepage: ElectroWillHomePage`.
+  - `tailwind.config.ts` — added `whatsapp` token + namespaced `ew-*` section colors (dark band/footer,
+    bands, eyebrow, etc.), `font-display`/`font-body` families, and the two allowed shadows
+    (`shadow-ew-bar`, `shadow-ew-header`).
+  - `globals.css` — `.ew-hatch` / `.ew-hatch-sm` 45° hatch photo-placeholder utilities.
+  - `src/components/electrowill/` — `ElectroWillLayout` (sticky header + mobile `StickyContactBar` +
+    `ElectroWillFooter`), `ElectroWillHeader`, primitives (`icons.tsx` inline SVGs, `CallButton`,
+    `WhatsAppButton`, `PhotoFrame`, `contact.ts`), and homepage sections (`Hero`, `ServicesPair`,
+    `HowItWorks`, `WhyUs` w/ CountUp, `WorkGallery`, `FaqAccordion`, `ServiceArea`, `CtaFinal`, `HomePage`).
+- **Phase B decisions:**
+  - **G5 gallery aspect = LANDSCAPE 16:10** (`aspect-[16/10]`), matching the shoot brief (no reshoot) over the mock's 4:5.
+  - **Icons = inline SVG** (`icons.tsx`), NOT lucide-react (not a dependency; lean/perf mandate). WhatsApp = filled brand mark.
+  - **Section/brand colors = literal hex in `tailwind.config.ts`** (`ew-*`, `whatsapp`) rather than CSS vars — functionally equal, less error-prone.
+  - FAQ built as an accessible accordion (aria-expanded/controls, grid-rows height anim, reduced-motion gated).
+- **Known issues / TODO:**
+  - ✅ **Fonts wired (2026-06-28):** Bitter (heading) + Mulish (body) now self-hosted via next/font in
+    `clients/electrowill-solutions/fonts.ts` (subsets `latin`+`latin-ext` for RO diacritics; weights 700/800
+    + 400/600/700/800). Registered on the manifest as `fonts` and applied to `<body>` in `app/layout.tsx`,
+    so `--font-heading`/`--font-body` now resolve to the real self-hosted families (no more Georgia fallback).
+    The old bare-string `<style>` var block was the bug and is removed. Per-client + zero cross-client bleed
+    (only the active client's manifest is bundled). portfolio + _template migrated to the same pattern.
+  - Run `yarn typecheck` + `yarn build:electrowill-solutions` to confirm (couldn't run in build env).
+  - D/F content + legal gaps still open (see "Open inputs needed", "Legal", DESIGN.md §8 G2/G4/G6).
+- **Next step:** run `yarn typecheck` to confirm Phases C+D+F are green; spot-check `/confidentialitate`
+  + `/termeni` render and the footer links work; validate the JSON-LD in Google's Rich Results Test.
+  Then Phase E (photos) and G (infra/launch — incl. setting the ANRE atestat number + lawyer review of the legal pages).
 
 ## Client gotchas
 - i18n OFF, blog OFF (target), darkMode OFF (target) — light mode only. Don't add `pages-en/` or dark styling.
