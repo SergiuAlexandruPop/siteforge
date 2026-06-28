@@ -133,7 +133,9 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   Phase B: real domain/phone/email, flip blog/darkMode off, register custom layout/homepage.
 - `theme.ts` — ⚠️ UNTOUCHED template: primary `#2563eb` (blue), Inter. Phase A seeds real palette from Claude Design.
 - `index.ts` — manifest. Phase B: register `layout`, `homepage`, custom `pages` (contact, confidentialitate, termeni).
-- `content/pages/index.md` — stub. `content/blog*`, `pages-en/` — empty (blog/i18n off; can be removed).
+- `content/pages/` — `confidentialitate.md` + `termeni.md` only. (Removed 2026-06-28: the dead
+  `pages/index.md` stub + the empty `blog/`, `blog-en/`, `pages-en/` dirs — blog/i18n off. `getPageSlugs`
+  already excludes `index.md`, so no route/sitemap impact.)
 - `public/` — empty. No logo/favicon/og-image yet.
 
 ## Living state   ← AUTO-UPDATED
