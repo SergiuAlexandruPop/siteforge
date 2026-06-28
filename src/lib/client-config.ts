@@ -1,5 +1,6 @@
 import type {
   ClientConfig,
+  ClientFonts,
   ClientHomePageComponent,
   ClientLayoutComponent,
   ClientPageComponent,
@@ -28,6 +29,15 @@ export function getClientConfig(): ClientConfig {
 
 export function getClientTheme(): ClientTheme {
   return activeClient.theme
+}
+
+/**
+ * Fonts for the active client, or null when the client declares none (the body
+ * then falls back to the system font stack). Only the active client's manifest
+ * is bundled, so only its fonts are ever loaded.
+ */
+export function getClientFonts(): ClientFonts | null {
+  return activeClient.fonts ?? null
 }
 
 /** Layout for the active client, or the shared default. */

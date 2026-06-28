@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter, Newsreader } from 'next/font/google'
 
-import { getClientConfig, getClientTheme, getClientLayout } from '@/lib/client-config'
+import { getClientConfig, getClientTheme, getClientFonts, getClientLayout } from '@/lib/client-config'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
@@ -9,17 +8,6 @@ import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { Smartsupp } from '@/components/integrations/Smartsupp'
 import { generateThemeCss } from '@/lib/theme-css'
 import './globals.css'
-
-const inter = Inter({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-inter',
-})
-
-const newsreader = Newsreader({
-  subsets: ['latin', 'latin-ext'],
-  variable: '--font-editorial',
-  display: 'swap',
-})
 
 export function generateMetadata(): Metadata {
   const config = getClientConfig()
@@ -104,6 +92,7 @@ export default function RootLayout({
 }) {
   const config = getClientConfig()
   const theme = getClientTheme()
+  const fonts = getClientFonts()
   const themeCss = generateThemeCss(theme)
   const isDev = process.env.NODE_ENV === 'development'
   const darkModeEnabled = config.features.darkMode
@@ -148,19 +137,14 @@ export default function RootLayout({
       <head>
         {/* Client theme colors — overrides shadcn defaults with client's brand */}
         <style dangerouslySetInnerHTML={{ __html: themeCss }} />
-        {/* Client fonts — loaded from Google Fonts */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          :root {
-            --font-heading: '${theme.fonts.heading}', sans-serif;
-            --font-body: '${theme.fonts.body}', sans-serif;
-            --font-blog: '${theme.fonts.blog}', serif;
-          }
-        `}} />
+        {/* Client fonts are self-hosted via next/font in clients/<name>/fonts.ts
+            and applied to <body> below; they define --font-heading / --font-body
+            (+ --font-editorial) that Tailwind's display/body/editorial resolve. */}
         {darkModeEnabled && (
           <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         )}
       </head>
-      <body className={`${inter.variable} ${newsreader.variable} font-sans antialiased transition-colors duration-200`}>
+      <body className={`${fonts?.className ?? ''} font-sans antialiased transition-colors duration-200`}>
         {darkModeEnabled ? (
           <ThemeProvider storageKey={themeStorageKey} defaultTheme={defaultTheme}>
             {appContent}

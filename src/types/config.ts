@@ -185,9 +185,25 @@ export interface ProjectDetailCapability {
   Component: ComponentType<{ slug: string; language: Language }>
 }
 
+// ---------------------------------------------------------------------------
+// Client Fonts — optional per-client font bundle (clients/<name>/fonts.ts).
+// ---------------------------------------------------------------------------
+// Each client may load its own Google Fonts via next/font and expose the
+// combined `.variable` classNames here. Applied to <body> in app/layout.tsx,
+// these define --font-heading / --font-body (and optionally --font-editorial)
+// with the real self-hosted font families that Tailwind's display/body/editorial
+// families resolve from. Because only the active client's manifest is bundled,
+// only that client's fonts are ever loaded — no cross-client interference.
+export interface ClientFonts {
+  /** Combined next/font `.variable` classNames to apply on <body>. */
+  className: string
+}
+
 export interface ClientManifest {
   config: ClientConfig
   theme: ClientTheme
+  /** Per-client fonts (next/font). Falls back to system fonts when omitted. */
+  fonts?: ClientFonts
   /** Custom layout. Defaults to LayoutShell when omitted. */
   layout?: ClientLayoutComponent
   /** Custom homepage. Defaults to DefaultHomePage when omitted. */
