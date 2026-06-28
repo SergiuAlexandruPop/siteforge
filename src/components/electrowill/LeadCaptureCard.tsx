@@ -3,6 +3,7 @@
 import { useId, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { WhatsAppButton } from './WhatsAppButton'
+import { Turnstile } from './Turnstile'
 import { PhoneIcon } from './icons'
 import { isCompleteRoPhone } from '@/lib/phone-ro'
 import { useAbandonedNumber } from '@/hooks/useAbandonedNumber'
@@ -37,6 +38,11 @@ export function LeadCaptureCard({ titleId, onDismiss }: LeadCaptureCardProps) {
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
+  // Honeypot: bots fill this hidden field; humans never see it.
+  const [trap, setTrap] = useState('')
+  // Cloudflare Turnstile token. Only required once a site key is configured.
+  const [token, setToken] = useState<string | null>(null)
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
   useAbandonedNumber({
     value: phone,
@@ -53,12 +59,18 @@ export function LeadCaptureCard({ titleId, onDismiss }: LeadCaptureCardProps) {
       return
     }
 
+    // When Turnstile is active, wait for its token before sending.
+    if (siteKey && !token) {
+      setError('Verificare de securitate în curs… mai încearcă în câteva secunde.')
+      return
+    }
+
     setStatus('submitting')
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, source: 'card', kind: 'submit' }),
+        body: JSON.stringify({ phone, source: 'card', kind: 'submit', trap, token }),
       })
       if (!res.ok) throw new Error('request failed')
       setStatus('success')
@@ -103,6 +115,23 @@ export function LeadCaptureCard({ titleId, onDismiss }: LeadCaptureCardProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
+      {/* Honeypot — off-screen, aria-hidden, untabbable. Only bots fill it. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden"
+      >
+        <label htmlFor={`${inputId}-companie`}>Nu completa acest câmp</label>
+        <input
+          id={`${inputId}-companie`}
+          type="text"
+          name="companie"
+          tabIndex={-1}
+          autoComplete="off"
+          value={trap}
+          onChange={(e) => setTrap(e.target.value)}
+        />
+      </div>
+
       <h2
         id={titleId}
         className="pr-10 font-display text-[22px] font-extrabold leading-[1.15] text-foreground"
@@ -139,6 +168,14 @@ export function LeadCaptureCard({ titleId, onDismiss }: LeadCaptureCardProps) {
         >
           {error}
         </p>
+      )}
+
+      {siteKey && (
+        <Turnstile
+          siteKey={siteKey}
+          onToken={setToken}
+          onExpire={() => setToken(null)}
+        />
       )}
 
       <button

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sendLeadEmail } from '@/lib/resend'
 import { normalizeRoPhone } from '@/lib/phone-ro'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 // ---------------------------------------------------------------------------
 // POST /api/lead  —  phone-first lead route (ElectroWill Phase C).
@@ -24,6 +25,10 @@ interface LeadBody {
   phone: unknown
   source: unknown
   kind: unknown
+  /** Honeypot field — only bots fill it. */
+  trap: unknown
+  /** Cloudflare Turnstile token (submit path only). */
+  token: unknown
 }
 
 function parseKind(value: unknown): 'submit' | 'abandoned' {
@@ -32,8 +37,18 @@ function parseKind(value: unknown): 'submit' | 'abandoned' {
 
 function parseSource(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined
-  const trimmed = value.trim()
+  // Strip CR/LF defensively (it only ever lands in the email body, not headers,
+  // but keep it clean) and cap length.
+  const trimmed = value.trim().replace(/[\r\n]+/g, ' ')
   return trimmed === '' ? undefined : trimmed.slice(0, 80)
+}
+
+function getClientIp(request: Request): string | undefined {
+  return (
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    undefined
+  )
 }
 
 export async function POST(request: Request) {
@@ -58,6 +73,34 @@ export async function POST(request: Request) {
 
   const kind = parseKind(body.kind)
   const source = parseSource(body.source)
+
+  // -------------------------------------------------------------------------
+  // Anti-abuse — SUBMIT path only.
+  // The abandoned rescue beacon carries no honeypot and no Turnstile token (it
+  // can't solve a challenge), and is GDPR-gated just below, so these checks are
+  // scoped to genuine 'submit' requests from the card.
+  // -------------------------------------------------------------------------
+  if (kind === 'submit') {
+    // Honeypot: a hidden field only bots fill — fake success, send nothing, so
+    // the bot never learns it was dropped.
+    if (typeof body.trap === 'string' && body.trap.trim() !== '') {
+      return NextResponse.json({ success: true })
+    }
+
+    // Cloudflare Turnstile — enforced ONLY once a secret is configured (Phase G).
+    // No secret (dev / pre-launch) = skip, so the form keeps working.
+    const secret = process.env.TURNSTILE_SECRET_KEY
+    if (secret) {
+      const token = typeof body.token === 'string' ? body.token : ''
+      const ok = token !== '' && (await verifyTurnstile(token, secret, getClientIp(request)))
+      if (!ok) {
+        return NextResponse.json(
+          { success: false, error: 'Verificare eșuată. Reîncearcă.' },
+          { status: 403 }
+        )
+      }
+    }
+  }
 
   // Abandoned-number rescue stays dark until Phase F sign-off.
   if (kind === 'abandoned' && process.env.EW_RESCUE_ENABLED !== 'true') {

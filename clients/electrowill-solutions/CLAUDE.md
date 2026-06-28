@@ -145,6 +145,22 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
   Phase F: legal identifiers in footer, `/confidentialitate` + `/termeni` pages, ANPC+SOL, JSON-LD
   legal identity. Phase B (core build) remains done/green per below.
+- **What's built (#3 lead-form hardening — 2026-06-28):**
+  - **Honeypot** (no deps, always on): hidden `companie` field in `LeadCaptureCard.tsx`; the lead route
+    silent-drops a `submit` whose `trap` is filled (fake `{success:true}`, sends nothing).
+  - **Cloudflare Turnstile** (zero-dep, modal-lazy, env-gated): `src/components/electrowill/Turnstile.tsx`
+    loads the CF script only on card mount (so it stays off the homepage first paint), `appearance:
+    interaction-only`. Server verify in `src/lib/turnstile.ts`. Enforced on `submit` ONLY when
+    `TURNSTILE_SECRET_KEY` is set; the card renders the widget only when `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+    is set — so with no keys (dev/pre-launch) the form works unchanged. Keys are empty in the env file.
+  - **Abandoned-beacon path untouched:** honeypot/Turnstile are scoped to `kind:'submit'`; the rescue
+    beacon carries neither and stays GDPR-gated by `EW_RESCUE_ENABLED`.
+  - **Header-injection: verified safe** (phone is digit-normalized, `source` is now CR/LF-stripped +
+    capped, to/from are env constants, Resend is a JSON API). Documented in `resend.ts`.
+  - Turnstile keys surfaced in the DevBanner env checks (`app/layout.tsx`).
+- **#3 still-to-do (Phase G):** create a Turnstile site for electrowill.ro → set both keys; add Cloudflare
+  edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`, ≈ 30/min/IP on `/api/track`) + Bot Fight Mode.
+  (Per the platform decision, rate-limiting is Cloudflare-native, not Upstash.)
 - **What's built (Phase F — legal):**
   - `src/components/electrowill/content/legal.ts` — identifiers from the certificat de înregistrare
     (ELECTROWILL SOLUTIONS S.R.L., CUI 50544190, Nr. Reg. Com. J2024022229009, EUID ROONRC.J2024022229009,

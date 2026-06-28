@@ -77,6 +77,10 @@ export async function sendLeadEmail(payload: LeadEmailPayload) {
   const { apiKey, fromEmail, toEmail } = getResendConfig()
   const resend = new Resend(apiKey)
 
+  // Header-injection note: `payload.phone` is normalizeRoPhone()-ed to digits
+  // upstream and `source` is CR/LF-stripped + length-capped, so neither can
+  // smuggle headers; `to`/`from` are env constants. Resend is a JSON API (not
+  // raw SMTP), so it sets headers itself — no user input reaches a header.
   const abandoned = payload.kind === 'abandoned'
   const subject = abandoned
     ? `Lead nou (neconfirmat): ${payload.phone}`

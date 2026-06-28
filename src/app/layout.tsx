@@ -61,6 +61,8 @@ function getEnvStatus() {
     check('ADMIN_SESSION_SECRET', false),
     check('NEXT_PUBLIC_SMARTSUPP_ID', false),
     check('NEXT_PUBLIC_GA4_ID', false),
+    check('NEXT_PUBLIC_TURNSTILE_SITE_KEY', false),
+    check('TURNSTILE_SECRET_KEY', false),
   ]
 }
 
