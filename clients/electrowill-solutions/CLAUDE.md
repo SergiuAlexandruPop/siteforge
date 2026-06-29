@@ -123,12 +123,25 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
   **G0 done (2026-06-28):** `@opennextjs/cloudflare` adapter wired — `open-next.config.ts`, `wrangler.jsonc`
   (nodejs_compat), `build:cf:`/`preview:cf:electrowill-solutions` scripts. Install deps + run the CF build to verify.
-  **G1 in progress (2026-06-28):** first deploy via Cloudflare Workers Builds (streamlined import flow — only
-  Worker name + build cmd set upfront; branch/deploy-cmd/env vars live under Settings after creation). First
-  build FAILED at install: Corepack defaulted to Yarn 4, which tried to migrate the v1 `yarn.lock` under an
-  immutable CI install (`YN0087`→`YN0028`). **Fix shipped:** pinned `"packageManager": "yarn@1.22.22"` in
-  `package.json` so CF uses Yarn 1 (matches the v1 lockfile). See `docs/DEV_NOTES.md`. Awaiting redeploy to
-  confirm install passes; then add the 5 env vars + verify deploy cmd is `wrangler deploy` before smoke test.
+  **G1 DONE (2026-06-29) — first deploy LIVE:** `https://electrowill-solutions.sergiualexandrupop.workers.dev`.
+  Earlier failure was a Yarn-version mismatch (Corepack defaulted to Yarn 4 → tried to migrate the v1
+  `yarn.lock` under an immutable CI install, `YN0087`→`YN0028`); fixed by pinning `"packageManager":
+  "yarn@1.22.22"` (see `docs/DEV_NOTES.md`). Redeploy ran on Yarn 1, build + deploy green. The streamlined
+  Workers Builds import flow only set Worker name + build cmd upfront; branch/deploy-cmd/env vars live under
+  the Worker's **Settings** after creation. Deploy cmd `npx wrangler deploy` auto-delegates to
+  `opennextjs-cloudflare deploy` and does NOT rebuild (reuses `.open-next`) — fine as-is.
+  **G1 STILL TO DO:** (a) add the 5 env vars under Settings → Variables (ADMIN_SESSION_SECRET as Secret);
+  (b) smoke test the live URL (homepage, sticky bar, favicon, POST /api/lead).
+  **G1 findings to fix (from the build log):**
+  - ⚠️ **Duplicate favicon:** the Task-A `git rm src/app/icon.svg` was NEVER done — `src/app/icon.svg`
+    (old shared rocket) still coexists with the dynamic `src/app/icon.tsx` (green bolt). Build emits BOTH
+    `/icon` and `/icon.svg`; the live tab icon may be the old rocket. Fix: `git rm src/app/icon.svg` + redeploy.
+  - **ESLint broken in build (non-blocking tech debt):** `Converting circular structure to JSON … .eslintrc.json`
+    — eslint@9 + `.eslintrc.json` + `eslint-config-next@16.2.9` (ahead of Next 15.5.19) crash the lint step,
+    so CI lint isn't actually running. Own task: align versions / migrate to flat config.
+  - **Worker ~2.81 MB gzip vs 3 MB free cap (~94%):** unused blog/admin/api-upload/novel/aws-sdk bundled into
+    a non-blog client. Thin headroom → do the route-gating task before the bundle grows. (Static photos are
+    separate assets, do NOT count toward the 3 MB script limit.)
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)

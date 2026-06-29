@@ -49,6 +49,21 @@ would have been modified by this install, which is explicitly forbidden`.
 
 ---
 
+## Gotcha: ESLint crashes in `next build` (circular JSON) — lint gate is a no-op
+
+Seen in the ElectroWill G1 Cloudflare build:
+`⨯ ESLint: Converting circular structure to JSON … Referenced from: .eslintrc.json`.
+The lint step **crashes** (it doesn't report lint errors), so `next build` continues and
+CI lint is effectively not running. Cause: `eslint@9` (flat-config era) + the legacy
+`.eslintrc.json` + `eslint-config-next@16.2.9` (which is *ahead* of Next 15.5.19) are
+incompatible. Build still goes green because a crash isn't counted as a lint failure.
+
+- **Not a launch blocker**, but the lint guardrail is off until fixed.
+- **Fix (own task):** align `eslint-config-next` to the Next 15 line and/or migrate to flat
+  config (`eslint.config.mjs`) for ESLint 9. Verify `yarn lint` runs clean locally first.
+
+---
+
 ## Environment Setup (Windows 11 + WebStorm)
 
 ### Prerequisites
