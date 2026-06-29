@@ -123,6 +123,12 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
   **G0 done (2026-06-28):** `@opennextjs/cloudflare` adapter wired — `open-next.config.ts`, `wrangler.jsonc`
   (nodejs_compat), `build:cf:`/`preview:cf:electrowill-solutions` scripts. Install deps + run the CF build to verify.
+  **G1 in progress (2026-06-28):** first deploy via Cloudflare Workers Builds (streamlined import flow — only
+  Worker name + build cmd set upfront; branch/deploy-cmd/env vars live under Settings after creation). First
+  build FAILED at install: Corepack defaulted to Yarn 4, which tried to migrate the v1 `yarn.lock` under an
+  immutable CI install (`YN0087`→`YN0028`). **Fix shipped:** pinned `"packageManager": "yarn@1.22.22"` in
+  `package.json` so CF uses Yarn 1 (matches the v1 lockfile). See `docs/DEV_NOTES.md`. Awaiting redeploy to
+  confirm install passes; then add the 5 env vars + verify deploy cmd is `wrangler deploy` before smoke test.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)

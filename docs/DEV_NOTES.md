@@ -27,6 +27,28 @@ single-client (no cross-client bundle leak).
 
 ---
 
+## Gotcha: Cloudflare Workers Builds picks Yarn 4 unless you pin `packageManager`
+
+The repo uses a **Yarn 1 (classic)** `yarn.lock` (`yarn lockfile v1`). Cloudflare
+Workers Builds runs installs through Corepack, and with **no `packageManager` field**
+in `package.json` it defaults to the newest Yarn (4.x). Yarn 4 then tries to migrate
+the v1 lockfile and the CI install is immutable, so it fails:
+`YN0087 Migrated your project to the latest Yarn version` → `YN0028 The lockfile
+would have been modified by this install, which is explicitly forbidden`.
+
+- **Fix:** pin `"packageManager": "yarn@1.22.22"` in `package.json` (added 2026-06-28,
+  ElectroWill G1). Corepack/Cloudflare then use Yarn 1, which reads the v1 lockfile
+  natively — no migration, no immutable conflict. The react19-vs-novel peer warnings
+  (`YN0060`) are non-fatal under Yarn 1. Local dev is unaffected (already on Yarn 1).
+- **Prerequisite:** the committed `yarn.lock` must already include any newly added
+  deps (e.g. `@opennextjs/cloudflare`, `wrangler`), or even Yarn 1's frozen install
+  fails as out-of-sync. Commit `yarn.lock` whenever deps change.
+- During CF install, `postinstall` (`gen-active-client`) runs **before** the build
+  command sets `ACTIVE_CLIENT`, so it generates for `_template` — harmless; the
+  `build:cf:<client>` script regenerates for the real client moments later.
+
+---
+
 ## Environment Setup (Windows 11 + WebStorm)
 
 ### Prerequisites
