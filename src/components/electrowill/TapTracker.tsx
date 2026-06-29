@@ -9,7 +9,11 @@ import { useEffect } from 'react'
 // sticky-bar taps). Instead of turning every CallButton/WhatsAppButton into a
 // client component, those primitives carry a `data-track` attribute and stay
 // server-rendered anchors; this single capture-phase listener beacons the tap
-// to /api/track. Renders nothing.
+// to /api/c. Renders nothing.
+//
+// NOTE: the endpoint is named /api/c (not /api/track) on purpose — ad blockers
+// and privacy shields block any path containing "track", which would silently
+// drop the counter (ERR_BLOCKED_BY_CLIENT). A neutral name slips past them.
 // ---------------------------------------------------------------------------
 
 const TRACKABLE = new Set(['call', 'whatsapp'])
@@ -25,7 +29,7 @@ export function TapTracker() {
       if (!el) return
       const value = el.getAttribute('data-track')
       if (!value || !TRACKABLE.has(value)) return
-      navigator.sendBeacon('/api/track', JSON.stringify({ event: value }))
+      navigator.sendBeacon('/api/c', JSON.stringify({ event: value }))
     }
 
     document.addEventListener('click', onClick, { capture: true })

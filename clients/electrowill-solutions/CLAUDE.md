@@ -333,8 +333,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     JSON `fetch` and the rescue `sendBeacon` (text/plain). Validates via phone-ro (400 on bad number).
     Abandoned beacons are accepted but **not emailed unless `EW_RESCUE_ENABLED==='true'`**. Send errors
     are logged but still return `success:true` (RESEND keys land in Phase G — a lead must not fail on infra).
-  - `src/app/api/track/route.ts` — cookieless counter (decision **B1-A**): one JSON line per event to Vercel
+  - `src/app/api/c/route.ts` — cookieless counter (decision **B1-A**): one JSON line per event to Vercel
     runtime logs (`call`/`whatsapp`/`lead_open`/`lead_submit`). No GA4, no cookie, no PII, always 204.
+    ⚠️ **Renamed from `/api/track` → `/api/c` (2026-06-29):** ad blockers / privacy shields block any path
+    containing "track" (`ERR_BLOCKED_BY_CLIENT` in console), silently dropping the counter. Callers
+    (`TapTracker.tsx`, `LeadCaptureManager.tsx`) updated. The old empty `src/app/api/track/` dir is
+    untracked by git (no `git rm` needed). **Rule for future routes: never put "track"/"ad"/"analytics"
+    in a public path.**
   - `src/hooks/useLeadCaptureTrigger.ts` — once/session (`sessionStorage` key `ew_lead_dismissed`), opens on
     first of ~60% scroll OR ~35s, desktop exit-intent; SSR-safe; NOT on the hero.
   - `src/hooks/useAbandonedNumber.ts` — beacons a valid-but-unsubmitted number on ~3-min idle or tab-close.

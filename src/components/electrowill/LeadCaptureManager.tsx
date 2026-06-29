@@ -36,7 +36,7 @@ export function LeadCaptureManager() {
       'sendBeacon' in navigator
     ) {
       beaconedRef.current = true
-      navigator.sendBeacon('/api/track', JSON.stringify({ event: 'lead_open' }))
+      navigator.sendBeacon('/api/c', JSON.stringify({ event: 'lead_open' }))
     }
 
     // Move focus into the dialog.

@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server'
 
 // ---------------------------------------------------------------------------
-// POST /api/track  —  cookieless first-party tap counter (ElectroWill Phase C).
+// POST /api/c  —  cookieless first-party tap counter (ElectroWill Phase C).
 // ---------------------------------------------------------------------------
+// Endpoint named /api/c (NOT /api/track) on purpose: ad blockers / privacy
+// shields block any path containing "track" (ERR_BLOCKED_BY_CLIENT), which would
+// silently drop the counter. A neutral name slips past them.
+//
 // The brief mandates tap counting (phone / WhatsApp / lead) with NO GA4 and NO
 // cookie banner. Phase C persistence (decision B1-A) = structured server logs:
 // emit one JSON line per event to the Vercel runtime logs. No cookies, no
