@@ -10,11 +10,12 @@
   (1) **Branșamente electrice** — "Îți aducem curentul în casă" (PRIMARY, lead-gen focus);
   (2) **Proiecte instalații electrice** for businesses, institutions, and individuals (SECONDARY,
   shown with EQUAL weight — must not be buried; higher-value commercial leads matter).
-  ⚠️ **House angle (see Phase L):** for HOUSES this = branșament + the electrical **PLAN/proiect**
-  (schema prizelor/circuitelor/tabloului), **NOT** the interior wiring labor. Present it as a natural
-  pairing for a casă nouă, orderable together OR standalone — never imply we run the cables, and never
-  imply the two are mandatorily bundled. The wiring is done by the client's own electrician, following
-  our plan.
+  ⚠️ **House angle (DECIDED, see Phase L):** for HOUSES this = branșament + an INFORMAL **plan/schemă**
+  of the interior layout (unde vin prizele, circuitele, tabloul), **NOT** the wiring labor and **NOT** a
+  formal ANRE-authorized proiect. Non-binding guide for the client's own electrician. Pair it naturally for
+  a casă nouă, orderable together OR standalone — never imply we run the cables, never imply the two are
+  mandatorily bundled, never attach garanție/conformitate to the house plan. Copy: use "plan/schemă", never
+  "proiect autorizat/conform".
 - **Primary goal:** capture leads from local search (incl. colloquial intent: "să-mi bag curent în
   casă", "vreau curent la casă"). The site is the closer; Google Business Profile is the main
   acquisition channel (Phase H).
@@ -238,18 +239,24 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   while staying accurate. DECIDED (Q3): KEEP legally-required disclosures (e.g. the ANSPDCP complaint right —
   GDPR Art. 13/14 — reworded gently, NOT removed); soften scary lines (the cookieless-tracking sentence →
   reassurance, e.g. "fără cookies, fără urmărire, fără bannere enervante"). Lawyer review before go-live.
-- **L) Service positioning — branșament + plan de instalație electrică (casă)** — refine how service 2
-  (Proiecte) connects to service 1 for HOMEOWNERS. We do the branșament + the electrical PLAN/proiect
-  (schema prizelor/circuitelor/tabloului), NOT the interior wiring labor. Frame as a natural pairing for a
-  casă nouă WITHOUT implying (a) we run the cables, or (b) that the two are mandatorily bundled (orderable
-  together OR separately). Plain RO, low reading level. Tactics: (1) refine the ServicesPair service-2 body
-  to plainly say "planul/proiectul" + the boundary ("montajul firelor îl face electricianul tău, după
-  planul nostru"); (2) add ONE bridge line in ServicesPair for casă-nouă ("le poți lua împreună sau
-  separat"); (3) add a plain FAQ entry ("Îmi faceți și instalația electrică din casă?" → branșament + plan
-  DA; montajul firelor = electricianul tău, după planul nostru). Guardian: the plan-vs-execution boundary
-  is ALSO liability-protective (don't let a plan-only client think we're responsible for the physical
-  install). Couples tightly with Phase D (content) + K (tone) — do together. NOT a separate third service
-  in the UI.
+- **L) Service positioning — branșament + plan de instalație electrică (casă) — DECIDED 2026-06-29.** For
+  HOMEOWNERS we do the branșament + an INFORMAL practical **plan/schemă** of the interior layout (unde vin
+  prizele, circuitele, tabloul), NOT the wiring labor and NOT a formal ANRE-authorized proiect. ⚠️
+  **Liability:** non-binding, NON-authorized guide for the client's own electrician ("like advising a rewire
+  without a contract"). In copy: use **"plan/schemă"**, NEVER "proiect autorizat/conform"; attach NO
+  garanție/declarație de conformitate to it; don't bind us to its execution. **Smart marketing, not
+  legalese:** present it as a concrete, helpful deliverable ("știe exact ce are de pus"); do NOT publicly
+  call it "doar o schiță sugestivă". LOCKED deliverables:
+  - **FAQ entry (approved verbatim)** — add to `content/faq.ts` (feeds accordion + FAQPage JSON-LD):
+    Q: "Îmi faceți și instalația electrică din casă?"
+    A: "Îți facem branșamentul și planul instalației (unde vin prizele, circuitele, tabloul). Montajul firelor
+    în pereți îl face electricianul tău, după planul nostru — așa știe exact ce are de pus."
+  - **Bridge line in ServicesPair (approved verbatim):** "Faci casă nouă? Le poți lua împreună — branșament
+    + planul instalației — în funcție de ce ai nevoie."
+  - **Do NOT change the service-2 card body** ("Proiectare completă și documentație conformă" stays — user
+    rejected rewording it). ⚠️ Open check (Phase K): that line claims a *formal* project; it's fine for the
+    COMMERCIAL/instituții angle but is NOT the house deliverable — revisit only if it reads as overreach.
+  - NOT a separate third service in the UI. Couples with Phase D (content) + K (tone).
 
 ## Open inputs needed (collect at the relevant phase)
 1. ⚠️ **STILL NEEDED:** Exact ANRE atestat type + number (not on the certificat); confirm electrician grades.
