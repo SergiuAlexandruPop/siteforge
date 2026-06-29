@@ -188,6 +188,11 @@ June 2026 architecture review §8.
 
 ## Future Phases (Not Scheduled)
 
+- [ ] **Reusable lead-capture + cookieless-analytics modules** — extract ElectroWill's call-popup lead
+      card + the `/api/c` cookieless tap counter into client-agnostic, flag-gated modules so any client
+      opts in cleanly. Guardian/@eng: EXTRACT on the SECOND real consumer, not speculatively (avoid
+      premature abstraction that couples clients to ElectroWill copy/markup). Tracked per-client as
+      ElectroWill Phase J. (Platform-level.)
 - [ ] Next.js Image proxy for branded R2 URLs per client domain
 - [ ] Vercel "Ignored Build Step" script to skip unchanged client rebuilds
 - [ ] Supabase integration module (for clients needing database features)

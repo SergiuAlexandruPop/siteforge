@@ -106,6 +106,57 @@ nothing routes.
 
 ---
 
+## Gotcha: build-time route gating for non-blog clients (`gate-routes.ts` + `build.ts`)
+
+Next's App Router compiles every route file that physically exists, and the bundler pulls in
+everything those files import — regardless of a runtime `features.blog` check. So a `blog:false`
+client still bundled the blog/CMS stack (novel, @aws-sdk, sharp, github, jose) and shipped a live
+`/admin` attack surface. The only way to actually drop the code (and the surface) is to make the
+files **absent at build time**.
+
+- **Mechanism:** non-blog client builds run through `scripts/build.ts` (`yarn build:cf:<client>` →
+  `tsx scripts/build.ts cf`): gen-active-client → `gate-routes apply` → the builder
+  (`next build` / `opennextjs-cloudflare build`) → **always** `gate-routes restore` (in `finally`
+  + SIGINT/SIGTERM handlers + a self-heal on the next `apply`), so the working tree is never left
+  with routes stashed.
+- **What's gated** (only when `features.blog === false`): `app/admin`, `app/api/auth`,
+  `app/api/blog`, `app/api/upload`, `middleware.ts` (CMS write stack + admin guard) and `app/blog`,
+  `app/en/blog` (blog read routes). Files move to a gitignored `.gated-routes/` stash and move back
+  after the build. Fully reversible: flip `features.blog → true` and nothing is gated.
+- **Result (ElectroWill, 2026-06-29):** Worker gzip **2.81 → 2.02 MB** (build log `gzip 2075.51 KiB`),
+  well under the 3 MB script cap, and `/admin` no longer exists on non-blog clients.
+- **Two tiers on purpose:** a future static "case-study" blog could bring back ONLY the read routes
+  (`app/blog`) while the heavy CMS write tier stays gated — a one-line change in `gate-routes.ts`,
+  no new flag.
+
+---
+
+## Gotcha: SSG/`[slug]` pages 404 on OpenNext Cloudflare without an incremental cache
+
+Symptom (ElectroWill, 2026-06-29): every markdown `[slug]` page (`/confidentialitate`, `/termeni`)
+404'd on the live Worker and `/sitemap.xml` returned only the homepage — while `/` worked and the
+build log clearly prerendered the pages (`● /[slug] → /confidentialitate, /termeni`).
+
+- **Why:** with `defineCloudflareConfig({})` (no `incrementalCache`), OpenNext serves pure-static
+  `○` pages as real HTML assets (so `/` works), but routes `●` SSG pages (anything using
+  `generateStaticParams`) through the incremental cache. No cache backend → cache miss → OpenNext
+  re-renders the page ON DEMAND in the Worker → the component calls `getPageBySlug()` →
+  `fs.readFileSync('clients/.../*.md')`. Workers has no project filesystem, so the read fails →
+  `notFound()` → 404. The runtime sitemap/robots handlers fail the same way (they call
+  `getPageSlugs()` at request time → empty).
+- **Tell:** the deploy log says `Incremental cache does not need populating` and uploads only
+  `_next/static/*` chunks — no page HTML/cache entries.
+- **Fix:** `open-next.config.ts` → `incrementalCache: staticAssetsIncrementalCache` (import from
+  `@opennextjs/cloudflare/overrides/incremental-cache/static-assets-incremental-cache`). A READ-ONLY
+  cache that serves prerendered pages straight from the `ASSETS` binding — correct for a fully-static,
+  no-ISR site, zero extra infra. Cache entries live as static assets (edge-served), NOT in the Worker
+  script, so they don't count against the 3 MB script budget.
+- **If a client later needs ISR / on-demand revalidation:** switch to the R2 (or KV) incremental
+  cache (`overrides/incremental-cache/r2-incremental-cache`) and bind the store in `wrangler.jsonc`.
+  The static-assets cache deliberately throws on the composable ("use cache") cache — fine, unused here.
+
+---
+
 ## Environment Setup (Windows 11 + WebStorm)
 
 ### Prerequisites

@@ -151,7 +151,9 @@ siteforge/
 │   ├── dev.ts                   # CLI: switches client + starts dev
 │   ├── new-client.ts            # CLI: scaffolds new client
 │   ├── toggle-feature.ts        # CLI: enable/disable features
-│   └── build-client.ts          # CLI: builds specific client
+│   ├── gen-active-client.ts     # codegen: ACTIVE_CLIENT → active-client.generated.ts
+│   ├── build.ts                 # build wrapper: gate-routes apply → build → restore
+│   └── gate-routes.ts           # build-time route gating for non-blog clients
 │
 ├── env/                         # Per-client env files (gitignored)
 ├── next.config.ts
@@ -159,6 +161,11 @@ siteforge/
 ├── tsconfig.json
 └── package.json
 ```
+
+> **Build-time route gating (non-blog clients):** for `features.blog === false`, `scripts/build.ts`
+> runs `scripts/gate-routes.ts` to MOVE the blog/CMS routes (`app/admin`, `app/api/{auth,blog,upload}`,
+> `middleware.ts`, `app/blog`, `app/en/blog`) out of `src/app/` before the build and restore them after
+> — so those routes never compile into that client's Worker. See §8 + `docs/DEV_NOTES.md` (Decision #83).
 
 ---
 
@@ -312,7 +319,8 @@ Each build sets `ACTIVE_CLIENT` → Next.js loads that client's config/theme/con
 - `/api/upload`: admin session required, file type/size validated, EXIF stripped
 - `/api/blog`: admin session required, writes to GitHub
 - `/admin`: password auth, httpOnly secure sameSite:strict cookie
-- All secrets in Vercel env vars (encrypted at rest)
+- **Non-blog clients ship no `/admin` at all** — `gate-routes.ts` removes the admin/CMS routes at build (§8), so the attack surface is physically absent, not just flag-hidden
+- All secrets in env vars (encrypted at rest)
 
 ---
 
@@ -328,7 +336,18 @@ Each build sets `ACTIVE_CLIENT` → Next.js loads that client's config/theme/con
 | Supabase | Yes | `features.supabase` |
 | Analytics | Yes | env var gated |
 
-Disabled modules render nothing. No dead code ships.
+Disabled modules render nothing. **For `features.blog === false`, no dead code ships at all:**
+`scripts/gate-routes.ts` (run by `scripts/build.ts`) physically moves the blog/CMS routes
+(`app/admin`, `app/api/{auth,blog,upload}`, `middleware.ts`, `app/blog`, `app/en/blog`) out of the
+tree before the build and restores them after — so a non-blog client's Worker excludes the entire
+blog/CMS stack (novel, @aws-sdk, sharp, github, jose) and exposes no `/admin`. Reversible per-client
+via the flag (Decision #83).
+
+**OpenNext serving (Cloudflare):** prerendered SSG (`generateStaticParams`) pages and the static
+sitemap are served from the `ASSETS` binding via the read-only static-assets incremental cache
+(`open-next.config.ts`, Decision #84). Without it those pages re-render on-demand in the Worker and
+404, because the markdown content lives on the build filesystem, which Workers doesn't have. See
+`docs/DEV_NOTES.md`.
 
 ---
 

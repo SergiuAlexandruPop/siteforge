@@ -15,8 +15,8 @@
 ---
 
 ## Last Updated
-**Date:** 2026-06-28
-**Updated By:** Claude — Platform hosting decision: **Vercel → Cloudflare Workers via `@opennextjs/cloudflare`** (Decision #81). Added `open-next.config.ts`, `wrangler.jsonc`, and `build:cf:`/`preview:cf:` scripts (ElectroWill Phase G0). Per-client favicon system landed (manifest `icon` capability). Earlier: Phase 9C — 160 Vitest tests + Playwright E2E green (Decisions #78–80).
+**Date:** 2026-06-29
+**Updated By:** Claude — Two platform mechanisms from ElectroWill Phase G hardening: **build-time route gating** for non-blog clients (Decision #83 — `gate-routes.ts`/`build.ts`; ElectroWill Worker **2.81 → 2.02 MB** gzip, `/admin` surface removed) and the **static-assets incremental cache** as the OpenNext serving default (Decision #84 — fixes SSG `[slug]` 404s on Workers). Earlier (2026-06-28): hosting **Vercel → Cloudflare Workers** via `@opennextjs/cloudflare` (Decision #81); per-client favicon (manifest `icon` capability).
 
 ---
 
@@ -180,6 +180,8 @@ All architecture and business decisions. Claude should reference this before sug
 | 81 | Host on **Cloudflare Workers via `@opennextjs/cloudflare`** (NOT Vercel, NOT next-on-pages) | Vercel Hobby/free is non-commercial only, but the client sites are commercial. Cloudflare's free tier allows commercial use, has unlimited bandwidth, and absorbs DDoS without billing. `@cloudflare/next-on-pages` is Edge-runtime-only and effectively deprecated — it would force an Edge rewrite of the Node `/api/lead` + `/api/track` routes and choke on the repo's `sharp` routes; OpenNext runs the **Node** runtime on Workers (`nodejs_compat`), so those routes work unchanged. DNS end-to-end on Cloudflare, **proxied (orange cloud)** for the free WAF/DDoS. Rate-limiting is Cloudflare-native; the free tier allows **1 rule, 10s period, IP characteristic**, so a single rule guards `/api/lead` (Bot Fight Mode + app-layer honeypot/Turnstile cover the rest). Supersedes the Vercel hosting assumption in Decisions #5/#19 wording. | Phase G |
 | 82 | Per-client favicon via `ClientManifest.icon` | The shared `app/icon.svg` + `app/apple-icon.tsx` were a portfolio rocket, wrong for other clients. Added an `icon` manifest capability (`mark: (px)=>ReactElement` + `appleBackground`) rendered by dynamic `app/icon.tsx` + `app/apple-icon.tsx` via next/og; only the active client's mark is bundled (same pattern as fonts). | Phase G |
 | 77 | Project-detail routes resolve via `ClientManifest.projectDetail` | Closing the residual leak from #73: shared `src/app/projects/[slug]` + `/en/...` routes hardcoded `import { projects }` and `ProjectDetail` from `clients/portfolio`, bundling portfolio data **and** component code into every client. Added optional `projectDetail` capability (`slugs` + `getMetadata` + server-component `Component`) to the manifest; routes read `activeClient.projectDetail`. Portfolio supplies it via a server wrapper that owns the lookup + `notFound()`. `resume` needs no equivalent — it's imported only by the portfolio-only `ResumePage`, never from shared `src/app/`. `Project` type stays in portfolio (manifest references only platform types) | P0 Split |
+| 83 | Build-time route gating for non-blog clients | Next compiles every route file present + its imports, so a `blog:false` client still bundled the blog/CMS stack and shipped a live `/admin`. `scripts/gate-routes.ts` (run by `scripts/build.ts`) MOVES `app/admin`, `app/api/{auth,blog,upload}`, `middleware.ts`, `app/blog`, `app/en/blog` out of the tree before build + restores after. Shrinks the Worker (ElectroWill 2.81 → 2.02 MB gzip) AND removes the `/admin` attack surface. Reversible via `features.blog`; two tiers so a static case-study blog can later return read-only routes only | Phase G |
+| 84 | Static-assets incremental cache = OpenNext serving default | `defineCloudflareConfig({})` routed SSG (`generateStaticParams`) `[slug]` pages through an absent incremental cache → on-demand Worker render → markdown `fs` read fails on Workers (no project FS) → 404 (sitemap too). `incrementalCache: staticAssetsIncrementalCache` serves prerendered pages read-only from the ASSETS binding. Zero infra (no R2/KV); entries are edge assets so they don't count against the 3 MB script cap. Switch to the R2/KV cache only if a client needs ISR | Phase G |
 
 ---
 
@@ -190,7 +192,7 @@ All architecture and business decisions. Claude should reference this before sug
 | Client | Folder Name | Domain | Status | Features Enabled | Agent brief |
 |--------|-------------|--------|--------|-----------------|-------------|
 | Portfolio (you) | `portfolio` | localhost (TBD) | Phase 8 COMPLETE | blog, i18n, darkMode, contactForm | `clients/portfolio/CLAUDE.md` |
-| ElectroWill | `electrowill-solutions` | electrowill.ro (planned) | Bare scaffold | blog, darkMode, contactForm | `clients/electrowill-solutions/CLAUDE.md` |
+| ElectroWill | `electrowill-solutions` | electrowill.ro (LIVE) | Launching (Phase G) | contactForm (blog/darkMode/i18n OFF) | `clients/electrowill-solutions/CLAUDE.md` |
 | Doctor | `doctor-maria` | TBD | Not started | TBD | (none yet) |
 | Electrician | `electrician-ion` | TBD | Not started | TBD | (none yet) |
 

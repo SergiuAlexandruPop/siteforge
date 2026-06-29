@@ -10,6 +10,11 @@
   (1) **Branșamente electrice** — "Îți aducem curentul în casă" (PRIMARY, lead-gen focus);
   (2) **Proiecte instalații electrice** for businesses, institutions, and individuals (SECONDARY,
   shown with EQUAL weight — must not be buried; higher-value commercial leads matter).
+  ⚠️ **House angle (see Phase L):** for HOUSES this = branșament + the electrical **PLAN/proiect**
+  (schema prizelor/circuitelor/tabloului), **NOT** the interior wiring labor. Present it as a natural
+  pairing for a casă nouă, orderable together OR standalone — never imply we run the cables, and never
+  imply the two are mandatorily bundled. The wiring is done by the client's own electrician, following
+  our plan.
 - **Primary goal:** capture leads from local search (incl. colloquial intent: "să-mi bag curent în
   casă", "vreau curent la casă"). The site is the closer; Google Business Profile is the main
   acquisition channel (Phase H).
@@ -118,6 +123,8 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **C) Lead capture** — phone card #3, wa.me handoff, abandoned-number rescue, cookieless counter, phone-first Resend route.
 - **D) Content & SEO** — copy, FAQ (plain RO), zona BN, LocalBusiness/Electrician JSON-LD (areaServed BN, no address).
 - **E) Photos** — optimize fixed set (Sharp: resize/WebP/strip GPS), feature priza-de-pământ, swap placeholders.
+  **+ mobile lightbox:** tap a gallery thumbnail → full-size overlay (thumbnails are too small on mobile);
+  lean, no heavy dep, keyboard + reduced-motion aware, ≥44px close target.
 - **F) Legal** — footer identifiers + Politică confidențialitate + Termeni + ANPC/SOL (user provides certificat de înregistrare).
 - **G) Infra/launch** — electrowill.ro (ROTLD, bought) → Cloudflare DNS (proxied) → **Cloudflare Workers (OpenNext)**;
   Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
@@ -220,6 +227,29 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
   + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
+- **I) Post-launch UX hardening** — I1 re-open lead card (inline CTAs), I2 abandoned anonymous-count, I3
+  sticky-bar overlap fix, plus branded 404/error pages. Detail + locked decisions in "Bugfix backlog" above.
+- **J) Platform modularization (PLATFORM-LEVEL)** — extract lead-capture (call popup) + the cookieless
+  tap-counter into client-agnostic, flag-gated modules so other clients opt in cleanly. Guardian/@eng: PLAN
+  the boundaries now, EXTRACT on the SECOND real consumer (avoid premature abstraction that couples clients to
+  ElectroWill copy/markup). Trigger = onboarding the next client that wants these. Mirrored as a platform
+  Future Phase in `docs/ROADMAP.md`.
+- **K) Copy & legal tone pass** — rewrite ALL user-facing text (legal + homepage) warmer + conversion-friendly
+  while staying accurate. DECIDED (Q3): KEEP legally-required disclosures (e.g. the ANSPDCP complaint right —
+  GDPR Art. 13/14 — reworded gently, NOT removed); soften scary lines (the cookieless-tracking sentence →
+  reassurance, e.g. "fără cookies, fără urmărire, fără bannere enervante"). Lawyer review before go-live.
+- **L) Service positioning — branșament + plan de instalație electrică (casă)** — refine how service 2
+  (Proiecte) connects to service 1 for HOMEOWNERS. We do the branșament + the electrical PLAN/proiect
+  (schema prizelor/circuitelor/tabloului), NOT the interior wiring labor. Frame as a natural pairing for a
+  casă nouă WITHOUT implying (a) we run the cables, or (b) that the two are mandatorily bundled (orderable
+  together OR separately). Plain RO, low reading level. Tactics: (1) refine the ServicesPair service-2 body
+  to plainly say "planul/proiectul" + the boundary ("montajul firelor îl face electricianul tău, după
+  planul nostru"); (2) add ONE bridge line in ServicesPair for casă-nouă ("le poți lua împreună sau
+  separat"); (3) add a plain FAQ entry ("Îmi faceți și instalația electrică din casă?" → branșament + plan
+  DA; montajul firelor = electricianul tău, după planul nostru). Guardian: the plan-vs-execution boundary
+  is ALSO liability-protective (don't let a plan-only client think we're responsible for the physical
+  install). Couples tightly with Phase D (content) + K (tone) — do together. NOT a separate third service
+  in the UI.
 
 ## Open inputs needed (collect at the relevant phase)
 1. ⚠️ **STILL NEEDED:** Exact ANRE atestat type + number (not on the certificat); confirm electrician grades.
@@ -243,17 +273,37 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **Launch (Phase G) progress:** G1 deploy LIVE; G2 DNS + custom domains LIVE (`https://electrowill.ro`
   loads with padlock); **G3 Resend DONE (2026-06-29)** — FROM commit pushed + deployed green, Resend domain
   Verified, `/api/lead` send-test PASSED (real email from `noreply@electrowill.ro` → electrowillsolutions@gmail.com).
-  **Next:** route-gating bundle-hardening pass (gate blog/admin/`api/upload`/`api/blog` out of non-blog
-  client builds). That deploy also binds the pending `TURNSTILE_SECRET_KEY` → run the deferred Turnstile
-  enforcement check then (see #3 block). Turnstile site key LIVE; secret added, pending deploy.
-  `ADMIN_PASSWORD` left UNSET (route-gating removes `/admin` → moots it).
-- **Bugfix backlog (Phase I — after launch hardening, not yet scheduled):**
-  - **Lead-card "Detalii" → `/confidentialitate` 404 (seen LIVE 2026-06-29):** the popup consent line
-    ("Lăsând numărul ești de acord… Detalii") links to `/confidentialitate`, which 404s on the live
-    Worker. Most likely cause: Phase F's pages aren't on the live deploy yet (Living state was "awaiting
-    `yarn typecheck`/deploy") — the page DOES exist in the repo as `content/pages/confidentialitate.md`,
-    auto-routed via `[slug]`. ACTION: confirm it resolves after the next deploy (the route-gating deploy
-    should ship it); if it still 404s, debug the `[slug]` markdown route + sitemap.
+  **Route-gating bundle-hardening DONE (2026-06-29):** `gate-routes.ts` + `build.ts` move blog/admin/
+  `api/upload`/`api/blog`/`api/auth`/`middleware.ts`/`en/blog` out of non-blog builds; deploy green, gzip
+  **2.81 → 2.02 MB** (build log `gzip 2075.51 KiB`), tree restores clean. **Turnstile ENFORCED + verified:**
+  the deploy bound `TURNSTILE_SECRET_KEY`; no-token POST to `/api/lead` → **403 `Verificare eșuată.
+  Reîncearcă.`** (was `{success:true}`), no email. **[slug] 404 FIXED** via the OpenNext incremental-cache
+  fix (see RESOLVED item below) — `/confidentialitate` + `/termeni` now resolve.
+  **Next:** Phase G remaining (#3 rate-limit rules + Bot Fight Mode; WhatsApp Business reg; ANRE atestat nr),
+  then Phases E/I/J/K (see phase plan + Bugfix backlog). `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
+- **Bugfix backlog (Phase I — post-launch UX hardening):**
+  - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
+    NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,
+    /termeni`). It was OpenNext *serving*: `open-next.config.ts` had no incremental cache, so SSG `[slug]`
+    pages fell through to on-demand render IN THE WORKER, where `lib/content.ts` reads the markdown via `fs`
+    — which Workers lacks — → `notFound()` → 404 (same reason the runtime sitemap returned only the homepage;
+    pure-static `/` survived because its component never touches `fs`). FIX (committed): `open-next.config.ts`
+    → `incrementalCache: staticAssetsIncrementalCache` (read-only; serves prerendered pages from the ASSETS
+    binding). See `docs/DEV_NOTES.md` "SSG 404 on OpenNext without an incremental cache".
+  - **I1 — Re-open the lead card (DECIDED: inline CTAs only).** The card fires once/session then is
+    unreachable. Wire existing homepage CTA buttons (hero secondary + final CTA section) to open the card.
+    NO new floating element, NO sticky-bar change (WhatsApp stays the primary channel). Card stays mounted in
+    HomePage; the trigger calls the existing open handler.
+  - **I2 — Number typed then ✕ → no email (DECIDED: anonymous count, no outreach).** NOT a code bug — the
+    abandoned-rescue is GDPR-gated OFF by design. Decision: on ✕/idle with a complete number, log a
+    `lead_abandoned` event via the cookieless counter (`/api/c`) — store NO number, contact no one. Legally
+    clean: under RO/GDPR + ePrivacy, emailing/calling an *unsubmitted* number needs BOTH a lawful basis AND
+    ePrivacy consent for the contact; pre-consent partial data must stay analytics-only. Keep
+    `EW_RESCUE_ENABLED=false`; do NOT wire the rescue beacon to send. (Research grounding in chat: formcrafts /
+    enzuzo / igdpr.)
+  - **I3 — Sticky bottom bar covers the last section (CSS).** The fixed call/WhatsApp bar overlaps the final
+    content on scroll. Fix: bottom padding on the page/last section = bar height + `env(safe-area-inset-bottom)`
+    so content clears the bar. No decision needed.
   - **Branded not-found / error pages (platform-level — benefits every client):** add a shared
     `src/app/not-found.tsx` (404) + `src/app/error.tsx` (runtime error boundary), theme-driven so a
     bad/expired link degrades gracefully instead of the raw Next break. Keep generic + theme-styled (no
@@ -277,15 +327,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   - **Header-injection: verified safe** (phone is digit-normalized, `source` is now CR/LF-stripped +
     capped, to/from are env constants, Resend is a JSON API). Documented in `resend.ts`.
   - Turnstile keys surfaced in the DevBanner env checks (`app/layout.tsx`).
-- **#3 Turnstile — IN PROGRESS (2026-06-29):** Turnstile site created for electrowill.ro.
-  `NEXT_PUBLIC_TURNSTILE_SITE_KEY` set as a **Build** variable + deployed — widget renders live on the lead
-  card (site key confirmed live). `TURNSTILE_SECRET_KEY` added as a runtime Worker Secret but **NOT yet
-  bound — no deploy since adding it.** ⚠️ **Until the next deploy binds the secret, submit enforcement is
-  OFF (honeypot only).** **DEFERRED CHECK (run after the next deploy):** console no-token POST to
-  `/api/lead` must flip `{success:true}` → 403 `Verificare eșuată`, AND the real popup must still submit in
-  a CLEAN browser (an ad blocker stops the widget solving → false 403). First confirm the secret sits in the
-  **runtime** Settings → Variables and Secrets (NOT the Build card) or it stays ignored. Batch this onto the
-  route-gating deploy below.
+- **#3 Turnstile — ENFORCED + VERIFIED (2026-06-29):** site key (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, Build var)
+  + secret (`TURNSTILE_SECRET_KEY`, runtime Worker Secret) both live; the route-gating deploy bound the secret.
+  Negative test PASSED: no-token POST to `/api/lead` → **403 `Verificare eșuată. Reîncearcă.`** (was
+  `{success:true}`), no email. The 403 is the proof the secret is runtime-bound — the Cloudflare MCP
+  (`workers_get_worker`) returns only name/id and can't read secret bindings. ⚠️ **Still owed:** the POSITIVE
+  test (CLEAN browser, real widget solve → success + email to electrowillsolutions@gmail.com). Ad blockers
+  block the widget → false 403, so a clean browser is mandatory.
 - **#3 still-to-do (Phase G):** Cloudflare edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`,
   ≈ 30/min/IP on `/api/c`) + Bot Fight Mode. (Rate-limiting is Cloudflare-native, not Upstash.)
 - **WhatsApp — wiring verified OK:** `WhatsAppButton` → `WHATSAPP_URL = https://wa.me/40750447426`
