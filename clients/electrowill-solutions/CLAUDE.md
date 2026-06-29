@@ -243,9 +243,22 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **Launch (Phase G) progress:** G1 deploy LIVE; G2 DNS + custom domains LIVE (`https://electrowill.ro`
   loads with padlock); **G3 Resend DONE (2026-06-29)** — FROM commit pushed + deployed green, Resend domain
   Verified, `/api/lead` send-test PASSED (real email from `noreply@electrowill.ro` → electrowillsolutions@gmail.com).
-  **Next:** Turnstile site keys for electrowill.ro (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var +
-  `TURNSTILE_SECRET_KEY` secret). `ADMIN_PASSWORD` intentionally left UNSET (admin/blog OFF for this client;
-  the planned route-gating pass removes `/admin` entirely → moots it).
+  **Next:** route-gating bundle-hardening pass (gate blog/admin/`api/upload`/`api/blog` out of non-blog
+  client builds). That deploy also binds the pending `TURNSTILE_SECRET_KEY` → run the deferred Turnstile
+  enforcement check then (see #3 block). Turnstile site key LIVE; secret added, pending deploy.
+  `ADMIN_PASSWORD` left UNSET (route-gating removes `/admin` → moots it).
+- **Bugfix backlog (Phase I — after launch hardening, not yet scheduled):**
+  - **Lead-card "Detalii" → `/confidentialitate` 404 (seen LIVE 2026-06-29):** the popup consent line
+    ("Lăsând numărul ești de acord… Detalii") links to `/confidentialitate`, which 404s on the live
+    Worker. Most likely cause: Phase F's pages aren't on the live deploy yet (Living state was "awaiting
+    `yarn typecheck`/deploy") — the page DOES exist in the repo as `content/pages/confidentialitate.md`,
+    auto-routed via `[slug]`. ACTION: confirm it resolves after the next deploy (the route-gating deploy
+    should ship it); if it still 404s, debug the `[slug]` markdown route + sitemap.
+  - **Branded not-found / error pages (platform-level — benefits every client):** add a shared
+    `src/app/not-found.tsx` (404) + `src/app/error.tsx` (runtime error boundary), theme-driven so a
+    bad/expired link degrades gracefully instead of the raw Next break. Keep generic + theme-styled (no
+    per-client copies); ElectroWill renders a friendly RO message + "Înapoi acasă" / Sună / WhatsApp CTA.
+    Light, no new deps. Pairs naturally with the Detalii fix above.
 - **Status:** **Phases C + D + F built + per-client favicon done — awaiting `yarn typecheck` on the dev machine.**
   Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
@@ -264,9 +277,17 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   - **Header-injection: verified safe** (phone is digit-normalized, `source` is now CR/LF-stripped +
     capped, to/from are env constants, Resend is a JSON API). Documented in `resend.ts`.
   - Turnstile keys surfaced in the DevBanner env checks (`app/layout.tsx`).
-- **#3 still-to-do (Phase G):** create a Turnstile site for electrowill.ro → set both keys; add Cloudflare
-  edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`, ≈ 30/min/IP on `/api/track`) + Bot Fight Mode.
-  (Per the platform decision, rate-limiting is Cloudflare-native, not Upstash.)
+- **#3 Turnstile — IN PROGRESS (2026-06-29):** Turnstile site created for electrowill.ro.
+  `NEXT_PUBLIC_TURNSTILE_SITE_KEY` set as a **Build** variable + deployed — widget renders live on the lead
+  card (site key confirmed live). `TURNSTILE_SECRET_KEY` added as a runtime Worker Secret but **NOT yet
+  bound — no deploy since adding it.** ⚠️ **Until the next deploy binds the secret, submit enforcement is
+  OFF (honeypot only).** **DEFERRED CHECK (run after the next deploy):** console no-token POST to
+  `/api/lead` must flip `{success:true}` → 403 `Verificare eșuată`, AND the real popup must still submit in
+  a CLEAN browser (an ad blocker stops the widget solving → false 403). First confirm the secret sits in the
+  **runtime** Settings → Variables and Secrets (NOT the Build card) or it stays ignored. Batch this onto the
+  route-gating deploy below.
+- **#3 still-to-do (Phase G):** Cloudflare edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`,
+  ≈ 30/min/IP on `/api/c`) + Bot Fight Mode. (Rate-limiting is Cloudflare-native, not Upstash.)
 - **WhatsApp — wiring verified OK:** `WhatsAppButton` → `WHATSAPP_URL = https://wa.me/40750447426`
   (= 0750447426, correct intl format), `data-track="whatsapp"`. Code is done. ONLY remaining: register a
   **WhatsApp Business account on the 0750447426 SIM** (Orange Yoxo — standard mobile number, verifies fine)
