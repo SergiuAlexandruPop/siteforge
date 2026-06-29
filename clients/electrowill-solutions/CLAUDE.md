@@ -130,8 +130,14 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   Workers Builds import flow only set Worker name + build cmd upfront; branch/deploy-cmd/env vars live under
   the Worker's **Settings** after creation. Deploy cmd `npx wrangler deploy` auto-delegates to
   `opennextjs-cloudflare deploy` and does NOT rebuild (reuses `.open-next`) — fine as-is.
-  **G1 STILL TO DO:** (a) add the 5 env vars under Settings → Variables (ADMIN_SESSION_SECRET as Secret);
-  (b) smoke test the live URL (homepage, sticky bar, favicon, POST /api/lead).
+  **G1 env vars DONE (2026-06-29):** the 4 plain-text vars (ACTIVE_CLIENT, EW_RESCUE_ENABLED=false,
+  RESEND_FROM_EMAIL placeholder, RESEND_TO_EMAIL) live in `wrangler.jsonc` → `vars` (committed, re-applied
+  every deploy); ADMIN_SESSION_SECRET added as an encrypted **Secret** in the dashboard (persists across
+  deploys). WHY the split: dashboard-only plain vars are wiped by `wrangler deploy`; secrets are not — see
+  `docs/DEV_NOTES.md`. Note ADMIN_PASSWORD is NOT set (blog/admin OFF for this client) so admin login is
+  inert anyway — the secret just keeps shared `/admin` routes from 500-ing.
+  **G1 STILL TO DO:** push (so the new `vars` deploy) + smoke test the live URL (homepage, sticky bar,
+  favicon, POST /api/lead).
   **G1 findings to fix (from the build log):**
   - ⚠️ **Duplicate favicon:** the Task-A `git rm src/app/icon.svg` was NEVER done — `src/app/icon.svg`
     (old shared rocket) still coexists with the dynamic `src/app/icon.tsx` (green bolt). Build emits BOTH

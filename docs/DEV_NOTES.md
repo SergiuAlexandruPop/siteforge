@@ -49,6 +49,24 @@ would have been modified by this install, which is explicitly forbidden`.
 
 ---
 
+## Gotcha: dashboard plain-text vars are WIPED by `wrangler deploy` — secrets are not
+
+With Workers Builds, every git push runs `wrangler deploy`, which treats the Wrangler
+config as the source of truth for **plain-text `vars`** and overwrites any plain vars set
+only in the dashboard. **Secrets are never deleted by a deploy** (only `wrangler secret
+delete` removes them). So the rule for any client deployed via Workers Builds:
+
+- **Non-secret config** (e.g. `ACTIVE_CLIENT`, `EW_RESCUE_ENABLED`, `RESEND_FROM_EMAIL`,
+  `RESEND_TO_EMAIL`) → put in `wrangler.jsonc` → `vars` (committed, re-applied every deploy).
+- **Secrets** (e.g. `ADMIN_SESSION_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`,
+  `ADMIN_PASSWORD`) → add as encrypted **Secrets** in the dashboard (or `wrangler secret put`).
+- **`NEXT_PUBLIC_*`** (e.g. `NEXT_PUBLIC_TURNSTILE_SITE_KEY`) is inlined at BUILD time → set as
+  a **Build variable** (Settings → Build), not a runtime var/secret.
+- Alternative (not used here): `keep_vars = true` in the config tells wrangler to leave
+  dashboard vars alone — rejected because vars-in-config is version-controlled + reproducible.
+
+---
+
 ## Gotcha: ESLint crashes in `next build` (circular JSON) — lint gate is a no-op
 
 Seen in the ElectroWill G1 Cloudflare build:
