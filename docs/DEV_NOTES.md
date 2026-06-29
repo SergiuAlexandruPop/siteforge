@@ -82,6 +82,30 @@ incompatible. Build still goes green because a crash isn't counted as a lint fai
 
 ---
 
+## Gotcha: attach the Worker custom domain AFTER the zone is Active, not before
+
+Attaching a Custom Domain to a Worker (Workers → `<worker>` → Settings → Domains & Routes →
+Add → Custom Domain) is what auto-creates the proxied A/AAAA record + SSL for the root and
+`www`. If you do it while the zone is still **"Pending Nameserver Update"** (registrar nameservers
+not yet verified by Cloudflare), the bind **silently creates no record** — no lasting error, just
+nothing routes.
+
+- **Symptom (ElectroWill G2, 2026-06-29):** the account **Domains** list shows the zone **Active**,
+  yet the site won't load — browser shows *"DNS address could not be found / DNS_PROBE_POSSIBLE"*.
+  A DoH/`dig` lookup of the root and `www` returns **NODATA** (NOERROR, no A/AAAA, only the SOA in
+  Authority). The zone itself is fine (e.g. Resend's `resend._domainkey` TXT resolves) — only the
+  Worker routing records are missing.
+- **Fix:** once the zone shows **Active**, (re-)add the two custom domains. If they're already listed
+  in Domains & Routes in a Pending/error state, ⋯ → Remove, then re-add. Records appear immediately;
+  the cert issues within ~1 min. Add NO manual A/CNAME.
+- **Order rule:** switch nameservers → wait for the zone to flip to **Active** → THEN attach the
+  custom domains. (Build other things while the zone propagates; just don't bind the domain early.)
+- **Propagation noise:** public resolvers cache the old NODATA answer for up to ~30 min (SOA negative
+  TTL 1800s), so the site can already work via Cloudflare while `dig @8.8.8.8` still shows nothing.
+  That's propagation, not a misconfiguration.
+
+---
+
 ## Environment Setup (Windows 11 + WebStorm)
 
 ### Prerequisites

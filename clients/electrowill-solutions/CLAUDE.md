@@ -163,11 +163,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   <Digest>` on ONE line (e.g. `2371 13 2 <64-hex>`), NOT Cloudflare's full `electrowill.ro. 3600 IN DS …`
   line (that triggers "DS necorespunzător"). These are the correct + complete manual actions; the rest is
   automatic propagation — do NOT keep re-checking dashboards.
-  **G2 NEXT ACTIVE STEP (do now, self-completes):** attach the custom domain to the Worker —
-  dash.cloudflare.com → **Compute (Workers)** → `electrowill-solutions` → **Settings** → **Domains & Routes**
-  → **Add → Custom Domain** → add `electrowill.ro`, then again `www.electrowill.ro`. Cloudflare auto-creates
-  the proxied record + provisions SSL; if DNS isn't fully propagated it just shows "Pending" and finishes on
-  its own. Add NO manual A/CNAME.
+  **G2 CUSTOM DOMAIN — DONE (2026-06-29):** `electrowill.ro` + `www.electrowill.ro` attached to the Worker
+  (Compute (Workers) → `electrowill-solutions` → Settings → Domains & Routes → Add → Custom Domain). Proxied
+  records + SSL auto-created; site loads with padlock at `https://electrowill.ro`. ⚠️ **The FIRST attach
+  attempt silently created NO records** — the zone was still "Pending Nameserver Update", so Cloudflare
+  wouldn't bind the custom domain (symptom: zone shows Active in the account Domains list, but the site won't
+  load — DoH/`dig` returns NODATA for root + `www`). Fix was to re-add the custom domains AFTER the zone
+  flipped to **Active**; records appeared immediately. Order rule + full write-up in `docs/DEV_NOTES.md`.
   **G2 DEFERRED VERIFICATION (a later pass — user does not want to check mid-build). Exact click-paths:**
   1. Zone active — dash.cloudflare.com → Account Home (site list) → status pill next to `electrowill.ro`
      should read **Active** (starts as "Pending Nameserver Update").
@@ -176,25 +178,29 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   3. Custom domain + cert — Workers → `electrowill-solutions` → Settings → Domains & Routes → each domain
      shows **Active** with a cert.
   4. Site loads — visit `https://electrowill.ro` + `https://www.electrowill.ro` → padlock, real site.
-  **G3 RESEND — PLANNED (not executed; plan-first gate applies). Prereqs already met (DNS on Cloudflare).**
-  Decisions locked: sending region **EU** (RO/GDPR); `RESEND_FROM_EMAIL = noreply@electrowill.ro` (override
-  to contact@/lead@ if user prefers). Var split per `docs/DEV_NOTES.md`: `RESEND_API_KEY` = dashboard
-  **Secret**; `RESEND_FROM_EMAIL` = `wrangler.jsonc` `vars` (currently placeholder `noreply@example.ro`).
+  **G3 RESEND — IN PROGRESS (2026-06-29): wiring done; awaiting commit/push + deferred send-test.**
+  Decisions locked: sending region **EU** (RO/GDPR); `RESEND_FROM_EMAIL = noreply@electrowill.ro`. Var split
+  per `docs/DEV_NOTES.md`: `RESEND_API_KEY` = dashboard **Secret**; `RESEND_FROM_EMAIL` = `wrangler.jsonc`
+  `vars` (now `noreply@electrowill.ro`, edited this session — no longer the `noreply@example.ro` placeholder).
   Concept: SPF/DKIM/DMARC DNS records authorize Resend to send as electrowill.ro (else leads spam/bounce).
-  Steps:
-  1. **resend.com** → sign up (free 3,000/mo, 100/day) → **Domains → Add Domain** → `electrowill.ro`,
-     region **EU**. Resend lists DNS records (MX for `send` bounces, SPF TXT, DKIM TXT, optional DMARC TXT).
-  2. Add them in Cloudflare: dash.cloudflare.com → `electrowill.ro` → **DNS → Records → Add record**, one each.
-     ⚠️ Name field: type only `send` / `resend._domainkey` (Cloudflare auto-appends `.electrowill.ro`;
-     typing the full host doubles it). MX/TXT are never proxied — no cloud toggle.
-  3. Verify: Resend auto-checks → **Verified** once propagated. DEFERRED — don't watch; batch into Step 6.
-  4. Resend → **API Keys → Create API Key** (`electrowill-solutions-prod`, Sending access, scope electrowill.ro).
-     Copy the `re_…` key (shown once).
-  5. Wire: `RESEND_API_KEY` → Workers → `electrowill-solutions` → **Settings → Variables and Secrets → Add
-     → Type Secret** → Deploy. `RESEND_FROM_EMAIL` → EDIT `wrangler.jsonc` vars to `noreply@electrowill.ro`
-     (ON GO) + mirror in `env/.env.electrowill-solutions` (user pastes the API key locally too).
-  6. Send-test (the real verification, deferred+batched): re-run the `/api/lead` console POST — a real email
-     should now land in **electrowillsolutions@gmail.com** (was just logging a failure). One test = whole chain.
+  What happened:
+  1. ✅ **Resend domain added** — `electrowill.ro`, region **EU = Ireland (eu-west-1)**, provider detected
+     as Cloudflare. Free tier 3,000/mo · 100/day.
+  2. ✅ **DNS records auto-added via Resend's Cloudflare integration** (the "add automatically" button) —
+     pushed SPF/DKIM/MX straight into the CF zone, so the manual `DNS → Records → Add record` path was NOT
+     needed. (If ever doing it manually: Name field takes only `send` / `resend._domainkey`; CF auto-appends
+     `.electrowill.ro`; MX/TXT never proxied.)
+  3. Verify: Resend shows **Pending** / "Looking for DNS records" → auto-flips to **Verified** on propagation
+     (mins–hours). DEFERRED — don't watch; the send-test below is the real check.
+  4. ✅ **API key created** (`electrowill-solutions-prod`, Sending access, scope electrowill.ro); pasted by
+     user as the `RESEND_API_KEY` **Worker Secret** + into `env/.env.electrowill-solutions`.
+  5. ✅ **`RESEND_FROM_EMAIL` edit DONE (this session):** `wrangler.jsonc` vars + `env/.env.electrowill-solutions`
+     both → `noreply@electrowill.ro` (+ updated the stale "placeholder" comment in `wrangler.jsonc`).
+     **Remaining:** user commits + pushes → the Workers Builds `wrangler deploy` re-applies the new FROM var
+     and runs alongside the already-set `RESEND_API_KEY` secret (no separate dashboard deploy needed).
+  6. **Send-test (real verification, deferred+batched, AFTER the push deploys):** re-run the `/api/lead`
+     console POST — a real email should now land in **electrowillsolutions@gmail.com** (was just logging a
+     failure). One test = whole chain (DNS verified + key + FROM domain). Also confirm Resend domain = Verified.
   **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
   + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.

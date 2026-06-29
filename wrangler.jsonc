@@ -26,11 +26,11 @@
   // Plain-text runtime vars. Kept here (not the dashboard) so every Workers Builds
   // `wrangler deploy` re-applies them — dashboard-only plain vars are wiped on deploy
   // (secrets like ADMIN_SESSION_SECRET are NOT, so those stay in the dashboard).
-  // None are sensitive; RESEND_FROM_EMAIL is a placeholder until G3 (real sender domain).
+  // None are sensitive; RESEND_FROM_EMAIL is the verified sender domain (G3, electrowill.ro).
   "vars": {
     "ACTIVE_CLIENT": "electrowill-solutions",
     "EW_RESCUE_ENABLED": "false",
-    "RESEND_FROM_EMAIL": "noreply@example.ro",
+    "RESEND_FROM_EMAIL": "noreply@electrowill.ro",
     "RESEND_TO_EMAIL": "electrowillsolutions@gmail.com"
   }
 }
