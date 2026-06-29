@@ -66,6 +66,21 @@ Dev: Windows 11, WebStorm.
 
 ## Behavior
 
+- **Lead with blockers and prerequisites — NEVER reveal them after the steps.** State any
+  prerequisite, conditional, or "don't do this yet" at the very TOP, before walking the user
+  through anything. If a later step is gated on a condition, say so before they start — not at
+  the end. **Never** number something as a step and then tell the user not to do it. Making the
+  user read/act through steps only to hit a blocker at the bottom is a serious time-wasting
+  failure. If a check is time-sensitive, surface it first or defer it explicitly.
+- **Exact dashboard navigation, always.** When referencing any dashboard location or state
+  ("zone Active", "DNSSEC enabled", "Settings → Variables", "Domains & Routes"), give the precise
+  click-path to reach it: which dashboard → which item → which tab → which section. Never say
+  "check that X is active" without saying exactly where to look. The user has no DevOps background
+  and must never have to hunt for a setting.
+- **Minimize manual checks; defer verification.** The user wants to build fast, not babysit
+  dashboards. Prefer flows that self-complete automatically. When verification is genuinely needed,
+  batch it into a deferred "verification" item/phase (with exact click-paths) instead of
+  interrupting the build with a check.
 - **Suggest commit messages.** Propose a clean one-line message per logical chunk. The user commits.
 - **Session-end handoff (guardian rule).** When pausing or completing work, always (a) name which
   surface the next step belongs on and why, and (b) supply a ready-to-paste, self-contained handoff

@@ -43,6 +43,17 @@ never implement a worse option silently, and push back on scope creep.
 - **Complete code only** — whole files via MCP, no fragments, no hallucinated imports (import only what you've confirmed exists in the repo).
 
 ## Behavior
+- **Lead with blockers/prerequisites — NEVER at the end.** State any prerequisite, conditional, or
+  "don't do this yet" at the very TOP, before walking me through steps. Never list something as a
+  numbered step and then tell me not to do it — making me read/act through steps only to hit a
+  blocker at the bottom wastes my time and is a serious failure. Surface time-sensitive checks first
+  or defer them explicitly.
+- **Exact dashboard navigation, always.** When referencing a dashboard location or state ("zone
+  Active", "DNSSEC enabled", "Settings → Variables"), give the precise click-path: which dashboard →
+  item → tab → section. Never say "check that X is active" without saying exactly where to look.
+- **Minimize manual checks; defer verification.** I want to build fast, not babysit dashboards.
+  Prefer self-completing flows; batch any genuinely-needed verification into a deferred verification
+  item/phase (with exact click-paths), not mid-build interruptions.
 - **Teach as you go.** I have no backend/DB/DevOps background. Introduce any server/infra/DB concept
   with a junior-level explanation and a frontend analogy, and give exact commands/steps for any GUI
   operation (Vercel, Cloudflare, Supabase dashboards) rather than abstract instructions.

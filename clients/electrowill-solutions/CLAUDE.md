@@ -136,8 +136,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   deploys). WHY the split: dashboard-only plain vars are wiped by `wrangler deploy`; secrets are not — see
   `docs/DEV_NOTES.md`. Note ADMIN_PASSWORD is NOT set (blog/admin OFF for this client) so admin login is
   inert anyway — the secret just keeps shared `/admin` routes from 500-ing.
-  **G1 STILL TO DO:** push (so the new `vars` deploy) + smoke test the live URL (homepage, sticky bar,
-  favicon, POST /api/lead).
+  **G1 SMOKE TEST (2026-06-29):** homepage + sticky Call/WhatsApp bar render correctly on the live URL
+  (H1, 2 services, 3 pași, FAQ, Zona BN, footer legal block all present) — **PASS**. `/api/lead` POST test
+  handed to user (browser-console fetch / curl; valid RO phone → `{success:true}`, no real email until G3
+  RESEND key; `wrangler tail` shows the logged send-failure = graceful-degrade working). Favicon fix
+  (`git rm src/app/icon.svg`) pushed by user 2026-06-29; deploy/verify deferred (low priority, will bug-report
+  if not fixed). Minor non-blocking finds: CountUp stats show "0+" in raw HTML pre-hydration (animate to
+  100+/3+ after JS); `og:image` → `https://electrowill.ro/og-image.jpg` is a placeholder (Phase E asset).
   **G1 findings to fix (from the build log):**
   - ⚠️ **Duplicate favicon:** the Task-A `git rm src/app/icon.svg` was NEVER done — `src/app/icon.svg`
     (old shared rocket) still coexists with the dynamic `src/app/icon.tsx` (green bolt). Build emits BOTH
@@ -152,6 +157,25 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     surface. **Slot:** after G2 (DNS) + G3 (Resend live) as a hardening pass; **pull forward** if any change
     pushes the bundle toward 3 MB. Platform-level change (touches shared `src/app/`), so it benefits every
     non-blog client, not just ElectroWill.
+  **G2 DNS — user actions DONE (2026-06-29):** user switched the domain's nameservers to the Cloudflare
+  pair at ROTLD + confirmed, enabled DNSSEC in Cloudflare, and published the DS at ROTLD (Key Tag 2371,
+  Algorithm 13, Digest Type 2, SHA256). ⚠️ ROTLD DS field format = `<KeyTag> <Algorithm> <DigestType>
+  <Digest>` on ONE line (e.g. `2371 13 2 <64-hex>`), NOT Cloudflare's full `electrowill.ro. 3600 IN DS …`
+  line (that triggers "DS necorespunzător"). These are the correct + complete manual actions; the rest is
+  automatic propagation — do NOT keep re-checking dashboards.
+  **G2 NEXT ACTIVE STEP (do now, self-completes):** attach the custom domain to the Worker —
+  dash.cloudflare.com → **Compute (Workers)** → `electrowill-solutions` → **Settings** → **Domains & Routes**
+  → **Add → Custom Domain** → add `electrowill.ro`, then again `www.electrowill.ro`. Cloudflare auto-creates
+  the proxied record + provisions SSL; if DNS isn't fully propagated it just shows "Pending" and finishes on
+  its own. Add NO manual A/CNAME.
+  **G2 DEFERRED VERIFICATION (a later pass — user does not want to check mid-build). Exact click-paths:**
+  1. Zone active — dash.cloudflare.com → Account Home (site list) → status pill next to `electrowill.ro`
+     should read **Active** (starts as "Pending Nameserver Update").
+  2. DNSSEC active — dash.cloudflare.com → click `electrowill.ro` → left sidebar **DNS** → **Settings** →
+     the **DNSSEC** card should read "DNSSEC is active" (pending until ROTLD publishes the DS).
+  3. Custom domain + cert — Workers → `electrowill-solutions` → Settings → Domains & Routes → each domain
+     shows **Active** with a cert.
+  4. Site loads — visit `https://electrowill.ro` + `https://www.electrowill.ro` → padlock, real site.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)
