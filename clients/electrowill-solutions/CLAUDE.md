@@ -196,11 +196,27 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
      user as the `RESEND_API_KEY` **Worker Secret** + into `env/.env.electrowill-solutions`.
   5. ✅ **`RESEND_FROM_EMAIL` edit DONE (this session):** `wrangler.jsonc` vars + `env/.env.electrowill-solutions`
      both → `noreply@electrowill.ro` (+ updated the stale "placeholder" comment in `wrangler.jsonc`).
-     **Remaining:** user commits + pushes → the Workers Builds `wrangler deploy` re-applies the new FROM var
-     and runs alongside the already-set `RESEND_API_KEY` secret (no separate dashboard deploy needed).
-  6. **Send-test (real verification, deferred+batched, AFTER the push deploys):** re-run the `/api/lead`
-     console POST — a real email should now land in **electrowillsolutions@gmail.com** (was just logging a
-     failure). One test = whole chain (DNS verified + key + FROM domain). Also confirm Resend domain = Verified.
+     ⚠️ **Committed but NOT pushed (2026-06-29).** Nothing is live until the push: Workers Builds only
+     re-applies the new FROM var (and runs the already-set `RESEND_API_KEY` secret) on a deploy, which a
+     `git push` to `main` triggers. Until then the live Worker still sends from the `noreply@example.ro`
+     placeholder → Resend rejects sends.
+  6. Send-test = the real verification. **DEFERRED into the G3-VERIFY batch below** (user out of time 2026-06-29).
+
+  **G3-VERIFY — DEFERRED TEST PHASE (batched; do in one sitting when there's time). Order matters:**
+  Prereqs — BOTH must be green before sending, or the test fails:
+  a. **Push the commit** → `git push` to `main` → Cloudflare Workers Builds redeploys. Confirm green:
+     dash.cloudflare.com → **Compute (Workers)** → `electrowill-solutions` → **Deployments** → newest = your commit.
+  b. **Resend domain Verified** → resend.com → left sidebar **Domains** → **electrowill.ro** → status
+     **Verified**, green check on every record row. (DKIM confirmed live 2026-06-29; the `send` SPF + bounce
+     MX were NOT resolving externally yet — if a row shows "not found", re-run the Cloudflare auto-add or add
+     that record manually, then let it verify.)
+  Test — only once a + b are green:
+  c. On `https://electrowill.ro` → DevTools (F12) → Console:
+     `fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'submit',phone:'0750447426',source:'g3-send-test'})}).then(r=>r.json()).then(console.log)`
+  d. **PASS = an email lands in electrowillsolutions@gmail.com** (check spam too) from `noreply@electrowill.ro`.
+     ⚠️ The route returns `{success:true}` even on send failure (graceful degrade) — the JSON is NOT proof,
+     the inbox is. If no email: dash.cloudflare.com → Worker → **Logs → Begin log stream**, re-run (c); a
+     `Lead email failed: …` line quotes the Resend error ("domain not verified" → fix b; "from not allowed" → a not deployed).
   **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
   + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
@@ -223,7 +239,12 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - `public/` — empty. No logo/favicon/og-image yet.
 
 ## Living state   ← AUTO-UPDATED
-- **Last updated:** 2026-06-28
+- **Last updated:** 2026-06-29
+- **Launch (Phase G) progress:** G1 deploy LIVE; G2 DNS + custom domains LIVE (`https://electrowill.ro`
+  loads with padlock); G3 Resend wired (domain added EU, API key set as Worker Secret + local env,
+  `RESEND_FROM_EMAIL` → `noreply@electrowill.ro` **committed but not yet pushed**). G3 send-test deferred
+  to the **G3-VERIFY** batch (see the G3 block in the phase plan). **Next:** push the FROM commit →
+  confirm Resend = Verified → run the send-test.
 - **Status:** **Phases C + D + F built + per-client favicon done — awaiting `yarn typecheck` on the dev machine.**
   Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
