@@ -146,8 +146,12 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     — eslint@9 + `.eslintrc.json` + `eslint-config-next@16.2.9` (ahead of Next 15.5.19) crash the lint step,
     so CI lint isn't actually running. Own task: align versions / migrate to flat config.
   - **Worker ~2.81 MB gzip vs 3 MB free cap (~94%):** unused blog/admin/api-upload/novel/aws-sdk bundled into
-    a non-blog client. Thin headroom → do the route-gating task before the bundle grows. (Static photos are
-    separate assets, do NOT count toward the 3 MB script limit.)
+    a non-blog client. Thin headroom. (Static photos are separate assets, do NOT count toward the 3 MB script limit.)
+    **ROUTE-GATING TASK — accepted into backlog (2026-06-29):** gate blog/admin/`api/upload`/`api/blog` out of
+    non-blog client builds. Removes the dead routes entirely → shrinks the bundle AND cuts the `/admin` attack
+    surface. **Slot:** after G2 (DNS) + G3 (Resend live) as a hardening pass; **pull forward** if any change
+    pushes the bundle toward 3 MB. Platform-level change (touches shared `src/app/`), so it benefits every
+    non-blog client, not just ElectroWill.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)
