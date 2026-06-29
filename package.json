@@ -21,8 +21,8 @@
     "dev:portfolio": "tsx scripts/dev.ts portfolio",
     "build:portfolio": "cross-env ACTIVE_CLIENT=portfolio tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=portfolio next build",
     "dev:electrowill-solutions": "tsx scripts/dev.ts electrowill-solutions",
-    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions next build",
-    "build:cf:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions opennextjs-cloudflare build",
+    "build:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/build.ts next",
+    "build:cf:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/build.ts cf",
     "preview:cf:electrowill-solutions": "cross-env ACTIVE_CLIENT=electrowill-solutions tsx scripts/gen-active-client.ts && cross-env ACTIVE_CLIENT=electrowill-solutions opennextjs-cloudflare preview"
   },
   "dependencies": {
