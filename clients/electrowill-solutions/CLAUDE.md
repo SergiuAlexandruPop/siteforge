@@ -176,6 +176,27 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   3. Custom domain + cert — Workers → `electrowill-solutions` → Settings → Domains & Routes → each domain
      shows **Active** with a cert.
   4. Site loads — visit `https://electrowill.ro` + `https://www.electrowill.ro` → padlock, real site.
+  **G3 RESEND — PLANNED (not executed; plan-first gate applies). Prereqs already met (DNS on Cloudflare).**
+  Decisions locked: sending region **EU** (RO/GDPR); `RESEND_FROM_EMAIL = noreply@electrowill.ro` (override
+  to contact@/lead@ if user prefers). Var split per `docs/DEV_NOTES.md`: `RESEND_API_KEY` = dashboard
+  **Secret**; `RESEND_FROM_EMAIL` = `wrangler.jsonc` `vars` (currently placeholder `noreply@example.ro`).
+  Concept: SPF/DKIM/DMARC DNS records authorize Resend to send as electrowill.ro (else leads spam/bounce).
+  Steps:
+  1. **resend.com** → sign up (free 3,000/mo, 100/day) → **Domains → Add Domain** → `electrowill.ro`,
+     region **EU**. Resend lists DNS records (MX for `send` bounces, SPF TXT, DKIM TXT, optional DMARC TXT).
+  2. Add them in Cloudflare: dash.cloudflare.com → `electrowill.ro` → **DNS → Records → Add record**, one each.
+     ⚠️ Name field: type only `send` / `resend._domainkey` (Cloudflare auto-appends `.electrowill.ro`;
+     typing the full host doubles it). MX/TXT are never proxied — no cloud toggle.
+  3. Verify: Resend auto-checks → **Verified** once propagated. DEFERRED — don't watch; batch into Step 6.
+  4. Resend → **API Keys → Create API Key** (`electrowill-solutions-prod`, Sending access, scope electrowill.ro).
+     Copy the `re_…` key (shown once).
+  5. Wire: `RESEND_API_KEY` → Workers → `electrowill-solutions` → **Settings → Variables and Secrets → Add
+     → Type Secret** → Deploy. `RESEND_FROM_EMAIL` → EDIT `wrangler.jsonc` vars to `noreply@electrowill.ro`
+     (ON GO) + mirror in `env/.env.electrowill-solutions` (user pastes the API key locally too).
+  6. Send-test (the real verification, deferred+batched): re-run the `/api/lead` console POST — a real email
+     should now land in **electrowillsolutions@gmail.com** (was just logging a failure). One test = whole chain.
+  **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
+  + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
 
 ## Open inputs needed (collect at the relevant phase)
