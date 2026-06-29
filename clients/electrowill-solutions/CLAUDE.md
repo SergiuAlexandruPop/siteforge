@@ -178,7 +178,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   3. Custom domain + cert — Workers → `electrowill-solutions` → Settings → Domains & Routes → each domain
      shows **Active** with a cert.
   4. Site loads — visit `https://electrowill.ro` + `https://www.electrowill.ro` → padlock, real site.
-  **G3 RESEND — IN PROGRESS (2026-06-29): wiring done; awaiting commit/push + deferred send-test.**
+  **G3 RESEND — DONE (2026-06-29): send-test PASSED — real email from `noreply@electrowill.ro` landed in electrowillsolutions@gmail.com.**
   Decisions locked: sending region **EU** (RO/GDPR); `RESEND_FROM_EMAIL = noreply@electrowill.ro`. Var split
   per `docs/DEV_NOTES.md`: `RESEND_API_KEY` = dashboard **Secret**; `RESEND_FROM_EMAIL` = `wrangler.jsonc`
   `vars` (now `noreply@electrowill.ro`, edited this session — no longer the `noreply@example.ro` placeholder).
@@ -196,13 +196,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
      user as the `RESEND_API_KEY` **Worker Secret** + into `env/.env.electrowill-solutions`.
   5. ✅ **`RESEND_FROM_EMAIL` edit DONE (this session):** `wrangler.jsonc` vars + `env/.env.electrowill-solutions`
      both → `noreply@electrowill.ro` (+ updated the stale "placeholder" comment in `wrangler.jsonc`).
-     ⚠️ **Committed but NOT pushed (2026-06-29).** Nothing is live until the push: Workers Builds only
-     re-applies the new FROM var (and runs the already-set `RESEND_API_KEY` secret) on a deploy, which a
-     `git push` to `main` triggers. Until then the live Worker still sends from the `noreply@example.ro`
-     placeholder → Resend rejects sends.
-  6. Send-test = the real verification. **DEFERRED into the G3-VERIFY batch below** (user out of time 2026-06-29).
+     ✅ **Committed AND pushed (2026-06-29)** → Workers Builds redeployed green; the live Worker now sends
+     from `noreply@electrowill.ro` (confirmed by the passing send-test below).
+  6. ✅ **Send-test PASSED (2026-06-29):** FROM commit pushed → Workers Builds redeployed green; Resend
+     domain Verified; `/api/lead` g3-send-test POST → real email from `noreply@electrowill.ro` landed in
+     electrowillsolutions@gmail.com. G3 Resend COMPLETE.
 
-  **G3-VERIFY — DEFERRED TEST PHASE (batched; do in one sitting when there's time). Order matters:**
+  **G3-VERIFY — ✅ DONE (2026-06-29). Steps that passed, kept for reference:**
   Prereqs — BOTH must be green before sending, or the test fails:
   a. **Push the commit** → `git push` to `main` → Cloudflare Workers Builds redeploys. Confirm green:
      dash.cloudflare.com → **Compute (Workers)** → `electrowill-solutions` → **Deployments** → newest = your commit.
@@ -241,10 +241,11 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 ## Living state   ← AUTO-UPDATED
 - **Last updated:** 2026-06-29
 - **Launch (Phase G) progress:** G1 deploy LIVE; G2 DNS + custom domains LIVE (`https://electrowill.ro`
-  loads with padlock); G3 Resend wired (domain added EU, API key set as Worker Secret + local env,
-  `RESEND_FROM_EMAIL` → `noreply@electrowill.ro` **committed but not yet pushed**). G3 send-test deferred
-  to the **G3-VERIFY** batch (see the G3 block in the phase plan). **Next:** push the FROM commit →
-  confirm Resend = Verified → run the send-test.
+  loads with padlock); **G3 Resend DONE (2026-06-29)** — FROM commit pushed + deployed green, Resend domain
+  Verified, `/api/lead` send-test PASSED (real email from `noreply@electrowill.ro` → electrowillsolutions@gmail.com).
+  **Next:** Turnstile site keys for electrowill.ro (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var +
+  `TURNSTILE_SECRET_KEY` secret). `ADMIN_PASSWORD` intentionally left UNSET (admin/blog OFF for this client;
+  the planned route-gating pass removes `/admin` entirely → moots it).
 - **Status:** **Phases C + D + F built + per-client favicon done — awaiting `yarn typecheck` on the dev machine.**
   Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
