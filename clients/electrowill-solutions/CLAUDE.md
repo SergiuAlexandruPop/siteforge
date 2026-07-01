@@ -123,7 +123,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **B) Build core (Claude Code)** — flip flags (blog/darkMode off), theme, custom layout+homepage+contact, light motion, placeholders.
 - **C) Lead capture** — phone card #3, wa.me handoff, abandoned-number rescue, cookieless counter, phone-first Resend route.
 - **D) Content & SEO** — copy, FAQ (plain RO), zona BN, LocalBusiness/Electrician JSON-LD (areaServed BN, no address).
-- **E) Photos — TOOLING BUILT 2026-07-01 (awaiting the field photos, then swap placeholders):** optimize
+- **E) Photos — TOOLING DONE 2026-07-01 (typecheck green); photo SWAP deferred to Phase O (field photos ~weeks out):** optimize
   fixed set (Sharp: resize/WebP/strip GPS), feature priza-de-pământ, swap placeholders.
   **+ mobile lightbox:** tap a gallery thumbnail → full-size overlay (thumbnails are too small on mobile);
   lean, no heavy dep, keyboard + reduced-motion aware, ≥44px close target.
@@ -142,7 +142,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   - `Lightbox.tsx` (client) + `WorkGallery` rewired to map `GALLERY_ITEMS`. Lightbox = role=dialog/aria-modal,
     focus move + Tab trap, Esc/overlay/✕ (≥44px), ← → paging, reduced-motion-gated. Grid stays server-rendered;
     real tiles carry `data-lightbox-index` and open via a delegated capture-phase click (mirrors TapTracker/I1);
-    placeholder tiles are inert until photos land. **Awaiting `yarn typecheck` + visual QA on the dev machine.**
+    placeholder tiles are inert until photos land. **`yarn typecheck` green 2026-07-01; visual/lightbox QA deferred to Phase O (needs real photos).**
 - **F) Legal** — footer identifiers + Politică confidențialitate + Termeni + ANPC/SOL (user provides certificat de înregistrare).
 - **G) Infra/launch** — electrowill.ro (ROTLD, bought) → Cloudflare DNS (proxied) → **Cloudflare Workers (OpenNext)**;
   Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
@@ -257,8 +257,17 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   the boundaries now, EXTRACT on the SECOND real consumer (avoid premature abstraction that couples clients to
   ElectroWill copy/markup). Trigger = onboarding the next client that wants these. Mirrored as a platform
   Future Phase in `docs/ROADMAP.md`.
-- **K) Copy & legal tone pass** — rewrite ALL user-facing text (legal + homepage) warmer + conversion-friendly
-  while staying accurate. DECIDED (Q3): KEEP legally-required disclosures (e.g. the ANSPDCP complaint right —
+- **K) Copy & legal tone pass — PRIVACY PASS DONE 2026-07-01 (homepage + service-2 left as-is by decision; lawyer review still pending):**
+  rewrite user-facing text warmer + conversion-friendly while staying accurate.
+  **Done 2026-07-01 (`confidentialitate.md`):** (1) cookieless paragraph reworded to lead with reassurance
+  („Fără cookies, fără urmărire, fără bannere enervante”) — the anonymous-tally line KEPT but de-jargoned;
+  legal note: anonymous, no-cookie counting is NOT personal data / not device storage → disclosure not
+  legally required, so this line is trust-only and freely editable. (2) ANSPDCP complaint right reworded to
+  the gentle „scrie-ne întâi, apoi ai dreptul și la ANSPDCP” framing — KEPT because GDPR Art. 13(2)(d) makes
+  the supervisory-authority complaint right a MANDATORY disclosure when personal data (phone) is collected;
+  it can be softened but not removed. Date bumped to iulie 2026. **Homepage + `termeni.md` + the service-2
+  card line left unchanged (already on-brief / decision).** *(Not legal advice — lawyer review before go-live.)*
+  DECIDED (Q3): KEEP legally-required disclosures (e.g. the ANSPDCP complaint right —
   GDPR Art. 13/14 — reworded gently, NOT removed); soften scary lines (the cookieless-tracking sentence →
   reassurance, e.g. "fără cookies, fără urmărire, fără bannere enervante"). Lawyer review before go-live.
 - **L) Service positioning — branșament + plan de instalație electrică (casă) — DECIDED 2026-06-29 · BUILT 2026-07-01** (FAQ entry #6 in `faq.ts` + bridge callout in `ServicesPair`; service-2 card body untouched). For
@@ -299,6 +308,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   verificări PRAM / priză de pământ + buletine, mentenanță; (5) EV charging installs. @growth caveat: capacity
   = 1× grad II + 1× grad III + partner overflow — validate demand + protect quality before scaling;
   branșamentele rămân pâlnia de lead-gen, upsell către cele de mai sus.
+- **O) Photo swap & Phase E close-out (BLOCKED on field photos, ~late Jul 2026) — ADDED 2026-07-01.** The
+  Phase E tooling is built + typecheck-green; this phase runs once the field photos exist. Steps: drop
+  originals in `photos-raw/{hero,gallery}/` → `yarn tsx scripts/optimize-photos.ts` → set each output as
+  `src: '/lucrari/<name>.webp'` in `src/components/electrowill/content/gallery.ts` (priză-de-pământ featured;
+  add a hero `src`/`eager` if a hero shot is chosen) → visual + Lightbox QA (no CLS, lazy load, focus trap,
+  ← →, reduced-motion, ≥44px targets) → replace the `og:image` placeholder + verify no EXIF/GPS in outputs →
+  commit `public/lucrari/*.webp` (NOT `photos-raw/`). Also swap any remaining hatch placeholders (hero, map).
 
 ## Open inputs needed (collect at the relevant phase)
 1. ✅ **DONE (2026-07-01):** ANRE atestat set — `legal.ts → anreAtestat = "Atestat ANRE nr. 22575/R1/18.11.2024
@@ -352,10 +368,14 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   **Phase E TOOLING DONE (2026-07-01):** `scripts/optimize-photos.ts` (Sharp CLI, `photos-raw/{hero,gallery}`
   → `public/lucrari/*.webp`, EXIF/GPS stripped) + `content/gallery.ts` manifest + `PhotoFrame` lazy-`<img>`
   support + accessible `Lightbox` wired into `WorkGallery`. Placeholders untouched until the shoot. ANRE
-  atestat number set (`legal.ts` + `termeni.md`). Awaiting `yarn typecheck` + visual QA on the dev machine.
-  **Next:** shoot the photos → run the optimizer → fill `src` in `gallery.ts` → visual QA → finish Phase E.
-  Phase G remaining — **Bot Fight Mode** (enabled; persistent deferred-check added; reminder 6 Jul),
-  WhatsApp Business reg — then Phases J/K. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
+  atestat number set (`legal.ts` + `termeni.md`). `yarn typecheck` GREEN 2026-07-01; visual QA + photo swap = Phase O.
+  **Phase K privacy pass DONE 2026-07-01:** `confidentialitate.md` cookieless paragraph softened (anonymous
+  tally kept, de-jargoned) + ANSPDCP complaint right reworded gently (mandatory disclosure, kept). Homepage +
+  `termeni.md` + service-2 line left as-is by decision. Lawyer review still pending before go-live.
+  **Next:** photo swap = **Phase O** (BLOCKED on field photos, ~late Jul 2026). Suggested next chunk:
+  **Phase M** (local on-page SEO — higher lead leverage). Phase G remaining is user-action only — **Bot Fight
+  Mode** (enabled; deferred-check added; reminder 6 Jul) + WhatsApp Business reg. Phase J deferred until a 2nd
+  consumer. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,

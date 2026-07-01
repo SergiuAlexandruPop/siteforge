@@ -21,7 +21,7 @@ Nu avem obligația legală de a desemna un responsabil cu protecția datelor (DP
 - **Numărul de telefon** — atunci când îl lași în formularul „Sună-mă" sau ni-l comunici direct, ca să te putem suna înapoi.
 - **E-mailul și mesajul** — dacă ne scrii pe e-mail.
 
-**Nu folosim cookie-uri și nu folosim Google Analytics.** Ca să înțelegem ce butoane sunt apăsate (telefon, WhatsApp, formular), numărăm anonim atingerile, fără să stocăm cookie-uri și fără date care să te identifice. De aceea nu vei vedea un banner de cookie-uri pe site.
+**Fără cookies, fără urmărire, fără bannere enervante.** Nu folosim Google Analytics și nu punem cookie-uri, așa că nu vei vedea niciodată un banner pe site. Ca să știm ce caută oamenii cel mai des (de pildă dacă se apasă mai mult pe „Sună" sau pe „WhatsApp"), ținem doar o socoteală totală, complet anonimă — nu salvăm nimic despre tine și nu putem ști cine ești.
 
 ## De ce le folosim
 
@@ -45,7 +45,7 @@ Păstrăm datele **12 luni** de la ultima interacțiune, apoi le ștergem — cu
 
 Conform GDPR, ai dreptul de **acces**, **rectificare**, **ștergere**, **restricționare**, **opoziție** și **portabilitate** a datelor, precum și dreptul de a-ți **retrage consimțământul**. Pentru oricare dintre ele, scrie-ne la datele de contact de mai sus.
 
-De asemenea, ai dreptul să depui o plângere la **Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP)** — [anspdcp.ro](https://www.dataprotection.ro).
+Dacă vreodată ceva legat de datele tale nu ți se pare în regulă, scrie-ne — rezolvăm cu drag. Iar dacă tot nu ești mulțumit, ai dreptul, potrivit legii, să te adresezi și **Autorității Naționale de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP)** — [anspdcp.ro](https://www.dataprotection.ro).
 
 ## Securitate
 
@@ -55,4 +55,4 @@ Luăm măsuri rezonabile pentru a păstra datele tale în siguranță și pentru
 
 Putem actualiza această politică din când în când. Versiunea curentă este afișată mereu pe această pagină.
 
-*Ultima actualizare: iunie 2026.*
+*Ultima actualizare: iulie 2026.*
