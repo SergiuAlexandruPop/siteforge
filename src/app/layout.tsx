@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 
 import { getClientConfig, getClientTheme, getClientFonts, getClientLayout } from '@/lib/client-config'
+import { getBrand } from '@/lib/brand'
+import { BrandProvider } from '@/components/brand/BrandProvider'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { DevBanner } from '@/components/dev/DevBanner'
 import { ThemeProvider } from '@/components/theme/ThemeProvider'
@@ -107,11 +109,15 @@ export default function RootLayout({
   // --- Resolve layout for the active client ---
   const ClientLayout = getClientLayout()
 
+  // Client-safe brand contact for Client Components (e.g. app/error.tsx) that
+  // can't import the config without pulling the manifest into the client bundle.
+  const brand = getBrand(config)
+
   const appContent = (
     <>
       <JsonLd config={config} />
       <ClientLayout config={config}>
-        {children}
+        <BrandProvider brand={brand}>{children}</BrandProvider>
       </ClientLayout>
 
       {/* Analytics — only loads when GA4 ID is set */}

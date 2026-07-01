@@ -228,8 +228,8 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
   + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
-- **I) Post-launch UX hardening** — ✅ I1 re-open lead card (inline CTAs), ✅ I2 abandoned anonymous-count,
-  ✅ I3 sticky-bar overlap fix (all DONE 2026-07-01); REMAINING: branded 404/error pages. Detail + locked
+- **I) Post-launch UX hardening — ✅ COMPLETE 2026-07-01** — ✅ I1 re-open lead card (inline CTAs), ✅ I2
+  abandoned anonymous-count, ✅ I3 sticky-bar overlap fix, ✅ branded 404/error pages. Detail + locked
   decisions in "Bugfix backlog" above.
 - **J) Platform modularization (PLATFORM-LEVEL)** — extract lead-capture (call popup) + the cookieless
   tap-counter into client-agnostic, flag-gated modules so other clients opt in cleanly. Guardian/@eng: PLAN
@@ -295,10 +295,15 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   `Hero` + `CtaFinal` (kept server-rendered; no floating element, no sticky-bar change). I2 = anonymous
   `lead_abandoned` count to `/api/c` from `useAbandonedNumber` on flush + on true unmount (covers ✕/Esc
   dismiss); NO number sent; `EW_RESCUE_ENABLED` stays false. Also fixed a stale `/api/track` → `/api/c`
-  beacon in `LeadCaptureCard` (`lead_submit`). **Awaiting `yarn typecheck` / build on the dev machine.**
+  beacon in `LeadCaptureCard` (`lead_submit`).
+  **Branded 404/error pages DONE (2026-07-01) — Phase I COMPLETE:** shared `app/not-found.tsx` (server) +
+  `app/error.tsx` (client boundary) render a themed `ErrorState` (`src/components/errors/`) with RO copy +
+  Înapoi acasă / Sună / WhatsApp CTAs. Client-safe `BrandProvider` (`src/components/brand/` + `src/lib/brand.ts`,
+  strings-only context wired in the root layout) feeds the client error boundary brand contact WITHOUT
+  importing the manifest into the client bundle; WhatsApp URL derived from `config.contact.phone`. Platform-level
+  (benefits every client). **Awaiting `yarn typecheck` / build on the dev machine.**
   **Next:** Phase G remaining (#3 rate-limit rules + Bot Fight Mode; WhatsApp Business reg; ANRE atestat nr),
-  then Phases E/J/K + branded 404/error pages (last open Phase I item). `ADMIN_PASSWORD` left UNSET
-  (route-gating removed `/admin`).
+  then Phases E/J/K. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,
@@ -326,11 +331,15 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     `calc(84px+env(safe-area-inset-bottom))` (was a flat `pb-[84px]` that ignored the iOS safe area), and the
     `StickyContactBar` inner bar gained `pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]` so its buttons
     clear the home indicator and its rendered height matches the reserved space.
-  - **Branded not-found / error pages (platform-level — benefits every client):** add a shared
-    `src/app/not-found.tsx` (404) + `src/app/error.tsx` (runtime error boundary), theme-driven so a
-    bad/expired link degrades gracefully instead of the raw Next break. Keep generic + theme-styled (no
-    per-client copies); ElectroWill renders a friendly RO message + "Înapoi acasă" / Sună / WhatsApp CTA.
-    Light, no new deps. Pairs naturally with the Detalii fix above.
+  - ✅ **DONE (2026-07-01) — Branded not-found / error pages (platform-level).** Shared `app/not-found.tsx`
+    (Server) + `app/error.tsx` (Client boundary, `reset()` retry) render a theme-driven `ErrorState`
+    (`src/components/errors/ErrorState.tsx`, generic + `ro`/`en` copy, NO per-client copies). Brand contact
+    reaches the client error boundary via a strings-only `BrandProvider` (`src/components/brand/BrandProvider.tsx`
+    + `src/lib/brand.ts`, wired in the root layout) — avoids pulling the client manifest (server components)
+    into the client bundle; WhatsApp derived from `config.contact.phone`. ElectroWill shows the RO message +
+    Înapoi acasă / Sună acum / Scrie pe WhatsApp; CTAs carry `data-track` so `TapTracker` counts them. No new
+    deps. `global-error.tsx` intentionally skipped (would render without the theme). **This was the last open
+    Phase I item — Phase I COMPLETE.**
 - **Status:** **Phases C + D + F built + per-client favicon done — awaiting `yarn typecheck` on the dev machine.**
   Phase C: phone-capture popup, phone-first Resend route, abandoned-number rescue (GDPR-gated OFF),
   cookieless tap counter. Phase D: real FAQ, Zona town list, Electrician + FAQPage JSON-LD.
