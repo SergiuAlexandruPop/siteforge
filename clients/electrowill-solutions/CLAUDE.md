@@ -258,6 +258,26 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     rejected rewording it). ⚠️ Open check (Phase K): that line claims a *formal* project; it's fine for the
     COMMERCIAL/instituții angle but is NOT the house deliverable — revisit only if it reads as overreach.
   - NOT a separate third service in the UI. Couples with Phase D (content) + K (tone).
+- **M) Local SEO & Google ranking (growth, ongoing) — ADDED 2026-07-01.** Currently INVISIBLE for
+  "branșamente electrice Beclean/Bistrița"; the local incumbent is **ELECTRO APARATAJ SRL** (own site
+  `eap.ro` + `daibau.ro`/`bizoo` directory listings). Bistrița organic SERP is otherwise thin (mostly
+  București/Ilfov firms + the ANRE portal + directories) — real opening. Work: on-page SEO for
+  "branșamente electrice <oraș>" across BN localități (per-locality landing content; reuse
+  `service-area.ts` + the validated colloquial phrases), directory listings (daibau nomenclator, bizoo,
+  local), Electrician + areaServed schema (done Phase D), fast mobile (done). **EMD domain decision
+  (`branșamente-electrice-bistrita.ro`):** keyword domains add ~nothing to Google ranking since 2012 —
+  at most a cheap defensive/redirect buy to electrowill.ro; do NOT build a second site (splits authority).
+  The biggest local lever is **H (Google Business Profile) + reviews**, not the domain. Verify current .ro
+  price at ROTLD before buying.
+- **N) Monetization / revenue growth (business, ongoing) — ADDED 2026-07-01.** Leverage the **TIP-B**
+  atestat (nr. 22575/R1/18.11.2024: proiectare + execuție, civil + industrial, branșamente aeriene/subterane,
+  0,4 kV) — broader than house branșamente. Highest-leverage bets: (1) **PV / prosumatori grid-connection**
+  work (booming with RO subsidies; tip-B 0,4 kV is exactly what racordarea prosumatorilor needs) — partner
+  with fotovoltaice installers; (2) **commercial/industrial** installs + proiectare (bigger tickets than
+  houses); (3) **primării / public tenders** (SEAP/e-licitație; already 3+ primării); (4) **recurring**:
+  verificări PRAM / priză de pământ + buletine, mentenanță; (5) EV charging installs. @growth caveat: capacity
+  = 1× grad II + 1× grad III + partner overflow — validate demand + protect quality before scaling;
+  branșamentele rămân pâlnia de lead-gen, upsell către cele de mai sus.
 
 ## Open inputs needed (collect at the relevant phase)
 1. ⚠️ **STILL NEEDED:** Exact ANRE atestat type + number (not on the certificat); confirm electrician grades.
@@ -302,8 +322,14 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   strings-only context wired in the root layout) feeds the client error boundary brand contact WITHOUT
   importing the manifest into the client bundle; WhatsApp URL derived from `config.contact.phone`. Platform-level
   (benefits every client). **Awaiting `yarn typecheck` / build on the dev machine.**
-  **Next:** Phase G remaining (#3 rate-limit rules + Bot Fight Mode; WhatsApp Business reg; ANRE atestat nr),
-  then Phases E/J/K. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
+  **Rate limiting DONE (2026-07-01) via Workers binding (not WAF):** `wrangler.jsonc` `ratelimits`
+  (`LEAD_RATELIMIT` 5/60s, `COUNTER_RATELIMIT` 60/60s) + `src/lib/rate-limit.ts` (`checkRateLimit`,
+  keyed by CF-Connecting-IP, fails open) enforced in `/api/lead` (429 before Turnstile) + `/api/c`
+  (silent 204). Free WAF rate limiting was rejected (1 rule, Block-only). **Awaiting `yarn typecheck` /
+  CF build on the dev machine.**
+  **Next:** Phase G remaining — **Bot Fight Mode** (user enables + monitors Security → Events; steps handed
+  over), WhatsApp Business reg, ANRE atestat nr — then Phases E/J/K. `ADMIN_PASSWORD` left UNSET
+  (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,
@@ -365,8 +391,14 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   (`workers_get_worker`) returns only name/id and can't read secret bindings. ⚠️ **Still owed:** the POSITIVE
   test (CLEAN browser, real widget solve → success + email to electrowillsolutions@gmail.com). Ad blockers
   block the widget → false 403, so a clean browser is mandatory.
-- **#3 still-to-do (Phase G):** Cloudflare edge **rate-limit rules** (≈ 5/min/IP on `/api/lead`,
-  ≈ 30/min/IP on `/api/c`) + Bot Fight Mode. (Rate-limiting is Cloudflare-native, not Upstash.)
+- **#3 rate limiting — DONE (2026-07-01), Workers binding:** `LEAD_RATELIMIT` 5/60s on `/api/lead`
+  (soft 429 before Turnstile) + `COUNTER_RATELIMIT` 60/60s on `/api/c` (silent 204). In-code via
+  `src/lib/rate-limit.ts` + `wrangler.jsonc` `ratelimits`; keyed by CF-Connecting-IP, fails open outside
+  the CF runtime. Picked over the Free WAF rule (1 rule, Block-only, hard IP block risky on CGNAT mobile).
+  See `docs/DEV_NOTES.md` “Workers Rate Limiting”. **Still-to-do (Phase G, user actions):** enable **Bot
+  Fight Mode** (Security → Settings → Bot traffic → Bot fight mode → On; monitor Security → Events, no CSP
+  so JS Detections is safe; reversible if it challenges real mobile/API traffic) + WhatsApp Business reg
+  + set the ANRE atestat number.
 - **WhatsApp — wiring verified OK:** `WhatsAppButton` → `WHATSAPP_URL = https://wa.me/40750447426`
   (= 0750447426, correct intl format), `data-track="whatsapp"`. Code is done. ONLY remaining: register a
   **WhatsApp Business account on the 0750447426 SIM** (Orange Yoxo — standard mobile number, verifies fine)

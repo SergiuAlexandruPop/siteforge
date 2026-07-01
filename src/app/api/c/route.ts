@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ---------------------------------------------------------------------------
 // POST /api/c  —  cookieless first-party tap counter (ElectroWill Phase C).
@@ -28,6 +29,13 @@ const ALLOWED_EVENTS = new Set([
 ])
 
 export async function POST(request: Request) {
+  // Per-IP rate limit (Workers binding). Over the cap = drop the count silently
+  // (this is fire-and-forget analytics; the beacon ignores the response anyway).
+  const ip = request.headers.get('cf-connecting-ip') ?? 'unknown'
+  if (!(await checkRateLimit('COUNTER_RATELIMIT', `c:${ip}`))) {
+    return new NextResponse(null, { status: 204 })
+  }
+
   let event = 'unknown'
   try {
     const raw = await request.text()

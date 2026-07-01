@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { sendLeadEmail } from '@/lib/resend'
 import { normalizeRoPhone } from '@/lib/phone-ro'
 import { verifyTurnstile } from '@/lib/turnstile'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 // ---------------------------------------------------------------------------
 // POST /api/lead  —  phone-first lead route (ElectroWill Phase C).
@@ -81,6 +82,17 @@ export async function POST(request: Request) {
   // scoped to genuine 'submit' requests from the card.
   // -------------------------------------------------------------------------
   if (kind === 'submit') {
+    // Rate limit (Workers binding) BEFORE the Turnstile verify + email work, so a
+    // flood is shed cheaply. Keyed per client IP; fails open when the binding is
+    // absent (local dev / non-CF build). See src/lib/rate-limit.ts.
+    const ip = getClientIp(request) ?? 'unknown'
+    if (!(await checkRateLimit('LEAD_RATELIMIT', `lead:${ip}`))) {
+      return NextResponse.json(
+        { success: false, error: 'Prea multe încercări. Mai încearcă peste un minut.' },
+        { status: 429 }
+      )
+    }
+
     // Honeypot: a hidden field only bots fill — fake success, send nothing, so
     // the bot never learns it was dropped.
     if (typeof body.trap === 'string' && body.trap.trim() !== '') {

@@ -433,6 +433,24 @@ function getRequiredEnv(key: string): string {
 - Selectors lean on stable accessibility hooks: header `nav[aria-label="Main navigation"]`, theme toggle `button` with aria-label `/Comută la modul/`. Dark mode is asserted via the `dark` class on `<html>` (server default is dark).
 - Vitest and Playwright never collide: Vitest is scoped to `tests/**/*.test.ts`, Playwright to `e2e/**`.
 
+## Workers Rate Limiting (Cloudflare `ratelimit` binding)
+
+- Enforced in-code via `src/lib/rate-limit.ts` (`checkRateLimit`), configured in `wrangler.jsonc` →
+  `ratelimits`. **`period` must be exactly 10 or 60 seconds** — no other values are accepted. Current
+  limiters: `LEAD_RATELIMIT` 5/60s on `/api/lead` (checked before Turnstile) and `COUNTER_RATELIMIT`
+  60/60s on `/api/c`.
+- Chosen over a **Free-plan WAF rate-limiting rule** because Free is capped at **1 rule, Block-only** —
+  the binding covers both endpoints, returns a soft 429 (lead) / silent 204 drop (counter), and lives in
+  the repo.
+- Bindings are reached via OpenNext `getCloudflareContext().env` and typed by augmenting the global
+  `CloudflareEnv` interface inside `rate-limit.ts`. Types are **optional** because the binding is absent
+  outside the Cloudflare runtime — the helper **fails open** so `next dev` / plain `next build` never throttle.
+- Counters are **per-Cloudflare-location + eventually consistent** (abuse mitigation, not exact accounting).
+  Keyed by `CF-Connecting-IP`, kept deliberately generous because carrier-grade NAT (this client's mobile
+  audience) shares IPs. Bindings are **not visible in the dashboard** — observe 429s via Workers Logs.
+
+---
+
 ## Performance Targets
 
 | Metric | Target | Tool |
