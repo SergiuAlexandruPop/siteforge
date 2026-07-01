@@ -72,6 +72,17 @@ export function ServicesPair() {
             </div>
           ))}
         </div>
+
+        {/* Bridge line (Phase L): pairs branșament + house install plan for a casă nouă.
+            Approved verbatim. Presented as a concrete deliverable, never "proiect autorizat". */}
+        <div className="mt-[14px] flex items-start gap-3 rounded-[16px] border border-ew-band-border bg-muted px-5 py-4 lg:mt-7">
+          <span className="mt-[2px] flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-white text-primary">
+            <BoltIcon className="h-[18px] w-[18px]" />
+          </span>
+          <p className="m-0 font-body text-[15px] leading-[1.5] text-foreground lg:text-[16.5px]">
+            Faci casă nouă? Le poți lua împreună — branșament + planul instalației — în funcție de ce ai nevoie.
+          </p>
+        </div>
       </div>
     </section>
   )

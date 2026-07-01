@@ -88,6 +88,12 @@ Dev: Windows 11, WebStorm.
   plan-first gate) — chat memory and Project Instructions do NOT reach Claude Code; only this
   `CLAUDE.md` plus the repo do.
 - **One chat per phase.** New phase or bloated context = tell the user to start a new chat, supply the seed prompt.
+- **Response structure (chat replies).** Structure every substantive reply with these headings, in
+  this order, and include a heading ONLY if it has content — otherwise write that section as "None":
+  **BLOCKERS** → **WHAT I MUST DECIDE** (the user's calls) → **WHAT SHOULD I TEST** → the body of the
+  work → always end with **COMMIT MESSAGES** then **NEXT PROMPT**. NEXT PROMPT = a single,
+  ready-to-send prompt with my recommended choices already baked in (never a menu of
+  options-to-delete) — least friction, move fast.
 
 ---
 

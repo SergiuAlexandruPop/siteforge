@@ -21,10 +21,25 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
 
 export function LeadCaptureManager() {
-  const { open, dismiss } = useLeadCaptureTrigger()
+  const { open, dismiss, openNow } = useLeadCaptureTrigger()
   const prefersReduced = useReducedMotion()
   const cardRef = useRef<HTMLDivElement>(null)
   const beaconedRef = useRef(false)
+
+  // Inline re-open (I1): any server-rendered [data-lead-open] control reopens the
+  // card. One delegated capture-phase listener keeps those CTAs server components
+  // (mirrors TapTracker). Always mounted, so it works independent of `open`.
+  useEffect(() => {
+    const onClick = (event: MouseEvent) => {
+      const node = event.target
+      if (!(node instanceof Element)) return
+      if (!node.closest('[data-lead-open]')) return
+      event.preventDefault()
+      openNow()
+    }
+    document.addEventListener('click', onClick, { capture: true })
+    return () => document.removeEventListener('click', onClick, { capture: true })
+  }, [openNow])
 
   useEffect(() => {
     if (!open) return

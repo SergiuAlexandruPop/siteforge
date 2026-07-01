@@ -15,7 +15,9 @@ import { PHONE_DISPLAY } from './contact'
 export function StickyContactBar() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 lg:hidden">
-      <div className="mx-auto flex max-w-[430px] items-stretch gap-[11px] border-t border-border bg-background px-[18px] py-3 shadow-ew-bar">
+      {/* pt-3 + inset bottom padding: the bar clears the iOS home indicator; the
+          layout reserves the matching 84px + inset on <main> so content clears it. (I3) */}
+      <div className="mx-auto flex max-w-[430px] items-stretch gap-[11px] border-t border-border bg-background px-[18px] pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-ew-bar">
         <CallButton
           className="h-[58px] flex-[1.5] flex-col gap-0 leading-[1.05] text-[16px]"
           hideIcon

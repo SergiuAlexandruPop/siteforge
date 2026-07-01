@@ -228,8 +228,9 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   **G3 remaining (not yet planned in detail):** Turnstile site keys (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` build var
   + `TURNSTILE_SECRET_KEY` secret) for electrowill.ro; strong `ADMIN_PASSWORD`. Plan when user reaches them.
 - **H) Google Business Profile** — full setup as service-area business (hide address) + reviews engine (one-tap review link via WhatsApp/SMS). Dedicated final phase.
-- **I) Post-launch UX hardening** — I1 re-open lead card (inline CTAs), I2 abandoned anonymous-count, I3
-  sticky-bar overlap fix, plus branded 404/error pages. Detail + locked decisions in "Bugfix backlog" above.
+- **I) Post-launch UX hardening** — ✅ I1 re-open lead card (inline CTAs), ✅ I2 abandoned anonymous-count,
+  ✅ I3 sticky-bar overlap fix (all DONE 2026-07-01); REMAINING: branded 404/error pages. Detail + locked
+  decisions in "Bugfix backlog" above.
 - **J) Platform modularization (PLATFORM-LEVEL)** — extract lead-capture (call popup) + the cookieless
   tap-counter into client-agnostic, flag-gated modules so other clients opt in cleanly. Guardian/@eng: PLAN
   the boundaries now, EXTRACT on the SECOND real consumer (avoid premature abstraction that couples clients to
@@ -239,7 +240,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   while staying accurate. DECIDED (Q3): KEEP legally-required disclosures (e.g. the ANSPDCP complaint right —
   GDPR Art. 13/14 — reworded gently, NOT removed); soften scary lines (the cookieless-tracking sentence →
   reassurance, e.g. "fără cookies, fără urmărire, fără bannere enervante"). Lawyer review before go-live.
-- **L) Service positioning — branșament + plan de instalație electrică (casă) — DECIDED 2026-06-29.** For
+- **L) Service positioning — branșament + plan de instalație electrică (casă) — DECIDED 2026-06-29 · BUILT 2026-07-01** (FAQ entry #6 in `faq.ts` + bridge callout in `ServicesPair`; service-2 card body untouched). For
   HOMEOWNERS we do the branșament + an INFORMAL practical **plan/schemă** of the interior layout (unde vin
   prizele, circuitele, tabloul), NOT the wiring labor and NOT a formal ANRE-authorized proiect. ⚠️
   **Liability:** non-binding, NON-authorized guide for the client's own electrician ("like advising a rewire
@@ -276,7 +277,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - `public/` — empty. No logo/favicon/og-image yet.
 
 ## Living state   ← AUTO-UPDATED
-- **Last updated:** 2026-06-29
+- **Last updated:** 2026-07-01
 - **Launch (Phase G) progress:** G1 deploy LIVE; G2 DNS + custom domains LIVE (`https://electrowill.ro`
   loads with padlock); **G3 Resend DONE (2026-06-29)** — FROM commit pushed + deployed green, Resend domain
   Verified, `/api/lead` send-test PASSED (real email from `noreply@electrowill.ro` → electrowillsolutions@gmail.com).
@@ -286,8 +287,18 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   the deploy bound `TURNSTILE_SECRET_KEY`; no-token POST to `/api/lead` → **403 `Verificare eșuată.
   Reîncearcă.`** (was `{success:true}`), no email. **[slug] 404 FIXED** via the OpenNext incremental-cache
   fix (see RESOLVED item below) — `/confidentialitate` + `/termeni` now resolve.
+  **Phase L + I1/I2/I3 BUILT (2026-07-01):** L = house-plan FAQ entry (`faq.ts`, item #6) + bridge
+  callout under the `ServicesPair` grid (both approved-verbatim; service-2 card body untouched). I3 =
+  `<main>` pb → `calc(84px+env(safe-area-inset-bottom))` + matching inset padding on the `StickyContactBar`
+  inner bar. I1 = `openNow()` on `useLeadCaptureTrigger` + a delegated `[data-lead-open]` capture listener
+  in `LeadCaptureManager`, fired by a new inline “Sau lasă-ne numărul — te sunăm noi.” text link in
+  `Hero` + `CtaFinal` (kept server-rendered; no floating element, no sticky-bar change). I2 = anonymous
+  `lead_abandoned` count to `/api/c` from `useAbandonedNumber` on flush + on true unmount (covers ✕/Esc
+  dismiss); NO number sent; `EW_RESCUE_ENABLED` stays false. Also fixed a stale `/api/track` → `/api/c`
+  beacon in `LeadCaptureCard` (`lead_submit`). **Awaiting `yarn typecheck` / build on the dev machine.**
   **Next:** Phase G remaining (#3 rate-limit rules + Bot Fight Mode; WhatsApp Business reg; ANRE atestat nr),
-  then Phases E/I/J/K (see phase plan + Bugfix backlog). `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
+  then Phases E/J/K + branded 404/error pages (last open Phase I item). `ADMIN_PASSWORD` left UNSET
+  (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,
@@ -297,20 +308,24 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     pure-static `/` survived because its component never touches `fs`). FIX (committed): `open-next.config.ts`
     → `incrementalCache: staticAssetsIncrementalCache` (read-only; serves prerendered pages from the ASSETS
     binding). See `docs/DEV_NOTES.md` "SSG 404 on OpenNext without an incremental cache".
-  - **I1 — Re-open the lead card (DECIDED: inline CTAs only).** The card fires once/session then is
-    unreachable. Wire existing homepage CTA buttons (hero secondary + final CTA section) to open the card.
-    NO new floating element, NO sticky-bar change (WhatsApp stays the primary channel). Card stays mounted in
-    HomePage; the trigger calls the existing open handler.
-  - **I2 — Number typed then ✕ → no email (DECIDED: anonymous count, no outreach).** NOT a code bug — the
-    abandoned-rescue is GDPR-gated OFF by design. Decision: on ✕/idle with a complete number, log a
-    `lead_abandoned` event via the cookieless counter (`/api/c`) — store NO number, contact no one. Legally
-    clean: under RO/GDPR + ePrivacy, emailing/calling an *unsubmitted* number needs BOTH a lawful basis AND
-    ePrivacy consent for the contact; pre-consent partial data must stay analytics-only. Keep
-    `EW_RESCUE_ENABLED=false`; do NOT wire the rescue beacon to send. (Research grounding in chat: formcrafts /
-    enzuzo / igdpr.)
-  - **I3 — Sticky bottom bar covers the last section (CSS).** The fixed call/WhatsApp bar overlaps the final
-    content on scroll. Fix: bottom padding on the page/last section = bar height + `env(safe-area-inset-bottom)`
-    so content clears the bar. No decision needed.
+  - ✅ **I1 DONE (2026-07-01) — Re-open the lead card (inline CTAs only).** The card fired once/session
+    then was unreachable. REFINED from “wire existing buttons” (the hero secondary is WhatsApp — hijacking
+    it conflicts with WhatsApp-as-primary; guardian-flagged, user approved) to a dedicated inline text link
+    **“Sau lasă-ne numărul — te sunăm noi.”** in `Hero` + `CtaFinal`. Mechanism: `openNow()` on
+    `useLeadCaptureTrigger` (bypasses the once/session guard) + a delegated `[data-lead-open]` capture-phase
+    listener in `LeadCaptureManager` (`preventDefault` + `openNow`), mirroring `TapTracker` so the links stay
+    server-rendered. No floating element, no sticky-bar change; card stays mounted in HomePage.
+  - ✅ **I2 DONE (2026-07-01) — Number typed then ✕ → anonymous count, no outreach.** On ✕/idle/tab-close
+    with a complete, unsubmitted number, `useAbandonedNumber` now beacons `{event:'lead_abandoned'}` to the
+    cookieless counter `/api/c` (added to its allow-list) with **NO number in the payload** — plus a flush on
+    true unmount so the ✕/Esc/overlay dismiss is counted, not just idle. Legally clean: under RO/GDPR +
+    ePrivacy, emailing/calling an *unsubmitted* number needs BOTH a lawful basis AND ePrivacy consent;
+    pre-consent partial data stays analytics-only. `EW_RESCUE_ENABLED` stays **false** (the `/api/lead`
+    rescue beacon remains accepted-and-dropped). (Research grounding: formcrafts / enzuzo / igdpr.)
+  - ✅ **I3 DONE (2026-07-01) — Sticky bottom bar covered the last section (CSS).** `<main>` pb is now
+    `calc(84px+env(safe-area-inset-bottom))` (was a flat `pb-[84px]` that ignored the iOS safe area), and the
+    `StickyContactBar` inner bar gained `pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]` so its buttons
+    clear the home indicator and its rendered height matches the reserved space.
   - **Branded not-found / error pages (platform-level — benefits every client):** add a shared
     `src/app/not-found.tsx` (404) + `src/app/error.tsx` (runtime error boundary), theme-driven so a
     bad/expired link degrades gracefully instead of the raw Next break. Keep generic + theme-styled (no

@@ -13,7 +13,12 @@ import { normalizeRoPhone } from '@/lib/phone-ro'
 //
 // Privacy: this only builds the MECHANISM. The server route refuses to email
 // abandoned numbers unless EW_RESCUE_ENABLED is set (GDPR lawful basis verified
-// in Phase F), so until then the beacon is accepted and dropped.
+// in Phase F), so until then the /api/lead beacon is accepted and dropped.
+//
+// I2: in parallel we emit ONE anonymous count to /api/c ('lead_abandoned') with
+// NO number in the payload — legally clean analytics (contact no one, store no
+// PII). We also flush on unmount so a ✕/Esc/overlay dismiss with a complete but
+// unsubmitted number is counted, not just idle/tab-close.
 // ---------------------------------------------------------------------------
 
 const IDLE_MS = 3 * 60_000
@@ -53,6 +58,8 @@ export function useAbandonedNumber({
       kind: 'abandoned',
     })
     navigator.sendBeacon('/api/lead', payload)
+    // I2: anonymous count only — no phone in this payload, no outreach.
+    navigator.sendBeacon('/api/c', JSON.stringify({ event: 'lead_abandoned' }))
   })
 
   useEffect(() => {
@@ -73,4 +80,12 @@ export function useAbandonedNumber({
       document.removeEventListener('visibilitychange', onVisibility)
     }
   }, [value])
+
+  // Flush on true unmount only (empty deps): covers dismissing the card (✕ / Esc /
+  // overlay) with a complete, unsubmitted number. sentRef keeps it one-shot; the
+  // `submitted` check inside flush suppresses it after a successful submit.
+  useEffect(() => {
+    const flush = flushRef.current
+    return () => flush()
+  }, [])
 }

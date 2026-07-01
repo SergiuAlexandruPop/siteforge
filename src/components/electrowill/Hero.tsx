@@ -26,7 +26,7 @@ export function Hero() {
           · Răspundem în 12 ore · Ne ocupăm de toate actele.
         </p>
 
-        <div className="mb-[26px] flex flex-col gap-[11px] sm:flex-row sm:gap-[14px]">
+        <div className="mb-[14px] flex flex-col gap-[11px] sm:flex-row sm:gap-[14px]">
           <CallButton className="h-[58px] w-full px-[30px] text-[18px] sm:w-auto lg:h-[62px] lg:text-[19px]">
             Sună acum
           </CallButton>
@@ -37,6 +37,16 @@ export function Hero() {
             Scrie pe WhatsApp
           </WhatsAppButton>
         </div>
+
+        {/* Inline re-open trigger (I1): brings the lead card back after auto-dismiss.
+            Server-rendered; handled by the delegated listener in LeadCaptureManager. */}
+        <button
+          type="button"
+          data-lead-open
+          className="mb-[26px] inline-block font-body text-[15px] font-semibold text-primary underline underline-offset-2 hover:text-foreground"
+        >
+          Sau lasă-ne numărul — te sunăm noi.
+        </button>
 
         <div className="flex flex-wrap items-center gap-x-[22px] gap-y-2 font-body text-[15px] font-bold text-muted-foreground">
           <span className="flex items-center gap-2">

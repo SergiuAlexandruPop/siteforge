@@ -26,8 +26,9 @@ export function ElectroWillLayout({ config, children }: ElectroWillLayoutProps) 
     <div className="flex min-h-screen flex-col font-body text-foreground">
       <ElectroWillHeader navigation={config.navigation} />
 
-      {/* pb-[84px] reserves space for the fixed mobile bottom bar; cleared at lg */}
-      <main className="flex-1 pb-[84px] lg:pb-0">{children}</main>
+      {/* Reserve space for the fixed mobile bottom bar (bar height 84px + iOS
+          home-indicator safe area) so the last section clears it; cleared at lg. (I3) */}
+      <main className="flex-1 pb-[calc(84px+env(safe-area-inset-bottom))] lg:pb-0">{children}</main>
 
       <ElectroWillFooter />
 

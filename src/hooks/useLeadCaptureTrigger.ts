@@ -12,6 +12,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 //   - desktop only: exit-intent (pointer leaves the viewport toward the top)
 //   - NOT on the hero — both signals require the visitor to engage first
 // Dismissing (button, overlay click, Esc) sets the flag so it never returns.
+// `openNow()` is the imperative re-open (I1): it forces the card open regardless
+// of the once/session flag, so inline CTAs can bring it back after auto-dismiss.
 // All browser access is inside useEffect → SSR-safe.
 // ---------------------------------------------------------------------------
 
@@ -31,6 +33,7 @@ function alreadyDismissed(): boolean {
 export function useLeadCaptureTrigger(): {
   open: boolean
   dismiss: () => void
+  openNow: () => void
 } {
   const [open, setOpen] = useState(false)
   const firedRef = useRef(false)
@@ -38,6 +41,13 @@ export function useLeadCaptureTrigger(): {
   const reveal = useCallback(() => {
     if (firedRef.current) return
     if (alreadyDismissed()) return
+    firedRef.current = true
+    setOpen(true)
+  }, [])
+
+  // Imperative re-open (I1): bypasses the once/session guard so an inline CTA
+  // can reopen the card after it was auto-shown and dismissed.
+  const openNow = useCallback(() => {
     firedRef.current = true
     setOpen(true)
   }, [])
@@ -86,5 +96,5 @@ export function useLeadCaptureTrigger(): {
     }
   }, [reveal])
 
-  return { open, dismiss }
+  return { open, dismiss, openNow }
 }

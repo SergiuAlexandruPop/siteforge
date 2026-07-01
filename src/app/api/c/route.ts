@@ -17,7 +17,15 @@ import { NextResponse } from 'next/server'
 // Always 204 — fire-and-forget; the client never waits on this.
 // ---------------------------------------------------------------------------
 
-const ALLOWED_EVENTS = new Set(['call', 'whatsapp', 'lead_open', 'lead_submit'])
+const ALLOWED_EVENTS = new Set([
+  'call',
+  'whatsapp',
+  'lead_open',
+  'lead_submit',
+  // I2: a complete number typed then abandoned (✕ / idle / tab-close). Anonymous
+  // count only — the payload carries NO phone number, we contact no one.
+  'lead_abandoned',
+])
 
 export async function POST(request: Request) {
   let event = 'unknown'

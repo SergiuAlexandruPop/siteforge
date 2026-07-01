@@ -65,6 +65,11 @@ never implement a worse option silently, and push back on scope creep.
   carry full context (files to read, the decision/leaning, the plan-first gate) — those surfaces only
   see the repo + `CLAUDE.md`, not this chat.
 - **One chat per phase.** Tell me to start a new chat when a phase finishes or context bloats.
+- **Response structure (chat replies).** Structure every substantive reply with these headings, in
+  order, including a heading ONLY if it has content — otherwise write that section as "None":
+  **BLOCKERS** → **WHAT I MUST DECIDE** → **WHAT SHOULD I TEST** → the body of the work → always end
+  with **COMMIT MESSAGES** then **NEXT PROMPT**. NEXT PROMPT = one ready-to-send prompt with your
+  recommended choices baked in (never a menu of options-to-delete) — least friction, move fast.
 
 ## Docs auto-update (do this without being asked)
 Updating docs is the final step of any task that changed code or made a decision. Do it

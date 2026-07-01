@@ -26,6 +26,15 @@ export function CtaFinal() {
           WhatsApp
         </WhatsAppButton>
       </div>
+
+      {/* Inline re-open trigger (I1): reopens the lead card after auto-dismiss. */}
+      <button
+        type="button"
+        data-lead-open
+        className="mt-6 font-body text-[15.5px] font-semibold text-primary underline underline-offset-2 hover:text-foreground"
+      >
+        Sau lasă-ne numărul — te sunăm noi.
+      </button>
     </section>
   )
 }

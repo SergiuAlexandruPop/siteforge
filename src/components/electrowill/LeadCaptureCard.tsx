@@ -75,8 +75,9 @@ export function LeadCaptureCard({ titleId, onDismiss }: LeadCaptureCardProps) {
       if (!res.ok) throw new Error('request failed')
       setStatus('success')
       if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        // /api/c, NOT /api/track — ad blockers drop any path containing "track".
         navigator.sendBeacon(
-          '/api/track',
+          '/api/c',
           JSON.stringify({ event: 'lead_submit' })
         )
       }

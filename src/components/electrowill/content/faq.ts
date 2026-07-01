@@ -38,6 +38,10 @@ export const FAQ_ITEMS: FaqItem[] = [
     a: 'Da. Ne ocupăm de branșamentul complet — de la stâlp și coborârea cablului până la firidă și contorul montat.',
   },
   {
+    q: 'Îmi faceți și instalația electrică din casă?',
+    a: 'Îți facem branșamentul și planul instalației (unde vin prizele, circuitele, tabloul). Montajul firelor în pereți îl face electricianul tău, după planul nostru — așa știe exact ce are de pus.',
+  },
+  {
     q: 'De ce e importantă priza de pământ?',
     a: 'Te protejează de electrocutare dacă apare o defecțiune. E obligatorie — o montăm corect și primești buletinul de verificare.',
   },
