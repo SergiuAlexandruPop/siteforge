@@ -11,6 +11,11 @@ out/
 dist/
 build/
 
+# Raw field photos (source for scripts/optimize-photos.ts). Only the optimized
+# WebP under clients/*/public/lucrari/ is committed; the originals never are
+# (large, and carry EXIF/GPS until stripped).
+photos-raw/
+
 # Environment files
 .env
 .env.local

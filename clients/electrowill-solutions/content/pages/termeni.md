@@ -18,8 +18,7 @@ Pe site **nu se vând produse sau servicii online** și **nu sunt afișate preț
 - **CUI:** 50544190
 - **Nr. Reg. Com.:** J2024022229009 (EUID ROONRC.J2024022229009)
 - **Activitate principală:** CAEN 4321 — Lucrări de instalații electrice
-- **Autorizare:** electrician autorizat ANRE
-<!-- TODO Phase G: adaugă numărul atestatului ANRE când e disponibil. -->
+- **Autorizare:** electrician autorizat ANRE — Atestat ANRE nr. 22575/R1/18.11.2024 (tip B, 0,4 kV)
 
 ## Zona de servire
 

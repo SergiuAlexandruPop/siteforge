@@ -478,3 +478,23 @@ function getRequiredEnv(key: string): string {
 - [ ] R2 access keys are per-bucket if possible
 - [ ] No secrets in client-side code (check with `grep -r "RESEND_API_KEY" src/`)
 - [ ] HTTPS enabled (automatic on Vercel)
+
+---
+
+## Work photos — `optimize-photos` workflow (ElectroWill, Phase E)
+
+Field photos never enter git raw — they're large and carry EXIF/GPS. The flow:
+
+1. Drop originals into the gitignored `photos-raw/` at the repo root: `photos-raw/hero/` for the
+   hero/wide shots (resized to 1600px) and `photos-raw/gallery/` for gallery tiles (900px).
+2. Run `yarn tsx scripts/optimize-photos.ts`. Sharp auto-rotates (EXIF), resizes (never upscales),
+   encodes WebP q80, and **drops all metadata** (we never call `.withMetadata()`, so EXIF + GPS are
+   gone), writing slugified names to `clients/electrowill-solutions/public/lucrari/*.webp`.
+3. Only the optimized WebP is committed (`photos-raw/` stays ignored).
+4. Set each output as a `src: '/lucrari/<name>.webp'` in
+   `src/components/electrowill/content/gallery.ts`. That manifest is the single source of truth for
+   both the `WorkGallery` grid and the `Lightbox`; a tile with no `src` renders the hatch placeholder.
+
+Why plain `<img>` and not `next/image`: the Cloudflare Workers runtime has no Next image optimizer,
+so `next/image` would 500 on-demand. `PhotoFrame` renders a plain lazy `<img>` inside a fixed-aspect
+frame (no CLS). The optimizer does the resizing that `next/image` normally would, at build/author time.

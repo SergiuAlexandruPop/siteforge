@@ -31,5 +31,5 @@ export const LEGAL: LegalIdentifiers = {
   regCom: 'J2024022229009',
   euid: 'ROONRC.J2024022229009',
   caen: '4321 — Lucrări de instalații electrice',
-  anreAtestat: '',
+  anreAtestat: 'Atestat ANRE nr. 22575/R1/18.11.2024 (tip B, 0,4 kV)',
 }

@@ -123,9 +123,26 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
 - **B) Build core (Claude Code)** — flip flags (blog/darkMode off), theme, custom layout+homepage+contact, light motion, placeholders.
 - **C) Lead capture** — phone card #3, wa.me handoff, abandoned-number rescue, cookieless counter, phone-first Resend route.
 - **D) Content & SEO** — copy, FAQ (plain RO), zona BN, LocalBusiness/Electrician JSON-LD (areaServed BN, no address).
-- **E) Photos** — optimize fixed set (Sharp: resize/WebP/strip GPS), feature priza-de-pământ, swap placeholders.
+- **E) Photos — TOOLING BUILT 2026-07-01 (awaiting the field photos, then swap placeholders):** optimize
+  fixed set (Sharp: resize/WebP/strip GPS), feature priza-de-pământ, swap placeholders.
   **+ mobile lightbox:** tap a gallery thumbnail → full-size overlay (thumbnails are too small on mobile);
   lean, no heavy dep, keyboard + reduced-motion aware, ≥44px close target.
+  **What's built (2026-07-01, against placeholders):**
+  - `scripts/optimize-photos.ts` — tsx Sharp CLI (`yarn tsx scripts/optimize-photos.ts`). Reads gitignored
+    `photos-raw/hero/` (→1600px) + `photos-raw/gallery/` (→900px), auto-rotates (EXIF), WebP q80, **strips
+    EXIF/GPS** (no `.withMetadata()`), slugifies names → `clients/electrowill-solutions/public/lucrari/*.webp`.
+    `photos-raw/` added to `.gitignore`. No new deps (sharp + tsx already present).
+  - `src/components/electrowill/content/gallery.ts` — photo manifest (single source of truth): `GALLERY_ITEMS`
+    `{id, caption, alt, src?, featured}` (priză-de-pământ featured first) + `GALLERY_PHOTOS_WITH_SRC` helper.
+    All `src` intentionally undefined until the shoot → hatch placeholders stay; fill `src: '/lucrari/…webp'`
+    after running the optimizer.
+  - `PhotoFrame.tsx` — new optional `src`/`alt`/`eager` props: renders a plain lazy `<img>` (object-cover,
+    `decoding=async`, `fetchPriority` when eager) when `src` is set; else the unchanged hatch. Plain `<img>`,
+    NOT next/image (no runtime image optimizer on Workers). Fixed-aspect frame reserves the box → no CLS.
+  - `Lightbox.tsx` (client) + `WorkGallery` rewired to map `GALLERY_ITEMS`. Lightbox = role=dialog/aria-modal,
+    focus move + Tab trap, Esc/overlay/✕ (≥44px), ← → paging, reduced-motion-gated. Grid stays server-rendered;
+    real tiles carry `data-lightbox-index` and open via a delegated capture-phase click (mirrors TapTracker/I1);
+    placeholder tiles are inert until photos land. **Awaiting `yarn typecheck` + visual QA on the dev machine.**
 - **F) Legal** — footer identifiers + Politică confidențialitate + Termeni + ANPC/SOL (user provides certificat de înregistrare).
 - **G) Infra/launch** — electrowill.ro (ROTLD, bought) → Cloudflare DNS (proxied) → **Cloudflare Workers (OpenNext)**;
   Resend keys; single CF rate-limit rule on /api/lead + Bot Fight Mode; WhatsApp Business on 0750447426; deploy.
@@ -186,6 +203,10 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   3. Custom domain + cert — Workers → `electrowill-solutions` → Settings → Domains & Routes → each domain
      shows **Active** with a cert.
   4. Site loads — visit `https://electrowill.ro` + `https://www.electrowill.ro` → padlock, real site.
+  5. **Bot Fight Mode active (persistent check)** — dash.cloudflare.com → click `electrowill.ro` → left
+     sidebar **Security** → **Settings** → **Bot traffic** → **Bot fight mode** should read **On**. Then
+     check **Security → Events** periodically to confirm it's challenging bots, NOT real mobile/API traffic
+     (reversible — toggle Off if it ever challenges genuine visitors or `/api/lead`). Reminder scheduled 6 Jul.
   **G3 RESEND — DONE (2026-06-29): send-test PASSED — real email from `noreply@electrowill.ro` landed in electrowillsolutions@gmail.com.**
   Decisions locked: sending region **EU** (RO/GDPR); `RESEND_FROM_EMAIL = noreply@electrowill.ro`. Var split
   per `docs/DEV_NOTES.md`: `RESEND_API_KEY` = dashboard **Secret**; `RESEND_FROM_EMAIL` = `wrangler.jsonc`
@@ -280,8 +301,9 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   branșamentele rămân pâlnia de lead-gen, upsell către cele de mai sus.
 
 ## Open inputs needed (collect at the relevant phase)
-1. ⚠️ **STILL NEEDED:** Exact ANRE atestat type + number (not on the certificat); confirm electrician grades.
-   Set `src/components/electrowill/content/legal.ts → anreAtestat` + `termeni.md` before launch (Phase G).
+1. ✅ **DONE (2026-07-01):** ANRE atestat set — `legal.ts → anreAtestat = "Atestat ANRE nr. 22575/R1/18.11.2024
+   (tip B, 0,4 kV)"` + same string inline in `termeni.md` (TODO removed). Footer now renders the ANRE line
+   (was auto-omitted while empty). (Electrician grades still 1× grad II + 1× grad III per the brief.)
 2. ✅ **DONE (Phase F):** denumire (ELECTROWILL SOLUTIONS S.R.L.), Nr. Reg. Com. (J2024022229009), CUI 50544190,
    sediu social (Sat Măluț, Com. Braniștea, nr. 113) — from certificat de înregistrare 13.09.2024.
 3. Work photos (Phase E). 4. Logo — created at the very end, a later phase (none now; use text wordmark).
@@ -327,9 +349,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   keyed by CF-Connecting-IP, fails open) enforced in `/api/lead` (429 before Turnstile) + `/api/c`
   (silent 204). Free WAF rate limiting was rejected (1 rule, Block-only). **Awaiting `yarn typecheck` /
   CF build on the dev machine.**
-  **Next:** Phase G remaining — **Bot Fight Mode** (user enables + monitors Security → Events; steps handed
-  over), WhatsApp Business reg, ANRE atestat nr — then Phases E/J/K. `ADMIN_PASSWORD` left UNSET
-  (route-gating removed `/admin`).
+  **Phase E TOOLING DONE (2026-07-01):** `scripts/optimize-photos.ts` (Sharp CLI, `photos-raw/{hero,gallery}`
+  → `public/lucrari/*.webp`, EXIF/GPS stripped) + `content/gallery.ts` manifest + `PhotoFrame` lazy-`<img>`
+  support + accessible `Lightbox` wired into `WorkGallery`. Placeholders untouched until the shoot. ANRE
+  atestat number set (`legal.ts` + `termeni.md`). Awaiting `yarn typecheck` + visual QA on the dev machine.
+  **Next:** shoot the photos → run the optimizer → fill `src` in `gallery.ts` → visual QA → finish Phase E.
+  Phase G remaining — **Bot Fight Mode** (enabled; persistent deferred-check added; reminder 6 Jul),
+  WhatsApp Business reg — then Phases J/K. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,
@@ -434,7 +460,7 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     numbers — which carry the card's consent microcopy — are acted on. *(Not legal advice; have a lawyer review.)*
   - Sediu social appears ONLY in /termeni + /confidentialitate (controller identity), never in the footer/homepage.
 - **Phase F known issues / TODO:**
-  - ⚠️ **Atestat ANRE number still missing** — set `LEGAL.anreAtestat` and remove the TODO in `termeni.md` before launch (Phase G).
+  - ✅ **Atestat ANRE number set (2026-07-01)** — `LEGAL.anreAtestat` filled + TODO removed from `termeni.md`.
   - Legal copy is a solid standard draft — **have a lawyer review** the privacy policy + terms before go-live.
 - **What's built (Phase D — content & SEO):**
   - `src/components/electrowill/content/faq.ts` — single source of truth for the 7 FAQ Q&A (colloquial
