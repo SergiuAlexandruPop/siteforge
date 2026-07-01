@@ -288,7 +288,24 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
     rejected rewording it). ⚠️ Open check (Phase K): that line claims a *formal* project; it's fine for the
     COMMERCIAL/instituții angle but is NOT the house deliverable — revisit only if it reads as overreach.
   - NOT a separate third service in the UI. Couples with Phase D (content) + K (tone).
-- **M) Local SEO & Google ranking (growth, ongoing) — ADDED 2026-07-01.** Currently INVISIBLE for
+- **M) Local SEO & Google ranking (growth, ongoing) — LEAN PASS DONE 2026-07-01 (differentiated town pages deliberately SKIPPED).**
+  **Built 2026-07-01:** (1) `/zona-acoperita` coverage hub (`content/pages/zona-acoperita.md`, auto-routed +
+  auto-sitemap + auto-metadata) — SEO frontmatter + county coverage copy weaving the validated colloquial
+  phrases, all 62 UAT (4 orașe + 58 comune) grouped by zonă, internal links to /#servicii /#pasi /contact.
+  (2) `service-area.ts` expanded: `SERVICE_AREA_ORASE` (4) + `SERVICE_AREA_COMUNE` (58) + `SERVICE_AREA_LOCALITIES`
+  (all 62, feeds `areaServed`) + `SERVICE_AREA_HIGHLIGHTS` (12, homepage chips). (3) `ElectroWillJsonLd` `areaServed`
+  now covers all 62 (auto, via the expanded array). (4) `ServiceArea` chips → highlights + a link to the hub.
+  (5) Homepage `<title>` tuned: added optional `ClientSEO.titleDefault` (platform, backward-compatible) used as
+  `title.default` in `app/layout.tsx`; ElectroWill home title = "Branșamente electrice în Bistrița-Năsăud —
+  Autorizați ANRE" (subpage `%s — ElectroWill Solutions` suffix unchanged). Awaiting `yarn typecheck` on the dev machine.
+  **⚠️ DSO CORRECTION:** the electricity distribution operator for BN is **Distribuție Energie Electrică România
+  (DEER), zona Transilvania Nord** (Sucursala Bistrița, str. Vasile Conta 11) — part of Electrica. **NOT Delgaz
+  Grid** (Delgaz does GAS in BN, not electricity). Racordări via the DEER dedicated portal. Used in hub copy.
+  **Guardian decision:** differentiated per-town pages SKIPPED — on a new domain they're doorway/thin-content
+  risk that can suppress the whole site; the local pack (GBP) owns these queries. Revisit ONE page (Beclean)
+  later only if Search Console shows real demand. **The biggest lever remains Phase H (GBP + reviews).**
+  Original context below —
+  Currently INVISIBLE for
   "branșamente electrice Beclean/Bistrița"; the local incumbent is **ELECTRO APARATAJ SRL** (own site
   `eap.ro` + `daibau.ro`/`bizoo` directory listings). Bistrița organic SERP is otherwise thin (mostly
   București/Ilfov firms + the ANRE portal + directories) — real opening. Work: on-page SEO for
@@ -372,10 +389,13 @@ Sitemap: `/` , `/contact` , `/confidentialitate` , `/termeni`. No blog, no `/en`
   **Phase K privacy pass DONE 2026-07-01:** `confidentialitate.md` cookieless paragraph softened (anonymous
   tally kept, de-jargoned) + ANSPDCP complaint right reworded gently (mandatory disclosure, kept). Homepage +
   `termeni.md` + service-2 line left as-is by decision. Lawyer review still pending before go-live.
-  **Next:** photo swap = **Phase O** (BLOCKED on field photos, ~late Jul 2026). Suggested next chunk:
-  **Phase M** (local on-page SEO — higher lead leverage). Phase G remaining is user-action only — **Bot Fight
-  Mode** (enabled; deferred-check added; reminder 6 Jul) + WhatsApp Business reg. Phase J deferred until a 2nd
-  consumer. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
+  **Phase M lean DONE 2026-07-01:** `/zona-acoperita` coverage hub (all 62 UAT grouped by zonă) + `areaServed`
+  → 62 + homepage title tuned + hub link. Differentiated town pages SKIPPED (doorway risk). DSO corrected to
+  DEER Transilvania Nord (not Delgaz). Awaiting `yarn typecheck`.
+  **Next (highest lead leverage): Phase H — Google Business Profile + reviews** (the real local lever; also
+  unlocks `aggregateRating` in the JSON-LD). Then **Phase O** (photo swap, BLOCKED on field photos ~late Jul).
+  Phase G remaining is user-action only — **Bot Fight Mode** (enabled; deferred-check added; reminder 6 Jul) +
+  WhatsApp Business reg. Phase J deferred until a 2nd consumer. `ADMIN_PASSWORD` left UNSET (route-gating removed `/admin`).
 - **Bugfix backlog (Phase I — post-launch UX hardening):**
   - ✅ **RESOLVED — `/confidentialitate` (+ `/termeni`) 404 on the live Worker (2026-06-29):** root cause was
     NOT Phase F content. The build log showed the pages prerendered fine (`● /[slug] → /confidentialitate,

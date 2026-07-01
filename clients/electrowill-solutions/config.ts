@@ -32,8 +32,11 @@ const config: ClientConfig = {
 
   seo: {
     siteName: 'ElectroWill Solutions',
+    // Keyword-first homepage <title> (only the homepage uses title.default);
+    // subpages keep the '%s — ElectroWill Solutions' brand suffix.
+    titleDefault: 'Branșamente electrice în Bistrița-Năsăud — Autorizați ANRE',
     siteDescription:
-      'Branșamente electrice în Bistrița-Năsăud. Autorizați ANRE, răspundem în 12 ore, ne ocupăm de toate actele — la cheie.',
+      'Branșamente electrice în Bistrița-Năsăud, în tot județul. Autorizați ANRE, răspundem în 12 ore, ne ocupăm de toate actele — la cheie.',
     ogImage: '/og-image.jpg',
   },
 

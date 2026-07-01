@@ -48,6 +48,14 @@ export interface ClientSEO {
   siteDescription: string
   /** Path to OG image relative to client's public/ folder */
   ogImage: string
+  /**
+   * Optional keyword-rich title for the HOME page only. When set, it becomes the
+   * metadata `title.default` (which only the homepage falls back to — every other
+   * page sets its own title via the `%s — siteName` template). Lets the homepage
+   * lead with the primary search term while subpage title suffixes stay the brand.
+   * Omit to use `siteName` as the homepage title.
+   */
+  titleDefault?: string
 }
 
 export interface ClientContact {

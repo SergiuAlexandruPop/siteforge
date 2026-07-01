@@ -19,7 +19,7 @@ export function generateMetadata(): Metadata {
 
   return {
     title: {
-      default: config.seo.siteName,
+      default: config.seo.titleDefault ?? config.seo.siteName,
       template: `%s — ${config.seo.siteName}`,
     },
     description: config.seo.siteDescription,

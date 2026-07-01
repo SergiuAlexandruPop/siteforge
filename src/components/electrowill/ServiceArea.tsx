@@ -1,6 +1,6 @@
 import { CallButton } from './CallButton'
 import { MapPinIcon } from './icons'
-import { SERVICE_AREA_LOCALITIES } from './content/service-area'
+import { SERVICE_AREA_HIGHLIGHTS } from './content/service-area'
 
 // ---------------------------------------------------------------------------
 // ServiceArea — "Zona acoperită" card (DESIGN.md §4.8, §5.7).
@@ -26,7 +26,7 @@ export function ServiceArea() {
       </p>
 
       <div className="mb-[18px] flex flex-wrap gap-2">
-        {SERVICE_AREA_LOCALITIES.map((loc) => (
+        {SERVICE_AREA_HIGHLIGHTS.map((loc) => (
           <span
             key={loc}
             className="rounded-full border border-border bg-muted px-3 py-1.5 font-body text-[13px] font-bold text-ew-badge-ink"
@@ -38,6 +38,13 @@ export function ServiceArea() {
           …și toate comunele din jur
         </span>
       </div>
+
+      <a
+        href="/zona-acoperita"
+        className="mb-[18px] inline-block font-body text-[15px] font-semibold text-primary underline underline-offset-2 hover:text-foreground"
+      >
+        Vezi toate localitățile din Bistrița-Năsăud →
+      </a>
 
       <div className="ew-hatch-sm mb-[18px] flex h-[200px] items-center justify-center rounded-[14px] border border-border">
         <span className="rounded-[9px] border border-border bg-white px-3 py-[7px] font-body text-[13px] font-bold text-muted-foreground">
